@@ -6,7 +6,7 @@ export const siteConfig = {
   description:
     "Боты, сайты, Telegram MiniApps и n8n-автоматизации под ключ. Запуск за 48–72 часа или MVP за 3–7 дней с интеграциями и измеримым результатом.",
   domain: "https://ai-delivery.studio",
-  ogImage: "/og",
+  ogImage: "/og.svg",
   logo: "/logo.svg",
   locale: "ru_RU",
   email: "hello@ai-delivery.studio",
