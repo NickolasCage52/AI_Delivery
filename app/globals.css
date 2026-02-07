@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Violet/pink premium theme */
+:root {
+  --bg-primary: #05030A;
+  --bg-secondary: #070014;
+  --bg-elevated: #0B0620;
+  --bg-surface: #12082A;
+  --text-primary: #F3F4F6;
+  --text-secondary: #A1A1B5;
+  --text-muted: #7C7C96;
+  --accent: #8B5CF6;
+  --accent-strong: #A78BFA;
+  --accent-pink: #EC4899;
+  --accent-pink-strong: #F472B6;
+  --hero-glow: rgba(139, 92, 246, 0.18);
+  --section-highlight-color: rgba(236, 72, 153, 0.35);
+  --border-default: rgba(255, 255, 255, 0.08);
+}
+
+@keyframes noiseShift {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, -1px); }
+  50% { transform: translate(1px, 0); }
+  75% { transform: translate(0, 1px); }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial, sans-serif;
+  color-scheme: dark;
+}
+
+/* Noise overlay - subtle texture */
+.noise::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Focus visible for a11y */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Section highlight after scroll-from-hero chip (800ms) */
+#bots.section-highlight,
+#sites.section-highlight,
+#miniapps.section-highlight,
+#n8n.section-highlight {
+  animation: sectionHighlight 800ms ease-out;
+}
+
+/* IntegrationGraph center breathing */
+.integration-graph-breath {
+  transform-origin: 200px 200px;
+  animation: integrationBreath 4s ease-in-out infinite;
+}
+@keyframes integrationBreath {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.03); opacity: 1; }
+}
+
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes sectionHighlight {
+  0% {
+    box-shadow: 0 0 0 0 var(--section-highlight-color);
+  }
+  40% {
+    box-shadow: 0 0 0 8px var(--section-highlight-color), 0 0 40px var(--section-highlight-color);
+  }
+  100% {
+    box-shadow: none;
+  }
+}

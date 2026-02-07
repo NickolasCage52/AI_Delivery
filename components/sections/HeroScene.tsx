@@ -1,0 +1,157 @@
+"use client";
+
+import { memo } from "react";
+import { motion } from "framer-motion";
+import { MagneticButton } from "@/components/fx/MagneticButton";
+import ShaderBackground from "@/components/ui/shader-background";
+import { BusinessCoverageGraph } from "@/components/hero/BusinessCoverageGraph";
+import { Container } from "@/components/ui/Container";
+import { useReducedMotion } from "@/lib/motion";
+import { getHeroBlurClass } from "@/lib/perf/quality";
+import { useQuality } from "@/hooks/useQuality";
+import { useLeadModal } from "@/components/cta";
+import { trackCtaEvent } from "@/lib/analytics/cta";
+
+const HERO = {
+  title: "AI Delivery — быстрые ИИ‑решения под ключ",
+  subtitle:
+    "Боты • сайты • Telegram MiniApps • n8n‑автоматизации. Запускаем за 48–72 часа или собираем MVP за 3–7 дней — чтобы вы сразу увидели результат.",
+  cta1: "Запросить демо и план",
+  cta2: "Смотреть кейсы",
+  bullets: [
+    "Запуск за 48–72 часа или MVP за 3–7 дней",
+    "Измеримый результат: заявки, экономия времени, проверка гипотезы",
+    "Прозрачный процесс: этапы, сроки, что нужно от вас",
+    "Под ключ: инструкции, handoff, поддержка на старт",
+  ],
+  offerNote: "Пилот от 48 ч • MVP 3–7 дней • Интеграции включены",
+};
+
+const HeroFXLayer = memo(function HeroFXLayer() {
+  const quality = useQuality();
+  const blurClass = getHeroBlurClass(quality);
+  const shaderOpacity = quality === "low" ? "opacity-40" : quality === "medium" ? "opacity-55" : "opacity-70";
+  return (
+    <>
+      <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)]" />
+      <div
+        className={`absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.08] ${blurClass.orb1}`}
+        aria-hidden
+      />
+      <div
+        className={`absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.05] ${blurClass.orb2}`}
+        aria-hidden
+      />
+      <ShaderBackground className={`absolute inset-0 z-0 h-full w-full ${shaderOpacity}`} />
+    </>
+  );
+});
+
+const HeroContent = memo(function HeroContent() {
+  const reduced = useReducedMotion();
+  const openModal = useLeadModal();
+
+  return (
+    <>
+      <Container className="relative z-10 py-24 md:py-32 flex flex-col lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+        {/* Left: copy */}
+        <div className="flex-1 max-w-2xl order-2 lg:order-1">
+          <div className="relative rounded-3xl border border-white/10 bg-black/40 p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+            <motion.h1
+              className="text-4xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-5xl lg:text-6xl leading-[1.05] drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
+              initial={reduced ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {HERO.title}
+            </motion.h1>
+            <motion.p
+              className="mt-6 text-lg text-[var(--text-primary)]/80 md:text-xl max-w-xl leading-relaxed"
+              initial={reduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.08 }}
+            >
+              {HERO.subtitle}
+            </motion.p>
+            {/* Benefit bullets */}
+            <ul className="mt-6 md:mt-8 space-y-2 max-w-lg">
+              {HERO.bullets.map((b, i) => (
+                <motion.li
+                  key={b}
+                  className="flex items-center gap-2 text-sm text-[var(--text-primary)]/75"
+                  initial={reduced ? false : { opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.12 + i * 0.04 }}
+                >
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" aria-hidden />
+                  {b}
+                </motion.li>
+              ))}
+            </ul>
+            <motion.p
+              className="mt-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+            >
+              {HERO.offerNote}
+            </motion.p>
+            <motion.div
+              className="mt-8 flex flex-wrap gap-4"
+              initial={reduced ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.2 }}
+            >
+              <MagneticButton
+                href="#contact"
+                variant="primary"
+                size="large"
+                onClick={() => {
+                  trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "hero" });
+                  openModal?.();
+                }}
+              >
+                {HERO.cta1}
+              </MagneticButton>
+              <MagneticButton href="/#cases" variant="secondary" size="large">
+                {HERO.cta2}
+              </MagneticButton>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Right: integration graph (brand visual) */}
+        <div className="flex-shrink-0 flex items-center justify-center order-1 lg:order-2 w-full mx-auto lg:mx-0 lg:flex-1">
+          <BusinessCoverageGraph />
+        </div>
+      </Container>
+
+      {!reduced && (
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[var(--text-muted)]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+        >
+          <span className="text-xs uppercase tracking-widest">Листайте</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            className="h-8 w-5 rounded-full border-2 border-current flex justify-center pt-1"
+          >
+            <motion.span className="h-1.5 w-1 rounded-full bg-current" />
+          </motion.div>
+        </motion.div>
+      )}
+    </>
+  );
+});
+
+export function HeroScene() {
+  return (
+    <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-[var(--bg-primary)]">
+      <HeroFXLayer />
+      <HeroContent />
+    </section>
+  );
+}

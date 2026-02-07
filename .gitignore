@@ -1,0 +1,30 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# build
+.next
+out
+build
+dist
+coverage
+
+# misc
+.DS_Store
+*.pem
+.env*
+!.env.example
+*.log
+npm-debug.log*
+
+# IDE
+.idea
+.vscode
+
+# xlsx extract (if was unzipped in root)
+xlsx_extract
+comp.xlsx.zip
+[Content_Types].xml
+_rels/
+xl/

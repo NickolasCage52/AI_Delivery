@@ -1,0 +1,230 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { LogoMark } from "@/components/brand/LogoMark";
+import { Container } from "@/components/ui/Container";
+import { useLeadModal } from "@/components/cta";
+import { trackCtaEvent } from "@/lib/analytics/cta";
+import { useQuality } from "@/hooks/useQuality";
+
+const ROUTES = [
+  { label: "Главная", href: "/" },
+  { label: "Услуги", href: "/services" },
+  { label: "Кейсы", href: "/cases" },
+  { label: "Insights", href: "/insights" },
+  { label: "О нас", href: "/about" },
+  { label: "Контакты", href: "/contact" },
+  { label: "Стек", href: "/stack" },
+];
+
+const HOME_ANCHORS = [
+  { label: "Цифры", id: "proof" },
+  { label: "Результаты", id: "results" },
+  { label: "Услуги", id: "services" },
+  { label: "Кейсы", id: "cases" },
+  { label: "Insights", id: "insights" },
+  { label: "Процесс", id: "process" },
+  { label: "FAQ", id: "faq" },
+  { label: "Контакты", id: "contact" },
+];
+
+export function Header() {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeAnchor, setActiveAnchor] = useState("results");
+  const openModal = useLeadModal();
+  const quality = useQuality();
+  const isHome = pathname === "/";
+  const blurClass = quality === "low" ? "" : "backdrop-blur-sm";
+  const headerBg = quality === "low" ? "bg-[var(--bg-primary)]/95" : "bg-[var(--bg-primary)]/80";
+  const subHeaderBg = quality === "low" ? "bg-[var(--bg-primary)]/85" : "bg-[var(--bg-primary)]/60";
+
+  useEffect(() => {
+    if (!isHome) return;
+    const sections = HOME_ANCHORS.map((s) => document.getElementById(s.id)).filter(Boolean) as HTMLElement[];
+    if (!sections.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]?.target?.id) setActiveAnchor(visible[0].target.id);
+      },
+      { rootMargin: "-40% 0px -40% 0px", threshold: [0.2, 0.5, 0.75] }
+    );
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, [isHome]);
+
+  const anchorLinks = useMemo(
+    () =>
+      HOME_ANCHORS.map((a) => ({
+        ...a,
+        href: `/#${a.id}`,
+        active: activeAnchor === a.id,
+      })),
+    [activeAnchor]
+  );
+
+  return (
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 ${headerBg} ${blurClass}`}>
+      <Container>
+        <div className="flex h-14 items-center justify-between md:h-16">
+          <Link href="/" className="flex items-center gap-2.5 text-lg font-semibold text-[var(--text-primary)]">
+            <LogoMark size={26} hover={false} className="shrink-0" />
+            <span>AI Delivery</span>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-1">
+            {ROUTES.map((item) => {
+              const isActive =
+                pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive ? "text-[var(--accent)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  }`}
+                >
+                  {item.label}
+                  {isActive && <span className="absolute bottom-1 left-2 right-2 h-px bg-[var(--accent)]/70" aria-hidden />}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                trackCtaEvent({ action: "open-modal", label: "Разобрать задачу", location: "header" });
+                openModal?.();
+              }}
+              className="rounded-lg border border-[var(--accent)]/40 px-4 py-2 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+            >
+              Разобрать задачу за 15 минут
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "header" });
+                openModal?.();
+              }}
+              className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+            >
+              Запросить демо
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className="md:hidden flex flex-col gap-1.5 p-2 text-[var(--text-primary)]"
+            aria-label="Открыть меню"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-expanded={mobileOpen}
+          >
+            <span className={`block h-0.5 w-6 bg-current transition-transform ${mobileOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <span className={`block h-0.5 w-6 bg-current transition-opacity ${mobileOpen ? "opacity-0" : ""}`} />
+            <span className={`block h-0.5 w-6 bg-current transition-transform ${mobileOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+          </button>
+        </div>
+      </Container>
+
+      {isHome && (
+        <div className={`hidden md:block border-t border-white/5 ${subHeaderBg}`}>
+          <Container>
+            <div className="flex items-center gap-3 py-2 text-xs text-[var(--text-secondary)]">
+              {anchorLinks.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className={`rounded-full px-3 py-1 transition-colors ${
+                    item.active ? "bg-white/10 text-[var(--text-primary)]" : "hover:text-[var(--text-primary)]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </Container>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            className={`fixed inset-0 top-14 md:hidden z-40 bg-[var(--bg-primary)]/96 ${blurClass}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setMobileOpen(false)}
+            aria-hidden
+          >
+            <motion.nav
+              className="flex flex-col gap-1 p-6 pt-4"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {ROUTES.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-xl py-3 px-4 text-[var(--text-primary)] font-medium hover:bg-white/5"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              {isHome && (
+                <div className="mt-4 space-y-1 border-t border-white/10 pt-4">
+                  {anchorLinks.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className="block rounded-xl py-2 px-4 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackCtaEvent({ action: "open-modal", label: "Разобрать задачу", location: "mobile-menu" });
+                    openModal?.();
+                    setMobileOpen(false);
+                  }}
+                  className="rounded-xl border border-[var(--accent)]/40 py-3 px-4 text-center text-sm font-medium text-[var(--accent)]"
+                >
+                  Разобрать задачу за 15 минут
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "mobile-menu" });
+                    openModal?.();
+                    setMobileOpen(false);
+                  }}
+                  className="rounded-xl bg-[var(--accent)] py-3 px-4 text-center text-sm font-semibold text-[#09040F]"
+                >
+                  Запросить демо
+                </button>
+              </div>
+            </motion.nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
+  );
+}
