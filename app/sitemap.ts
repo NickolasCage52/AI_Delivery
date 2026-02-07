@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const urls = [...staticRoutes, ...caseRoutes, ...insightRoutes];
 
   return urls.map((path) => ({
-    url: `${siteConfig.domain}${path}`,
+    url: `${siteConfig.siteUrl}${path}`,
     lastModified: now,
     changeFrequency: "weekly",
     priority: path === "" ? 1 : 0.7,

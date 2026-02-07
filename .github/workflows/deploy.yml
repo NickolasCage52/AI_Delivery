@@ -32,6 +32,9 @@ jobs:
         run: npm ci
 
       - name: Build (Next.js export)
+        env:
+          NEXT_PUBLIC_BASE_PATH: /AI_Delivery
+          NEXT_PUBLIC_SITE_URL: https://nickolascage52.github.io
         run: npm run build
 
       - name: Upload artifact
