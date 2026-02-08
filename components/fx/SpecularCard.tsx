@@ -29,6 +29,7 @@ export function SpecularCard({
   const x = useMotionValue(50);
   const y = useMotionValue(50);
   const reduced = useReducedMotion();
+  const hasReveal = Boolean(revealContent);
 
   const handleMove = useRef(
     rafThrottle((e: React.MouseEvent<HTMLDivElement>) => {
@@ -65,15 +66,19 @@ export function SpecularCard({
         />
       )}
       <div className="relative z-10 p-6 md:p-8">
-        {children}
-      </div>
-      {revealContent && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[var(--bg-secondary)]/95 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <div className="px-6 text-center text-sm text-[var(--text-secondary)]">
-            {revealContent}
+        {hasReveal ? (
+          <div className="relative min-h-[200px]">
+            <div className="absolute inset-0 transition-all duration-300 group-hover:opacity-0 group-hover:translate-y-2 group-focus-within:opacity-0 group-focus-within:translate-y-2">
+              {children}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-secondary)]/95 px-6 text-center text-sm text-[var(--text-secondary)] opacity-0 transition-all duration-300 translate-y-2 group-hover:opacity-100 group-hover:-translate-y-2 group-focus-within:opacity-100 group-focus-within:-translate-y-2 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto">
+              {revealContent}
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          children
+        )}
+      </div>
     </motion.div>
   );
 }

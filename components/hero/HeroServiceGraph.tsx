@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import { useQuality } from "@/hooks/useQuality";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 const CENTER = { x: 200, y: 200 };
 const NODE_RADIUS = 140;
@@ -55,8 +57,11 @@ export function HeroServiceGraph() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const reduced = useReducedMotion();
   const quality = useQuality();
-  const showParticles = !reduced && quality !== "low";
-  const particleCount = quality === "high" ? 2 : 1;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInViewport(containerRef);
+  const fx = useFxLifecycle({ enabled: !reduced && quality !== "low", isInViewport: inView });
+  const showParticles = fx.isActive;
+  const particleCount = quality === "high" ? 1 : 1;
 
   const positions = useMemo(() => NODES.map((_, i) => getNodePosition(i)), []);
 
@@ -80,12 +85,14 @@ export function HeroServiceGraph() {
 
   return (
     <div
+      ref={containerRef}
       className="relative flex items-center justify-center w-full max-w-[380px] md:max-w-[420px] mx-auto aspect-square select-none"
-      aria-hidden
+      role="group"
+      aria-label="Граф направлений и сроков"
     >
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
-        className="w-full h-full drop-shadow-[0_0_40px_var(--hero-glow,rgba(86,240,255,0.12))]"
+        className="w-full h-full drop-shadow-[0_0_32px_var(--hero-glow,rgba(86,240,255,0.1))]"
       >
         <defs>
           <linearGradient id="hero-sg-line" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -102,7 +109,7 @@ export function HeroServiceGraph() {
             <stop offset="100%" stopColor="var(--accent, #56F0FF)" stopOpacity="0" />
           </radialGradient>
           <filter id="hero-sg-glow" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -116,7 +123,7 @@ export function HeroServiceGraph() {
           cy={CENTER.y}
           r={NODE_RADIUS + 20}
           fill="url(#hero-sg-center-glow)"
-          className="origin-center animate-[pulse_4s_ease-in-out_infinite]"
+          className={!fx.isActive ? "" : "origin-center animate-[pulse_4s_ease-in-out_infinite]"}
         />
 
         {/* Branches: line + particles per node */}
@@ -200,7 +207,7 @@ export function HeroServiceGraph() {
         {NODES.map((node, i) => {
           const pos = positions[i];
           const isHovered = hoveredId === node.slug;
-          const r = 38;
+          const r = 42;
           return (
             <g
               key={node.slug}
@@ -208,6 +215,8 @@ export function HeroServiceGraph() {
               style={{ pointerEvents: "all" }}
               onMouseEnter={() => setHoveredId(node.slug)}
               onMouseLeave={() => setHoveredId(null)}
+              onFocus={() => setHoveredId(node.slug)}
+              onBlur={() => setHoveredId(null)}
               onClick={() => handleNodeClick(node.slug)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -222,12 +231,29 @@ export function HeroServiceGraph() {
               <circle
                 cx={pos.x}
                 cy={pos.y}
+                r={r + 6}
+                fill="transparent"
+              />
+              <circle
+                cx={pos.x}
+                cy={pos.y}
                 r={isHovered ? r * 1.03 : r}
                 fill="var(--bg-elevated, #0E131C)"
                 stroke={isHovered ? "var(--accent, #56F0FF)" : "rgba(255,255,255,0.15)"}
                 strokeWidth={isHovered ? 2 : 1}
                 className="transition-all duration-200"
+                style={{ willChange: "transform" }}
               />
+              {isHovered && (
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r={r + 10}
+                  fill="none"
+                  stroke="rgba(86,240,255,0.35)"
+                  strokeWidth={1}
+                />
+              )}
               <g pointerEvents="none">
                 {/* Idle: label + timing */}
                 <text

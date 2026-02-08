@@ -15,6 +15,7 @@ export function lerp(a: number, b: number, t: number): number {
 /**
  * Throttle callback to requestAnimationFrame
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function rafThrottle<T extends (...args: any[]) => void>(fn: T): T {
   let rafId: number | null = null;
   let lastArgs: Parameters<T> | null = null;

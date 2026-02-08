@@ -5,6 +5,8 @@ import { useReducedMotion } from "@/lib/motion";
 import { getCanvasDPR, getCanvasTargetFPS } from "@/lib/perf/quality";
 import { useQuality } from "@/hooks/useQuality";
 import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 const NEON_VIOLET = "139, 92, 246";
 const NEON_PINK = "236, 72, 153";
@@ -13,12 +15,14 @@ export function NeuralGridCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduced = useReducedMotion();
   const quality = useQuality();
+  const inView = useInViewport(canvasRef);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView });
   const dpr = getCanvasDPR(quality);
   const targetFPS = getCanvasTargetFPS(quality);
   const frameInterval = 1000 / targetFPS;
 
   useEffect(() => {
-    if (reduced) return;
+    if (!fx.isActive) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -26,7 +30,6 @@ export function NeuralGridCanvas() {
     if (!ctx) return;
 
     let pulsePhase = 0;
-    let hidden = false;
     let lastFrameTime = 0;
 
     const setSize = () => {
@@ -38,7 +41,6 @@ export function NeuralGridCanvas() {
     };
 
     const draw = (now: number) => {
-      if (hidden) return;
       if (targetFPS < 60 && now - lastFrameTime < frameInterval) return;
       lastFrameTime = now;
 
@@ -46,10 +48,10 @@ export function NeuralGridCanvas() {
       const h = canvas.offsetHeight;
       ctx.clearRect(0, 0, w, h);
 
-      pulsePhase += 0.012;
-      const pulse = 0.15 + 0.08 * Math.sin(pulsePhase);
+      pulsePhase += 0.01;
+      const pulse = 0.12 + 0.06 * Math.sin(pulsePhase);
 
-      const step = 48;
+      const step = 60;
       ctx.strokeStyle = `rgba(${NEON_VIOLET}, ${0.06 + pulse * 0.5})`;
       ctx.lineWidth = 0.5;
       for (let x = 0; x <= w + step; x += step) {
@@ -75,21 +77,15 @@ export function NeuralGridCanvas() {
       ctx.stroke();
     };
 
-    const onVisibility = () => {
-      hidden = document.hidden;
-    };
-
     setSize();
     const unsubscribe = rafLoopSubscribe(draw);
     window.addEventListener("resize", setSize);
-    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       unsubscribe();
       window.removeEventListener("resize", setSize);
-      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [reduced, quality, dpr, targetFPS, frameInterval]);
+  }, [fx.isActive, quality, dpr, targetFPS, frameInterval]);
 
   if (reduced) return null;
 

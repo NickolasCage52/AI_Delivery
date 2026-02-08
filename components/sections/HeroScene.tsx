@@ -30,16 +30,20 @@ const HERO = {
 const HeroFXLayer = memo(function HeroFXLayer() {
   const quality = useQuality();
   const blurClass = getHeroBlurClass(quality);
-  const shaderOpacity = quality === "low" ? "opacity-40" : quality === "medium" ? "opacity-55" : "opacity-70";
+  const shaderOpacity =
+    quality === "low" ? "opacity-[0.35]" : quality === "medium" ? "opacity-[0.55]" : "opacity-[0.65]";
   return (
     <>
-      <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)]" />
       <div
-        className={`absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.08] ${blurClass.orb1}`}
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)]"
         aria-hidden
       />
       <div
-        className={`absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.05] ${blurClass.orb2}`}
+        className={`pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.08] ${blurClass.orb1}`}
+        aria-hidden
+      />
+      <div
+        className={`pointer-events-none absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.05] ${blurClass.orb2}`}
         aria-hidden
       />
       <ShaderBackground className={`absolute inset-0 z-0 h-full w-full ${shaderOpacity}`} />

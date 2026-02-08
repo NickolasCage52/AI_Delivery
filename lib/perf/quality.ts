@@ -70,7 +70,7 @@ export function getCanvasTargetFPS(quality?: QualityLevel): number {
   const q = quality ?? getQuality();
   if (q === "low") return 30;
   if (q === "medium") return 45;
-  return 60;
+  return 50;
 }
 
 /**
@@ -78,9 +78,9 @@ export function getCanvasTargetFPS(quality?: QualityLevel): number {
  */
 export function getHeroBlurClass(quality?: QualityLevel): { orb1: string; orb2: string } {
   const q = quality ?? getQuality();
-  if (q === "low") return { orb1: "blur-[40px]", orb2: "blur-[32px]" };
-  if (q === "medium") return { orb1: "blur-[60px]", orb2: "blur-[48px]" };
-  return { orb1: "blur-[100px]", orb2: "blur-[80px]" };
+  if (q === "low") return { orb1: "blur-[32px]", orb2: "blur-[24px]" };
+  if (q === "medium") return { orb1: "blur-[56px]", orb2: "blur-[44px]" };
+  return { orb1: "blur-[80px]", orb2: "blur-[64px]" };
 }
 
 /**

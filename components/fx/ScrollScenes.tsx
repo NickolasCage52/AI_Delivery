@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, ReactNode } from "react";
 import { useReducedMotion } from "@/lib/motion";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 const THESES = [
   { label: "48–72 часа", sub: "Быстрый запуск" },
@@ -23,11 +25,16 @@ export function ScrollScenes({
   const sectionRef = useRef<HTMLElement>(null);
   const thesesRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const inView = useInViewport(sectionRef);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView });
+  const initRef = useRef(false);
+  const triggerRef = useRef<{ kill: () => void; disable: () => void; enable: () => void } | null>(null);
 
   useEffect(() => {
-    if (reduced || !sectionRef.current || !thesesRef.current) return;
+    if (reduced || initRef.current || !inView || !sectionRef.current || !thesesRef.current) return;
+    initRef.current = true;
 
-    let trigger: { kill: () => void } | null = null;
+    let mounted = true;
 
     const run = async () => {
       const gsap = (await import("gsap")).default;
@@ -36,10 +43,12 @@ export function ScrollScenes({
 
       const section = sectionRef.current;
       const theses = thesesRef.current;
-      if (!section || !theses) return;
+      if (!mounted || !section || !theses) return;
+      const isDesktop = window.innerWidth >= 768;
+      if (!isDesktop) return;
 
       const panels = theses.querySelectorAll("[data-thesis]");
-      trigger = ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: section,
         start: "top top",
         end: "+=300%",
@@ -56,14 +65,25 @@ export function ScrollScenes({
             (el as HTMLElement).style.transform = `translateY(${20 - 20 * t}px)`;
           });
         },
-      }) as unknown as { kill: () => void };
+      }) as unknown as { kill: () => void; disable: () => void; enable: () => void };
+      triggerRef.current = trigger;
+      if (!fx.isActive) trigger.disable();
     };
 
     run();
     return () => {
-      trigger?.kill();
+      mounted = false;
+      triggerRef.current?.kill();
+      triggerRef.current = null;
     };
-  }, [reduced]);
+  }, [reduced, inView, fx.isActive]);
+
+  useEffect(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    if (fx.isActive) trigger.enable();
+    else trigger.disable();
+  }, [fx.isActive]);
 
   return (
     <section ref={sectionRef} className={`relative ${className}`}>

@@ -4,6 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useReducedMotion } from "@/lib/motion";
 import { useElementSize } from "@/hooks/useElementSize";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 import { polarToCartesian } from "@/lib/geometry/polar";
 import { useQuality } from "@/hooks/useQuality";
 
@@ -164,7 +166,6 @@ function getTooltipPosition({
   pos: { x: number; y: number };
 }) {
   const dx = pos.x - center.x;
-  const dy = pos.y - center.y;
   const offset = nodeRadius + clamp(size * 0.03, 12, 18);
   let x = dx >= 0 ? pos.x + offset : pos.x - offset - tooltipWidth;
   let y = pos.y - tooltipHeight / 2;
@@ -215,12 +216,15 @@ function BusinessNode({
   const fontSize = layout.labelFontSize;
   const lineHeight = layout.labelLineHeight;
   const textYOffset = lines.length === 2 ? -lineHeight * 0.45 : 0;
+  const hitRadius = layout.nodeRadius + clamp(layout.size * 0.012, 4, 8);
 
   return (
     <g
       className="cursor-pointer outline-none"
       onMouseEnter={() => onHover(node.id)}
       onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(node.id)}
+      onBlur={() => onHover(null)}
       onClick={() => onClick(node.anchor)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -236,6 +240,12 @@ function BusinessNode({
       <circle
         cx={position.x}
         cy={position.y}
+        r={hitRadius}
+        fill="transparent"
+      />
+      <circle
+        cx={position.x}
+        cy={position.y}
         r={layout.nodeRadius}
         fill="var(--bg-elevated)"
         stroke={isHovered ? "var(--accent)" : isActive ? "rgba(139,92,246,0.55)" : "rgba(255,255,255,0.2)"}
@@ -244,8 +254,19 @@ function BusinessNode({
         style={{
           transform: isHovered ? `scale(${layout.hoverScale})` : "scale(1)",
           transformOrigin: `${position.x}px ${position.y}px`,
+          willChange: "transform",
         }}
       />
+      {isHovered && (
+        <circle
+          cx={position.x}
+          cy={position.y}
+          r={layout.nodeRadius + clamp(layout.size * 0.018, 6, 10)}
+          fill="none"
+          stroke="rgba(139,92,246,0.35)"
+          strokeWidth={1}
+        />
+      )}
       <text
         x={position.x}
         y={position.y + textYOffset}
@@ -321,10 +342,12 @@ export function BusinessCoverageGraph() {
   const pathname = usePathname();
   const router = useRouter();
   const { ref: containerRef, size } = useElementSize<HTMLDivElement>(520);
+  const inView = useInViewport(containerRef);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView, debugKey: "graph" });
   const compact = size <= 440;
-  const packetCount = quality === "high" ? PACKET_EDGES.length : quality === "medium" ? 2 : 0;
+  const packetCount = quality === "high" ? 3 : quality === "medium" ? 1 : 0;
   const packetEdges = useMemo(() => PACKET_EDGES.slice(0, packetCount), [packetCount]);
-  const showPackets = !reduced && !compact && packetCount > 0;
+  const showPackets = fx.isActive && !compact && packetCount > 0;
 
   const layout = useMemo(() => {
     const center = { x: size / 2, y: size / 2 };
@@ -332,11 +355,11 @@ export function BusinessCoverageGraph() {
     const outerRadius = size * 0.41;
     const innerRadius = size * 0.28;
     const orbitRadius = size * 0.39;
-    const nodeRadius = clamp(size * 0.088, 32, 54);
-    const hoverScale = compact ? 1.03 : 1.05;
+    const nodeRadius = clamp(size * 0.095, 36, 60);
+    const hoverScale = compact ? 1.04 : 1.06;
     const coreRadius = clamp(size * 0.125, 54, 70);
     const coreInnerRadius = coreRadius * 0.72;
-    const labelFontSize = clamp(size * 0.022, 10, 13);
+    const labelFontSize = clamp(size * 0.024, 11, 15);
     const labelLineHeight = labelFontSize * 1.15;
     const maxChars = compact ? 10 : 16;
     const positions = new Map<string, { x: number; y: number; angle: number }>();
@@ -425,11 +448,11 @@ export function BusinessCoverageGraph() {
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center justify-center w-[clamp(320px,86vw,420px)] sm:w-[clamp(360px,70vw,520px)] lg:w-[clamp(360px,44vw,560px)] aspect-square select-none"
+      className="relative flex flex-col items-center justify-center w-full max-w-[420px] sm:max-w-[520px] lg:max-w-[560px] aspect-square select-none"
     >
       <svg
         viewBox={`0 0 ${layout.size} ${layout.size}`}
-        className="w-full h-full drop-shadow-[0_0_50px_rgba(139,92,246,0.18)]"
+        className="w-full h-full drop-shadow-[0_0_38px_rgba(139,92,246,0.14)]"
         aria-hidden
       >
         <defs>
@@ -447,7 +470,7 @@ export function BusinessCoverageGraph() {
             <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
           </radialGradient>
           <filter id="bcg-glow" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -460,7 +483,7 @@ export function BusinessCoverageGraph() {
           cy={layout.center.y}
           r={(layout.useTwoOrbits ? layout.size * 0.44 : layout.size * 0.42) + layout.nodeRadius * 0.45}
           fill="url(#bcg-core-glow)"
-          className={reduced ? "" : "origin-center animate-[pulse_5s_ease-in-out_infinite]"}
+          className={!fx.isActive ? "" : "origin-center animate-[pulse_5s_ease-in-out_infinite]"}
         />
 
         <GraphEdges
@@ -550,7 +573,7 @@ export function BusinessCoverageGraph() {
 
         return (
           <div
-            className="absolute rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/95 p-4 text-xs text-[var(--text-secondary)] shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
+            className="absolute z-20 pointer-events-auto"
             style={{
               width: tooltipWidth,
               height: tooltipHeight,
@@ -560,16 +583,22 @@ export function BusinessCoverageGraph() {
             onMouseEnter={() => setHoveredId(activeNode.id)}
             onMouseLeave={() => setHoveredId(null)}
           >
-            <div className="text-[11px] uppercase tracking-widest text-[var(--accent)]">{activeNode.label}</div>
-            <div className="mt-1 text-sm text-[var(--text-primary)]">{activeNode.summary}</div>
-            <button
-              type="button"
-              onClick={() => handleNodeClick(activeNode.anchor)}
-              className="mt-3 flex w-full items-center justify-between rounded-full border border-[var(--accent)]/40 px-3 py-1 text-[10px] uppercase tracking-widest text-[var(--accent)] transition hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
-            >
-              <span>Перейти к решению</span>
-              <span aria-hidden>↗</span>
-            </button>
+            <div
+              className="absolute -inset-1 rounded-[20px] bg-gradient-to-r from-[rgba(139,92,246,0.35)] via-[rgba(236,72,153,0.2)] to-[rgba(86,240,255,0.25)] opacity-70 blur-xl"
+              aria-hidden
+            />
+            <div className="relative h-full rounded-2xl border border-white/10 bg-[rgba(10,6,20,0.55)] p-4 text-xs text-[var(--text-secondary)] shadow-[0_18px_40px_rgba(5,5,10,0.45)] backdrop-blur-[10px]">
+              <div className="text-[11px] uppercase tracking-widest text-[var(--accent)]">{activeNode.label}</div>
+              <div className="mt-1 text-sm text-[var(--text-primary)]">{activeNode.summary}</div>
+              <button
+                type="button"
+                onClick={() => handleNodeClick(activeNode.anchor)}
+                className="mt-3 flex w-full items-center justify-between rounded-full border border-[var(--accent)]/40 px-3 py-1 text-[10px] uppercase tracking-widest text-[var(--accent)] transition hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
+              >
+                <span>Перейти к решению</span>
+                <span aria-hidden>↗</span>
+              </button>
+            </div>
           </div>
         );
       })()}

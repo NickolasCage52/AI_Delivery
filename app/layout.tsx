@@ -9,6 +9,7 @@ import { ScrollVelocityBlur } from "@/components/fx/ScrollVelocityBlur";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/lib/seo/metadata";
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/seo/schema";
+import { UiDebugTools } from "@/components/ui/UiDebugTools";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.domain),
@@ -55,6 +56,7 @@ export default function RootLayout({
           <NoiseOverlay />
           <ScrollVelocityBlur />
           <EffectsDebugOverlay />
+          <UiDebugTools />
           <SmoothScroll>{children}</SmoothScroll>
           <StickyCTA />
         </LeadModalProvider>

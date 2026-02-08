@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "@/lib/motion";
 import { getGlowCursorScale } from "@/lib/perf/quality";
 import { useQuality } from "@/hooks/useQuality";
-import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
+import { setFxDebugStatus } from "@/lib/perf/fxDebug";
 
 const DOT_R = 3;
 const CLICKABLE = "a, button, [role=button], [data-cursor-hover], input, select, textarea, [href]";
@@ -17,55 +16,62 @@ function isClickable(el: Element | null): boolean {
 
 export function GlowCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-  const [isCoarse, setIsCoarse] = useState(false);
-  const reduced = useReducedMotion();
+  const [isFine, setIsFine] = useState(false);
   const quality = useQuality();
-  const scale = getGlowCursorScale(reduced ? "low" : quality);
+  const scale = getGlowCursorScale(quality);
 
   useEffect(() => {
-    setMounted(true);
-    setIsCoarse(typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(pointer: fine)");
+    const update = () => setIsFine(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => {
+      media.removeEventListener("change", update);
+    };
   }, []);
 
   useEffect(() => {
+    setFxDebugStatus("cursor", isFine ? "running" : "off");
+  }, [isFine]);
+
+  useEffect(() => {
     const dot = dotRef.current;
-    if (!dot || reduced || !mounted || isCoarse) return;
+    if (!dot || !isFine) return;
 
     const target = { x: 0, y: 0 };
-    let dirty = false;
     let hover = false;
+    let rafId = 0;
+
+    const update = () => {
+      rafId = 0;
+      const scaleVal = hover ? 1.15 : 1;
+      dot.style.transform = `translate3d(${target.x}px, ${target.y}px, 0) translate(-50%,-50%) scale(${scaleVal})`;
+      dot.style.setProperty("--cursor-glow", hover ? "1" : "0.7");
+    };
 
     const onMove = (e: MouseEvent) => {
       target.x = e.clientX;
       target.y = e.clientY;
       hover = isClickable(e.target as Element | null);
-      dirty = true;
+      if (!rafId) rafId = window.requestAnimationFrame(update);
     };
-
-    const unsubscribe = rafLoopSubscribe(() => {
-      if (!dirty) return;
-      const scaleVal = hover ? 1.2 : 1;
-      dot.style.transform = `translate3d(${target.x}px, ${target.y}px, 0) translate(-50%,-50%) scale(${scaleVal})`;
-      dot.style.setProperty("--cursor-glow", hover ? "1" : "0.7");
-      dirty = false;
-    });
 
     window.addEventListener("mousemove", onMove, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", onMove);
-      unsubscribe();
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
-  }, [mounted, reduced, isCoarse, scale]);
+  }, [isFine]);
 
-  if (!mounted || reduced || isCoarse) return null;
+  if (!isFine) return null;
 
   const dotSize = DOT_R * 2;
 
   return (
     <div
-      className="pointer-events-none fixed left-0 top-0 z-[999] hidden md:block"
+      className="pointer-events-none fixed left-0 top-0 z-[1200]"
       aria-hidden
     >
       <div

@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
 import { SectionCTA, useLeadModal } from "@/components/cta";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 const STEPS = [
   {
@@ -51,8 +53,11 @@ export function Process() {
   const lastIndexRef = useRef(-1);
   const reduced = useReducedMotion();
   const openModal = useLeadModal();
+  const inView = useInViewport(sectionRef);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView });
 
-  const triggerRef = useRef<{ kill: () => void } | null>(null);
+  const triggerRef = useRef<{ kill: () => void; disable: () => void; enable: () => void } | null>(null);
+  const initRef = useRef(false);
 
   const applyActiveIndex = useCallback((index: number) => {
     if (index === lastIndexRef.current) return;
@@ -76,16 +81,19 @@ export function Process() {
   }, [applyActiveIndex]);
 
   useEffect(() => {
-    if (reduced || typeof window === "undefined") return;
+    if (reduced || initRef.current || !inView || typeof window === "undefined") return;
     const section = sectionRef.current;
     if (!section) return;
-    const isDesktop = window.innerWidth >= 768;
+    initRef.current = true;
 
+    let mounted = true;
     const run = async () => {
       const gsap = (await import("gsap")).default;
       const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
       gsap.registerPlugin(ScrollTrigger);
 
+      if (!mounted) return;
+      const isDesktop = window.innerWidth >= 768;
       const steps = STEPS.length;
       const t = ScrollTrigger.create({
         trigger: section,
@@ -100,15 +108,24 @@ export function Process() {
           applyActiveIndex(index);
         },
       });
-      triggerRef.current = t as unknown as { kill: () => void };
+      triggerRef.current = t as unknown as { kill: () => void; disable: () => void; enable: () => void };
+      if (!fx.isActive) triggerRef.current?.disable();
     };
 
     run();
     return () => {
+      mounted = false;
       triggerRef.current?.kill?.();
       triggerRef.current = null;
     };
-  }, [reduced]);
+  }, [applyActiveIndex, reduced, inView, fx.isActive]);
+
+  useEffect(() => {
+    const trigger = triggerRef.current as null | { disable: () => void; enable: () => void };
+    if (!trigger) return;
+    if (fx.isActive) trigger.enable();
+    else trigger.disable();
+  }, [fx.isActive]);
 
   return (
     <section

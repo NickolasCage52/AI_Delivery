@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/lib/motion";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 /**
  * Animated "data packets" flowing along lines toward center (CRM).
@@ -11,8 +13,10 @@ import { useReducedMotion } from "@/lib/motion";
 export function DataStreams() {
   const reduced = useReducedMotion();
   const ref = useRef<SVGSVGElement>(null);
+  const inView = useInViewport(ref);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView });
 
-  if (reduced) return null;
+  if (!fx.isActive) return null;
 
   const paths = [
     "M 80 80 Q 200 80 200 200",
@@ -25,7 +29,7 @@ export function DataStreams() {
     <svg
       ref={ref}
       viewBox="0 0 400 400"
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-40"
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-30"
       aria-hidden
     >
       <defs>

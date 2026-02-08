@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState, useMemo, useEffect } from "react";
+import { useMemo, useRef } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import { useQuality } from "@/hooks/useQuality";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 const NODES = [
   { id: "n8n", label: "n8n" },
@@ -44,11 +46,12 @@ export function HeroIntegrationGraph({
   highlightedNodeId = null,
   className = "",
 }: HeroIntegrationGraphProps) {
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [tooltip, setTooltip] = useState<{ label: string; x: number; y: number } | null>(null);
   const reduced = useReducedMotion();
   const quality = useQuality();
-  const lightFx = quality !== "low" && !reduced;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInViewport(containerRef);
+  const fx = useFxLifecycle({ enabled: quality !== "low" && !reduced, isInViewport: inView });
+  const lightFx = fx.isActive;
   const showPackets = lightFx && quality === "high";
   const showBreathing = lightFx;
 
@@ -57,17 +60,18 @@ export function HeroIntegrationGraph({
     []
   );
 
-  const activeNode = highlightedNodeId || hovered;
+  const activeNode = highlightedNodeId;
 
   return (
     <div
+      ref={containerRef}
       className={`absolute inset-0 flex items-center justify-center md:justify-end md:pr-4 lg:pr-8 ${className}`}
       aria-hidden
       style={{ pointerEvents: "none" }}
     >
       <div
         className="relative w-full max-w-[280px] md:max-w-[360px] lg:max-w-[420px] aspect-square opacity-90 md:opacity-100"
-        style={{ filter: "drop-shadow(0 0 40px rgba(86,240,255,0.15))" }}
+        style={{ filter: "drop-shadow(0 0 32px rgba(86,240,255,0.14))" }}
       >
         <svg
           viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -85,7 +89,7 @@ export function HeroIntegrationGraph({
               <stop offset="100%" stopColor="#56F0FF" stopOpacity="0" />
             </radialGradient>
             <filter id="hero-ig-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -183,7 +187,7 @@ export function HeroIntegrationGraph({
 
           {/* Data packets: 2–3 dots along lines (high quality only, slow) */}
           {showPackets &&
-            NODES.slice(0, 3).map((_, i) => (
+            NODES.slice(0, 2).map((_, i) => (
               <circle key={`pkt-${i}`} r="3" fill="#56F0FF" opacity="0.9">
                 <animateMotion
                   dur={`${4 + i * 0.8}s`}

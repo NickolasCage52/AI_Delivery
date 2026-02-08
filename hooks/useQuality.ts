@@ -8,10 +8,7 @@ import { getQualityLevel, invalidateQualityCache, QualityLevel } from "@/lib/per
  * prefers-reduced-motion changes. No FPS-based auto-downgrade.
  */
 export function useQuality(): QualityLevel {
-  const [level, setLevel] = useState<QualityLevel>(() => {
-    if (typeof window === "undefined") return "high";
-    return getQualityLevel();
-  });
+  const [level, setLevel] = useState<QualityLevel>("high");
   const resizeTimeout = useRef<number | null>(null);
 
   useEffect(() => {

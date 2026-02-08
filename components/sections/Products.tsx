@@ -81,12 +81,26 @@ function ProductsInner() {
         >
           {PRODUCTS.map((p) => (
             <motion.div key={p.title} variants={item} className="scroll-mt-24">
-              <SpecularCard accent={p.accent} revealContent={p.result}>
+              <SpecularCard
+                accent={p.accent}
+                className="min-h-[260px]"
+                revealContent={
+                  <div className="space-y-3">
+                    <p>{p.result}</p>
+                    <Link href={`/directions/${p.anchorId}`} className="inline-flex text-xs text-[var(--accent)]">
+                      Подробнее →
+                    </Link>
+                  </div>
+                }
+              >
                 <span className="text-xs font-medium uppercase tracking-wider text-[var(--accent)]">
                   {p.duration}
                 </span>
                 <h3 className="mt-3 text-lg font-semibold text-[var(--text-primary)]">{p.title}</h3>
                 <p className="mt-2 text-sm text-[var(--text-secondary)] line-clamp-2">{p.result}</p>
+                <Link href={`/directions/${p.anchorId}`} className="mt-3 inline-flex text-xs text-[var(--accent)]/80 hover:text-[var(--accent)]">
+                  Подробнее →
+                </Link>
                 <button
                   type="button"
                   onClick={() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,7 @@ import { Container } from "@/components/ui/Container";
 import { useLeadModal } from "@/components/cta";
 import { trackCtaEvent } from "@/lib/analytics/cta";
 import { useQuality } from "@/hooks/useQuality";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/ui/scrollLock";
 
 const ROUTES = [
   { label: "Главная", href: "/" },
@@ -37,10 +38,15 @@ export function Header() {
   const [activeAnchor, setActiveAnchor] = useState("results");
   const openModal = useLeadModal();
   const quality = useQuality();
+  const menuRef = useRef<HTMLElement>(null);
+  const lastActiveRef = useRef<HTMLElement | null>(null);
   const isHome = pathname === "/";
-  const blurClass = quality === "low" ? "" : "backdrop-blur-sm";
-  const headerBg = quality === "low" ? "bg-[var(--bg-primary)]/95" : "bg-[var(--bg-primary)]/80";
+  const blurClass = quality === "low" ? "backdrop-blur-sm" : "backdrop-blur-md";
+  const mobileHeaderBg = quality === "low" ? "bg-[rgba(6,6,10,0.95)]" : "bg-[rgba(10,6,20,0.72)]";
+  const headerBg = quality === "low" ? "md:bg-[var(--bg-primary)]/95" : "md:bg-[var(--bg-primary)]/80";
   const subHeaderBg = quality === "low" ? "bg-[var(--bg-primary)]/85" : "bg-[var(--bg-primary)]/60";
+  const mobileMenuBg = quality === "low" ? "bg-[rgba(6,6,10,0.96)]" : "bg-[rgba(10,6,20,0.86)]";
+  const mobileMenuBlur = quality === "low" ? "backdrop-blur-md" : "backdrop-blur-2xl backdrop-saturate-150";
 
   useEffect(() => {
     if (!isHome) return;
@@ -59,6 +65,59 @@ export function Header() {
     return () => observer.disconnect();
   }, [isHome]);
 
+  useEffect(() => {
+    if (!mobileOpen || typeof document === "undefined") return;
+    lockBodyScroll();
+    lastActiveRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const menu = menuRef.current;
+
+    const getFocusable = (el: HTMLElement) =>
+      Array.from(
+        el.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((node) => !node.hasAttribute("disabled") && !node.getAttribute("aria-hidden"));
+
+    const focusFirst = () => {
+      if (!menu) return;
+      const focusables = getFocusable(menu);
+      (focusables[0] ?? menu).focus();
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setMobileOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !menu) return;
+      const focusables = getFocusable(menu);
+      if (focusables.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const raf = window.requestAnimationFrame(focusFirst);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", onKeyDown);
+      unlockBodyScroll();
+      lastActiveRef.current?.focus();
+    };
+  }, [mobileOpen]);
+
   const anchorLinks = useMemo(
     () =>
       HOME_ANCHORS.map((a) => ({
@@ -70,7 +129,9 @@ export function Header() {
   );
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 ${headerBg} ${blurClass}`}>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 ${mobileHeaderBg} ${headerBg} ${blurClass}`}
+    >
       <Container>
         <div className="flex h-14 items-center justify-between md:h-16">
           <Link href="/" className="flex items-center gap-2.5 text-lg font-semibold text-[var(--text-primary)]">
@@ -157,16 +218,20 @@ export function Header() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className={`fixed inset-0 top-14 md:hidden z-40 bg-[var(--bg-primary)]/96 ${blurClass}`}
+            className={`fixed inset-0 top-14 md:hidden z-[60] bg-black/40`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Меню"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setMobileOpen(false)}
-            aria-hidden
           >
             <motion.nav
-              className="flex flex-col gap-1 p-6 pt-4"
+              ref={menuRef}
+              className={`flex flex-col gap-1 p-6 pt-4 border border-white/10 ${mobileMenuBg} ${mobileMenuBlur}`}
+              tabIndex={-1}
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}

@@ -2,6 +2,7 @@
 
 import { useQuality } from "@/hooks/useQuality";
 import { useReducedMotion } from "@/lib/motion";
+import { useFxDebugState } from "@/lib/perf/fxDebug";
 
 const FX_DEBUG_ENABLED =
   process.env.NODE_ENV === "development" &&
@@ -12,6 +13,7 @@ const FX_DEBUG_ENABLED =
 export function EffectsDebugOverlay() {
   const quality = useQuality();
   const reduced = useReducedMotion();
+  const fxState = useFxDebugState();
 
   if (!FX_DEBUG_ENABLED) return null;
 
@@ -26,6 +28,9 @@ export function EffectsDebugOverlay() {
       <div className="font-semibold text-white/90">FX Debug</div>
       <div>quality: {quality}</div>
       <div>reduced-motion: {reduced ? "on" : "off"}</div>
+      <div>HeroFX: {fxState.heroFx}</div>
+      <div>Graph: {fxState.graph}</div>
+      <div>Cursor: {fxState.cursor}</div>
       <div>shader: {shaderEnabled ? "on" : "off"}</div>
       <div>header blur: {headerBlurEnabled ? "on" : "off"}</div>
       <div>fps sampler: disabled</div>

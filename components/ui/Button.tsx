@@ -57,6 +57,11 @@ export function Button(props: AsButton | AsLink) {
       onDragEnd,
       ...aRest
     } = rest as AsLink;
+    void onAnimationStart;
+    void onAnimationEnd;
+    void onDragStart;
+    void onDrag;
+    void onDragEnd;
     return (
       <motion.a
         href={href}
@@ -70,13 +75,18 @@ export function Button(props: AsButton | AsLink) {
   }
 
   const {
-    onAnimationStart: _onAnimationStart,
-    onAnimationEnd: _onAnimationEnd,
-    onDragStart: _onDragStart,
-    onDrag: _onDrag,
-    onDragEnd: _onDragEnd,
+    onAnimationStart,
+    onAnimationEnd,
+    onDragStart,
+    onDrag,
+    onDragEnd,
     ...buttonRest
   } = rest as ButtonHTMLAttributes<HTMLButtonElement>;
+  void onAnimationStart;
+  void onAnimationEnd;
+  void onDragStart;
+  void onDrag;
+  void onDragEnd;
 
   const { type = "button", ...restButton } = buttonRest;
   return (

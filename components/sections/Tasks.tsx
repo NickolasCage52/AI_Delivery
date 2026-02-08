@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SectionCTA } from "@/components/cta";
@@ -9,28 +10,24 @@ const TASKS = [
   {
     title: "Лиды и поддержка 24/7",
     timing: "5–7 дней",
-    href: "#bots",
     id: "bots",
     desc: "Квалификация, ответы, передача в CRM.",
   },
   {
     title: "Лендинг под трафик",
     timing: "48–72 часа",
-    href: "#sites",
     id: "sites",
     desc: "Быстрый запуск и аналитика.",
   },
   {
     title: "n8n‑автоматизации",
     timing: "5–7 дней",
-    href: "#n8n",
     id: "n8n",
     desc: "Лид → CRM → отчёты без рутины.",
   },
   {
     title: "Telegram MiniApp MVP",
     timing: "3–5 дней",
-    href: "#miniapps",
     id: "miniapps",
     desc: "Каталог/анкета/форма в Telegram.",
   },
@@ -61,20 +58,26 @@ function TasksInner() {
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TASKS.map((task, i) => (
-            <motion.a
+            <motion.div
               key={task.id}
-              href={task.href}
-              id={task.id}
-              className="scroll-mt-24 rounded-xl border border-white/10 bg-[var(--bg-elevated)]/80 p-5 transition-colors hover:border-[var(--accent)]/25 hover:bg-[var(--bg-elevated)]"
+              className="scroll-mt-24"
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
             >
-              <span className="text-sm font-medium text-[var(--accent)]">{task.timing}</span>
-              <h3 className="mt-2 font-semibold text-[var(--text-primary)]">{task.title}</h3>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">{task.desc}</p>
-            </motion.a>
+              <Link
+                href={`/directions/${task.id}`}
+                id={task.id}
+                className="block rounded-xl border border-white/10 bg-[var(--bg-elevated)]/80 p-5 transition-colors hover:border-[var(--accent)]/25 hover:bg-[var(--bg-elevated)]"
+                aria-label={`${task.title}. Подробнее о направлении`}
+              >
+                <span className="text-sm font-medium text-[var(--accent)]">{task.timing}</span>
+                <h3 className="mt-2 font-semibold text-[var(--text-primary)]">{task.title}</h3>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">{task.desc}</p>
+                <span className="mt-3 inline-flex text-xs text-[var(--accent)]">Подробнее →</span>
+              </Link>
+            </motion.div>
           ))}
         </div>
 

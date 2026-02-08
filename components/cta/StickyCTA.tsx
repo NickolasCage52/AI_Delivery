@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLeadModal } from "./LeadModal";
 import { useEffect, useState } from "react";
@@ -43,13 +44,13 @@ export function StickyCTA() {
       >
         Запросить демо
       </button>
-      <a
+      <Link
         href="/#cases"
         onClick={() => trackCtaEvent({ action: "click", label: "Смотреть кейсы", location: "sticky", href: "/#cases" })}
         className="rounded-lg border border-[var(--accent)]/50 px-4 py-2.5 text-sm font-semibold text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
       >
         Смотреть кейсы
-      </a>
+      </Link>
     </motion.div>
   );
 }

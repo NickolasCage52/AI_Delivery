@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import { useQuality } from "@/hooks/useQuality";
+import { useInViewport } from "@/hooks/useInViewport";
 
 const SIZE = 420;
 const CENTER = { x: 210, y: 210 };
@@ -73,7 +74,9 @@ export function IntegrationGraph() {
   const reduced = useReducedMotion();
   const quality = useQuality();
   const packetCount = quality === "high" ? 4 : quality === "medium" ? 2 : 0;
-  const showPackets = !reduced && packetCount > 0;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInViewport(containerRef);
+  const showPackets = !reduced && inView && packetCount > 0;
 
   const positions = useMemo(
     () => NODES.map((_, i) => getPosition(i, NODES.length)),
@@ -83,7 +86,7 @@ export function IntegrationGraph() {
   const activeNode = hovered ? NODES.find((node) => node.id === hovered) : null;
 
   return (
-    <div className="relative flex flex-col items-center">
+    <div ref={containerRef} className="relative flex flex-col items-center">
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         className="h-full w-full max-h-[360px] max-w-[420px]"
@@ -117,7 +120,7 @@ export function IntegrationGraph() {
           cy={CENTER.y}
           r={RADIUS + 22}
           fill="url(#stack-core-glow)"
-          className={reduced ? "" : "integration-graph-breath"}
+          className={reduced || !inView ? "" : "integration-graph-breath"}
         />
 
         {NODES.map((node, i) => {
@@ -171,7 +174,12 @@ export function IntegrationGraph() {
               key={node.id}
               onMouseEnter={() => setHovered(node.id)}
               onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(node.id)}
+              onBlur={() => setHovered(null)}
               className="cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label={`${node.label}. ${node.title}`}
             >
               <circle
                 cx={pos.x}

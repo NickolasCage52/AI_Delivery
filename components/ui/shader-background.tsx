@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import { getCanvasDPR, getCanvasTargetFPS } from "@/lib/perf/quality";
 import { useQuality } from "@/hooks/useQuality";
 import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
+import { useInViewport } from "@/hooks/useInViewport";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 type ShaderBackgroundProps = {
   className?: string;
@@ -14,6 +16,8 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const reduced = useReducedMotion();
   const quality = useQuality();
+  const inView = useInViewport(canvasRef);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView, debugKey: "heroFx" });
 
   // Vertex shader source code
   const vsSource = `
@@ -51,7 +55,7 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
     const float offsetSpeed = 1.33 * overallSpeed;
     const float minOffsetSpread = 0.6;
     const float maxOffsetSpread = 2.0;
-    const int linesPerGroup = 16;
+    const int linesPerGroup = 12;
 
     #define drawCircle(pos, radius, coord) smoothstep(radius + gridSmoothWidth, radius, length(coord - (pos)))
     #define drawSmoothLine(pos, halfWidth, t) smoothstep(halfWidth, 0.0, abs(pos - (t)))
@@ -120,24 +124,24 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
   `;
 
   // Helper function to compile shader
-  const loadShader = (gl: WebGLRenderingContext, type: number, source: string) => {
+  const loadShader = useCallback((gl: WebGLRenderingContext, type: number, source: string) => {
     const shader = gl.createShader(type);
     if (!shader) return null;
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      // eslint-disable-next-line no-console
       console.error("Shader compile error: ", gl.getShaderInfoLog(shader));
       gl.deleteShader(shader);
       return null;
     }
 
     return shader;
-  };
+  }, []);
 
   // Initialize shader program
-  const initShaderProgram = (gl: WebGLRenderingContext, vs: string, fs: string) => {
+  const initShaderProgram = useCallback(
+    (gl: WebGLRenderingContext, vs: string, fs: string) => {
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vs);
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fs);
     if (!vertexShader || !fragmentShader) return null;
@@ -149,13 +153,14 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
     gl.linkProgram(shaderProgram);
 
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      // eslint-disable-next-line no-console
       console.error("Shader program link error: ", gl.getProgramInfoLog(shaderProgram));
       return null;
     }
 
     return shaderProgram;
-  };
+    },
+    [loadShader]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -163,6 +168,8 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
 
     canvas.style.backgroundImage =
       "radial-gradient(120% 80% at 20% 20%, rgba(139,92,246,0.22), transparent 55%), radial-gradient(120% 80% at 80% 30%, rgba(236,72,153,0.18), transparent 60%), linear-gradient(180deg, rgba(5,3,10,0.9), rgba(7,0,20,0.95))";
+
+    if (!fx.isActive) return;
 
     let cleanup = () => {};
 
@@ -176,7 +183,6 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
         powerPreference: "high-performance",
       });
       if (!gl) {
-        // eslint-disable-next-line no-console
         console.warn("WebGL not supported.");
         return () => {};
       }
@@ -214,11 +220,9 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
       };
 
       let lastFrameTime = 0;
-      let hidden = false;
       const startTime = performance.now();
 
       const drawFrame = (now: number) => {
-        if (hidden) return;
         const currentTime = (now - startTime) / 1000;
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -240,14 +244,9 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
         drawFrame(now);
       };
 
-      const onVisibility = () => {
-        hidden = document.hidden;
-      };
-
       const resizeObserver = new ResizeObserver(resizeCanvas);
       resizeObserver.observe(canvas.parentElement ?? canvas);
       window.addEventListener("resize", resizeCanvas);
-      document.addEventListener("visibilitychange", onVisibility);
       resizeCanvas();
       const animate = !reduced;
       const unsubscribe = animate ? rafLoopSubscribe(render) : null;
@@ -257,7 +256,6 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
         unsubscribe?.();
         resizeObserver.disconnect();
         window.removeEventListener("resize", resizeCanvas);
-        document.removeEventListener("visibilitychange", onVisibility);
       };
     };
 
@@ -279,7 +277,7 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
       canvas.removeEventListener("webglcontextlost", onContextLost);
       canvas.removeEventListener("webglcontextrestored", onContextRestored);
     };
-  }, [quality, reduced, fsSource, vsSource]);
+  }, [quality, reduced, fx.isActive, fsSource, vsSource, initShaderProgram]);
 
   return (
     <canvas

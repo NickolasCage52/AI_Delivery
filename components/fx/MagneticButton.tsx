@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useReducedMotion } from "@/lib/motion";
 import { clamp } from "@/lib/motion/utils";
@@ -31,8 +31,6 @@ export function MagneticButton({
   const springX = useSpring(x, SPRING);
   const springY = useSpring(y, SPRING);
   const reduced = useReducedMotion();
-  const [hover, setHover] = useState(false);
-
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (reduced || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
@@ -48,7 +46,6 @@ export function MagneticButton({
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
-    setHover(false);
   };
 
   const base =
@@ -85,7 +82,6 @@ export function MagneticButton({
       className="inline-block"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onMouseEnter={() => setHover(true)}
     >
       {inner}
     </div>

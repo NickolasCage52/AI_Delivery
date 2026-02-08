@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import { useQuality } from "@/hooks/useQuality";
 

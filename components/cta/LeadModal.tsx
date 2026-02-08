@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/ui/scrollLock";
 
 type LeadModalContextType = ((context?: { sourcePage?: string; service?: string }) => void) | null;
 
@@ -25,6 +26,8 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
   const [context, setContext] = useState({ sourcePage: "", service: "" });
   const [showMore, setShowMore] = useState(false);
   const router = useRouter();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const lastActiveRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -57,11 +60,64 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
   };
 
   const visible = open || closing;
+  useEffect(() => {
+    if (!visible || typeof document === "undefined") return;
+    lockBodyScroll();
+    lastActiveRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    const modal = modalRef.current;
+    const getFocusable = (el: HTMLElement) =>
+      Array.from(
+        el.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((node) => !node.hasAttribute("disabled") && !node.getAttribute("aria-hidden"));
+
+    const focusFirst = () => {
+      if (!modal) return;
+      const focusables = getFocusable(modal);
+      (focusables[0] ?? modal).focus();
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        closeModal();
+        return;
+      }
+      if (e.key !== "Tab" || !modal) return;
+      const focusables = getFocusable(modal);
+      if (focusables.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const raf = window.requestAnimationFrame(focusFirst);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", onKeyDown);
+      unlockBodyScroll();
+      lastActiveRef.current?.focus();
+    };
+  }, [visible, closeModal]);
+
   const modalContent =
     mounted && typeof document !== "undefined" && visible ? (
       <motion.div
         key="lead-modal"
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 z-[1200] flex items-center justify-center p-4"
         initial={false}
         animate={{ opacity: closing ? 0 : 1 }}
         transition={{ duration: 0.2 }}
@@ -74,7 +130,12 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
           aria-hidden
         />
         <motion.div
-          className="relative z-50 w-full max-w-md rounded-2xl border border-white/10 bg-[var(--bg-elevated)] p-6 shadow-xl md:p-8"
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lead-modal-title"
+          tabIndex={-1}
+          className="relative z-[1201] w-full max-w-md rounded-2xl border border-white/10 bg-[var(--bg-elevated)] p-6 shadow-xl md:p-8"
           initial={closing ? false : { opacity: 0, scale: 0.96, y: -10 }}
           animate={
             closing
@@ -85,7 +146,9 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
           onClick={(e) => e.stopPropagation()}
         >
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-[var(--text-primary)]">Запросить демо и план внедрения</h3>
+                <h3 id="lead-modal-title" className="text-xl font-semibold text-[var(--text-primary)]">
+                  Запросить демо и план внедрения
+                </h3>
                 <button
                   type="button"
                   onClick={closeModal}

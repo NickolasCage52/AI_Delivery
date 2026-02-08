@@ -6,6 +6,7 @@ import { getScrollBlurMax } from "@/lib/perf/quality";
 import { useQuality } from "@/hooks/useQuality";
 import { startScrollVelocityTracking, stopScrollVelocityTracking, getScrollVelocity } from "@/lib/scroll/velocity";
 import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
+import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
 const VELOCITY_THRESHOLD = 400;
 const DECAY = 0.9;
@@ -17,6 +18,7 @@ export function ScrollVelocityBlur() {
   const blurRef = useRef(0);
   const maxBlurRef = useRef(0);
   const isMobileRef = useRef(false);
+  const fx = useFxLifecycle({ enabled: !reduced, isInViewport: true });
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");
@@ -34,7 +36,7 @@ export function ScrollVelocityBlur() {
   }, [quality, reduced]);
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !fx.isActive) return;
     const el = overlayRef.current;
     if (!el) return;
 
@@ -67,9 +69,9 @@ export function ScrollVelocityBlur() {
       unsubscribe();
       stopScrollVelocityTracking();
     };
-  }, [reduced, quality]);
+  }, [reduced, quality, fx.isActive]);
 
-  const active = !reduced && maxBlurRef.current > 0;
+  const active = fx.isActive && maxBlurRef.current > 0;
   return (
     <div
       ref={overlayRef}

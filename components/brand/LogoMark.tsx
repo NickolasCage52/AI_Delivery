@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-
 /** Simplified integration graph as logo mark: center + 4 nodes + 4 lines. Readable at 24–32px. */
 const CENTER = { x: 16, y: 16 };
 const R = 10;

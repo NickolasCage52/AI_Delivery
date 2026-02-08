@@ -3,7 +3,6 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { useReducedMotion } from "@/lib/motion";
 import { SectionCTA } from "@/components/cta";
 import { Typewriter } from "@/components/ui/Typewriter";
 
@@ -33,8 +32,6 @@ const FLOW = [
 ];
 
 function PainSolutionInner() {
-  const reduced = useReducedMotion();
-
   return (
     <section id="results" className="relative py-24 md:py-32 bg-[var(--bg-secondary)]/40">
       <Container>
