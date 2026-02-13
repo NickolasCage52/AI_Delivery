@@ -2,34 +2,39 @@
 
 Одностраничный маркетинговый сайт уровня **Apple / Nothing / Google I/O**: кинематографичный скролл, глубокий свет, «живой» интерфейс. Тёмная премиальная эстетика, неон (cyan/violet) в одной палитре, ощущение «ИИ как ускоритель».
 
-## Установка
+## Как запустить
 
 ```bash
 npm install
-```
-
-## Команды
-
-```bash
+cp .env.example .env.local   # опционально
 npm run dev
 ```
 
-```bash
-npm run build
-npm run start
-```
+Откройте [http://localhost:3000](http://localhost:3000).
 
-```bash
-npm run lint
-```
+## Команды
+
+| Команда | Описание |
+|---------|----------|
+| `npm run dev` | Режим разработки (hot reload) |
+| `npm run build` | Сборка для production |
+| `npm run start` | Запуск production-сервера после `build` |
+| `npm run lint` | Проверка ESLint |
+| `npm run typecheck` | Проверка TypeScript |
 
 ## Переменные окружения
 
-Скопируйте `.env.example` в `.env.local` и заполните значения.
+Скопируйте `.env.example` в `.env.local` и при необходимости заполните:
 
-```
-NEXT_PUBLIC_FX_DEBUG=1
-```
+| Переменная | Описание | По умолчанию |
+|------------|----------|--------------|
+| `NEXT_PUBLIC_FX_DEBUG` | Overlay для отладки анимаций (dev) | — |
+| `NEXT_PUBLIC_UI_DEBUG` | Панель отладки UI (dev) | — |
+| `NEXT_PUBLIC_SCROLL_DEBUG` | Отладка скролла (dev) | — |
+| `NEXT_PUBLIC_BASE_PATH` | Базовый путь для поддиректории | — |
+| `NEXT_PUBLIC_SITE_URL` | URL сайта (SEO, sitemap) | `https://ai-delivery.studio` |
+
+Все переменные опциональны. Для локальной разработки достаточно `npm run dev` без `.env.local`.
 
 ## Деплой
 
@@ -44,8 +49,6 @@ NEXT_PUBLIC_FX_DEBUG=1
 - **GSAP + ScrollTrigger** — pinned-сцены (Hero → тезисы, Timeline beam)
 - **Lenis** — плавный скролл (с отключением при `prefers-reduced-motion`)
 - **Canvas/SVG** — Neural Grid, Orbit Integrations, Data Streams (лёгкие)
-
-Откройте [http://localhost:3000](http://localhost:3000) после `npm run dev`.
 
 ## Структура
 

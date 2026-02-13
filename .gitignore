@@ -25,6 +25,8 @@ npm-debug.log*
 # xlsx extract (if was unzipped in root)
 xlsx_extract
 comp.xlsx.zip
+*.xlsx
 [Content_Types].xml
 _rels/
 xl/
+docProps/
