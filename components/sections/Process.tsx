@@ -4,7 +4,8 @@ import { useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
-import { SectionCTA, useLeadModal } from "@/components/cta";
+import Link from "next/link";
+import { SectionCTA } from "@/components/cta";
 import { useInViewport } from "@/hooks/useInViewport";
 import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 
@@ -52,7 +53,6 @@ export function Process() {
   const panelElsRef = useRef<HTMLElement[]>([]);
   const lastIndexRef = useRef(-1);
   const reduced = useReducedMotion();
-  const openModal = useLeadModal();
   const inView = useInViewport(sectionRef);
   const fx = useFxLifecycle({ enabled: !reduced, isInViewport: inView });
 
@@ -86,13 +86,11 @@ export function Process() {
     if (!section) return;
     initRef.current = true;
 
-    let mounted = true;
     const run = async () => {
       const gsap = (await import("gsap")).default;
       const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!mounted) return;
       const isDesktop = window.innerWidth >= 768;
       const steps = STEPS.length;
       const t = ScrollTrigger.create({
@@ -113,11 +111,6 @@ export function Process() {
     };
 
     run();
-    return () => {
-      mounted = false;
-      triggerRef.current?.kill?.();
-      triggerRef.current = null;
-    };
   }, [applyActiveIndex, reduced, inView, fx.isActive]);
 
   useEffect(() => {
@@ -126,6 +119,13 @@ export function Process() {
     if (fx.isActive) trigger.enable();
     else trigger.disable();
   }, [fx.isActive]);
+
+  useEffect(() => {
+    return () => {
+      triggerRef.current?.kill?.();
+      triggerRef.current = null;
+    };
+  }, []);
 
   return (
     <section
@@ -180,13 +180,12 @@ export function Process() {
                 </div>
                 <p className="mt-3 text-sm text-[#A7AFC2]">{step.what}</p>
                 <p className="mt-1 text-sm font-medium text-[#E9ECF5]">→ {step.get}</p>
-                <button
-                  type="button"
-                  onClick={() => openModal?.()}
-                  className="mt-4 rounded-lg border border-[#56F0FF]/40 px-4 py-2 text-sm font-medium text-[#56F0FF] transition-colors hover:bg-[#56F0FF]/10"
+                <Link
+                  href="/demo"
+                  className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[#56F0FF]/40 px-4 py-2 text-sm font-medium text-[#56F0FF] transition-colors hover:bg-[#56F0FF]/10"
                 >
                   Начать этот этап
-                </button>
+                </Link>
               </motion.div>
             ))}
           </div>

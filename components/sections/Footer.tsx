@@ -30,8 +30,17 @@ export function Footer() {
             <Link href="/contact" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Контакты
             </Link>
+            <Link href="/demo" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+              Демо
+            </Link>
             <Link href="/#process" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Процесс
+            </Link>
+            <Link href="/privacy" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+              Конфиденциальность
+            </Link>
+            <Link href="/cookies" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+              Cookies
             </Link>
           </nav>
         </div>

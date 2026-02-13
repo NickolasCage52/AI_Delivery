@@ -33,7 +33,7 @@ export function ContactForm({ sourcePage, service }: { sourcePage?: string; serv
           required
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+          className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
           placeholder="Как к вам обращаться"
         />
       </div>
@@ -47,7 +47,7 @@ export function ContactForm({ sourcePage, service }: { sourcePage?: string; serv
           required
           value={form.contact}
           onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-          className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+          className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
           placeholder="@username или +7..."
         />
       </div>
@@ -96,7 +96,7 @@ export function ContactForm({ sourcePage, service }: { sourcePage?: string; serv
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full rounded-lg bg-[var(--accent)] py-3 font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_24px_rgba(139,92,246,0.35)] disabled:opacity-70"
+        className="w-full min-h-[48px] rounded-lg bg-[var(--accent)] py-3 text-base font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_24px_rgba(139,92,246,0.35)] disabled:opacity-70"
       >
         {status === "loading" ? "Отправка…" : "Отправить"}
       </button>

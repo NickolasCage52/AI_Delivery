@@ -48,6 +48,11 @@ export default function CasesPage() {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {cases.map((c) => (
                 <SpecularCard key={c.slug} accent="violet">
+                  {c.niche && (
+                    <div className="mb-3 inline-flex rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-[var(--text-secondary)]">
+                      {c.niche}
+                    </div>
+                  )}
                   <h2 className="text-lg font-semibold text-[var(--text-primary)]">{c.title}</h2>
                   <p className="mt-2 text-sm text-[var(--text-secondary)]">{c.context}</p>
                   <p className="mt-3 text-xs text-[var(--text-muted)]">Цель</p>

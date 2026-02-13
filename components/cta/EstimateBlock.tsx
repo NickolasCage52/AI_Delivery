@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { useLeadModal } from "./LeadModal";
 import { trackCtaEvent } from "@/lib/analytics/cta";
 
 const WHAT_OPTIONS = [
@@ -36,7 +36,6 @@ export function EstimateBlock() {
   const [what, setWhat] = useState("");
   const [deadline, setDeadline] = useState("");
   const [integrations, setIntegrations] = useState("");
-  const openModal = useLeadModal();
 
   const estimate = getEstimate(what, deadline, integrations);
 
@@ -92,16 +91,13 @@ export function EstimateBlock() {
         </div>
       </div>
       <p className="mt-4 text-sm text-[var(--accent)]">{estimate}</p>
-      <button
-        type="button"
-        onClick={() => {
-          trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "estimate" });
-          openModal?.();
-        }}
-        className="mt-4 rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+      <Link
+        href="/demo"
+        onClick={() => trackCtaEvent({ action: "click", label: "Запросить демо и план", location: "estimate", href: "/demo" })}
+        className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
       >
         Запросить демо и план
-      </button>
+      </Link>
     </motion.div>
   );
 }

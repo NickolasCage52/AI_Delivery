@@ -14,11 +14,14 @@ export type CaseMetric = {
 export type CaseStudy = {
   slug: string;
   title: string;
+  niche?: string;
   context: string;
+  before?: string;
   goal: string;
   build: string;
   timeline: string;
   stack: string[];
+  after?: string;
   results: string[];
   metrics: CaseMetric[];
   artifact: CaseArtifact;

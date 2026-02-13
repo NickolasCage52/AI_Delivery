@@ -49,9 +49,29 @@ html {
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial, sans-serif;
+  font-size: 16px;
   color-scheme: dark;
   overflow-x: hidden;
+}
+
+/* Typography tokens (wired via `next/font` variables in `app/layout.tsx`) */
+.font-sans {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial, sans-serif;
+}
+.font-display {
+  font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial,
+    sans-serif;
+}
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial,
+    sans-serif;
 }
 
 :where(section[id]) {
@@ -62,14 +82,15 @@ body {
   overscroll-behavior: contain;
 }
 
-/* Noise overlay - subtle texture */
-.noise::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1000;
+/* Layered aurora background (cheap, no canvas, no full-screen blur). */
+.aurora-bg {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(1100px 520px at 18% -8%, rgba(139, 92, 246, 0.22) 0%, transparent 60%),
+    radial-gradient(920px 520px at 88% 18%, rgba(236, 72, 153, 0.16) 0%, transparent 62%),
+    radial-gradient(880px 520px at 50% 110%, rgba(167, 139, 250, 0.12) 0%, transparent 65%),
+    linear-gradient(180deg, rgba(7, 0, 20, 0.78) 0%, rgba(5, 3, 10, 1) 55%, rgba(5, 3, 10, 1) 100%);
+  background-repeat: no-repeat;
 }
 
 /* Focus visible for a11y */

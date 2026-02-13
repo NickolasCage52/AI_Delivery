@@ -3,7 +3,8 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { SectionCTA } from "@/components/cta";
+import { HOME_COPY } from "@/content/site-copy";
+import Link from "next/link";
 
 const METRICS = [
   { label: "Заявки за 10 дней", value: "212" },
@@ -23,7 +24,7 @@ function ProofInner() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Цифры, которые дают уверенность
+          {HOME_COPY.proof.title}
         </motion.h2>
         <motion.p
           className="mt-4 text-[var(--text-secondary)] max-w-2xl"
@@ -32,7 +33,7 @@ function ProofInner() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Показываем измеримый эффект на пилотах и MVP — без «долгой классической разработки».
+          {HOME_COPY.proof.subtitle}
         </motion.p>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -51,11 +52,13 @@ function ProofInner() {
           ))}
         </div>
 
-        <p className="mt-6 text-xs text-[var(--text-muted)]">
-          Данные на основе кейсов AI Delivery.
-        </p>
+        <p className="mt-6 text-xs text-[var(--text-muted)]">{HOME_COPY.proof.footnote}</p>
 
-        <SectionCTA primary="Запросить демо и план" />
+        <div className="mt-10">
+          <Link href="/cases" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+            {HOME_COPY.hero.ctaSecondary} →
+          </Link>
+        </div>
       </Container>
     </section>
   );

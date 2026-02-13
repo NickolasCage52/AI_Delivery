@@ -9,23 +9,10 @@ import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
 import { getHeroBlurClass } from "@/lib/perf/quality";
 import { useQuality } from "@/hooks/useQuality";
-import { useLeadModal } from "@/components/cta";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { HOME_COPY } from "@/content/site-copy";
 
-const HERO = {
-  title: "AI Delivery — быстрые ИИ‑решения под ключ",
-  subtitle:
-    "Боты • сайты • Telegram MiniApps • n8n‑автоматизации. Запускаем за 48–72 часа или собираем MVP за 3–7 дней — чтобы вы сразу увидели результат.",
-  cta1: "Запросить демо и план",
-  cta2: "Смотреть кейсы",
-  bullets: [
-    "Запуск за 48–72 часа или MVP за 3–7 дней",
-    "Измеримый результат: заявки, экономия времени, проверка гипотезы",
-    "Прозрачный процесс: этапы, сроки, что нужно от вас",
-    "Под ключ: инструкции, handoff, поддержка на старт",
-  ],
-  offerNote: "Пилот от 48 ч • MVP 3–7 дней • Интеграции включены",
-};
+const HERO = HOME_COPY.hero;
 
 const HeroFXLayer = memo(function HeroFXLayer() {
   const quality = useQuality();
@@ -37,6 +24,18 @@ const HeroFXLayer = memo(function HeroFXLayer() {
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)]"
         aria-hidden
+      />
+      {/* Subtle grid only in hero (depth, not cyberpunk) */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.22]"
+        aria-hidden
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(139,92,246,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(236,72,153,0.08) 1px, transparent 1px)",
+          backgroundSize: "72px 72px",
+          maskImage: "radial-gradient(circle at 40% 35%, black 0%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(circle at 40% 35%, black 0%, transparent 70%)",
+        }}
       />
       <div
         className={`pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.08] ${blurClass.orb1}`}
@@ -53,7 +52,6 @@ const HeroFXLayer = memo(function HeroFXLayer() {
 
 const HeroContent = memo(function HeroContent() {
   const reduced = useReducedMotion();
-  const openModal = useLeadModal();
 
   return (
     <>
@@ -76,6 +74,14 @@ const HeroContent = memo(function HeroContent() {
               transition={{ duration: 0.4, delay: 0.08 }}
             >
               {HERO.subtitle}
+            </motion.p>
+            <motion.p
+              className="mt-4 text-xs font-medium text-[var(--text-muted)]"
+              initial={reduced ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.14 }}
+            >
+              {HERO.speedLine}
             </motion.p>
             {/* Benefit bullets */}
             <ul className="mt-6 md:mt-8 space-y-2 max-w-lg">
@@ -107,18 +113,15 @@ const HeroContent = memo(function HeroContent() {
               transition={{ duration: 0.35, delay: 0.2 }}
             >
               <MagneticButton
-                href="#contact"
+                href="/demo"
                 variant="primary"
                 size="large"
-                onClick={() => {
-                  trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "hero" });
-                  openModal?.();
-                }}
+                onClick={() => trackCtaEvent({ action: "click", label: HERO.ctaPrimary, location: "hero", href: "/demo" })}
               >
-                {HERO.cta1}
+                {HERO.ctaPrimary}
               </MagneticButton>
               <MagneticButton href="/#cases" variant="secondary" size="large">
-                {HERO.cta2}
+                {HERO.ctaSecondary}
               </MagneticButton>
             </motion.div>
           </div>

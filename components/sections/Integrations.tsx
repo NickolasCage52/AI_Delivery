@@ -1,10 +1,11 @@
 "use client";
 
 import { memo } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { SectionCTA } from "@/components/cta";
 import { IntegrationGraph } from "@/components/stack/IntegrationGraph";
+import { HOME_COPY } from "@/content/site-copy";
 
 const STACK_BLOCKS = [
   {
@@ -100,7 +101,14 @@ function IntegrationsInner() {
           </div>
         </div>
 
-        <SectionCTA />
+        <div className="mt-12 flex flex-wrap gap-6">
+          <Link href="/stack" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+            Смотреть стек и интеграции →
+          </Link>
+          <Link href="/cases" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+            {HOME_COPY.hero.ctaSecondary} →
+          </Link>
+        </div>
       </Container>
     </section>
   );

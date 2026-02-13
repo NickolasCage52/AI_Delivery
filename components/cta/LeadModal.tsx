@@ -147,19 +147,19 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
         >
               <div className="flex items-center justify-between">
                 <h3 id="lead-modal-title" className="text-xl font-semibold text-[var(--text-primary)]">
-                  Запросить демо и план внедрения
+                  Получить план внедрения
                 </h3>
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-lg p-1 text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                   aria-label="Закрыть"
                 >
                   ×
                 </button>
               </div>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Оставьте контакт — покажем демо, разберём задачу и предложим план за 15 минут.
+                Оставьте контакт — разберём задачу и предложим реалистичный план со сроками, стеком и ожидаемыми метриками.
               </p>
 
               {status === "success" ? (

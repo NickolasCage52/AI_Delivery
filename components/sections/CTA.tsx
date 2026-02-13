@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { HOME_COPY } from "@/content/site-copy";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -43,14 +44,16 @@ export function CTA() {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)] md:text-3xl">
-            Запросить демо и план внедрения
+            {HOME_COPY.finalCta.title}
           </h2>
           <p className="mt-3 text-[var(--text-secondary)]">
-            Оставьте контакт — покажем демо, разберём задачу и дадим план за 15 минут.
+            {HOME_COPY.finalCta.subtitle}
           </p>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
-            Ответим в течение рабочего дня. Оценка и план внедрения — в течение 24 часов после брифа.
-          </p>
+          <div className="mt-2 text-sm text-[var(--text-muted)] space-y-1">
+            {HOME_COPY.finalCta.noteLines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
 
           {status === "success" ? (
             <motion.div
@@ -145,14 +148,6 @@ export function CTA() {
                   disabled={status === "loading"}
                 >
                   {status === "loading" ? "Отправка…" : "Получить план внедрения"}
-                </Button>
-                <Button
-                  href="/#process"
-                  variant="secondary"
-                  size="large"
-                  onClick={() => trackCtaEvent({ action: "click", label: "Разобрать задачу", location: "home-final", href: "/#process" })}
-                >
-                  Разобрать задачу за 15 минут
                 </Button>
               </div>
             </form>

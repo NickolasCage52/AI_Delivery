@@ -5,9 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SpecularCard } from "@/components/fx/SpecularCard";
-import { SectionCTA } from "@/components/cta";
-import { useLeadModal } from "@/components/cta/LeadModal";
-import { trackCtaEvent } from "@/lib/analytics/cta";
 
 const PRODUCTS = [
   {
@@ -48,8 +45,6 @@ const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { st
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 function ProductsInner() {
-  const openModal = useLeadModal();
-
   return (
     <section id="products" className="relative py-24 md:py-32 bg-[var(--bg-secondary)]/50">
       <Container>
@@ -101,16 +96,6 @@ function ProductsInner() {
                 <Link href={`/directions/${p.anchorId}`} className="mt-3 inline-flex text-xs text-[var(--accent)]/80 hover:text-[var(--accent)]">
                   Подробнее →
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    trackCtaEvent({ action: "open-modal", label: p.title, location: "products" });
-                    openModal?.();
-                  }}
-                  className="mt-4 w-full rounded-lg border border-[var(--accent)]/40 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
-                >
-                  {p.cta}
-                </button>
               </SpecularCard>
             </motion.div>
           ))}
@@ -123,8 +108,6 @@ function ProductsInner() {
             Все услуги и пакеты
           </Link>
         </div>
-
-        <SectionCTA />
       </Container>
     </section>
   );

@@ -69,21 +69,38 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
         <section className="py-20 bg-[var(--bg-secondary)]/40">
           <Container className="grid gap-12 lg:grid-cols-[1.2fr,0.8fr]">
             <div>
-              <h2 className="text-2xl font-semibold text-[var(--text-primary)]">Цель</h2>
+              {data.before && (
+                <>
+                  <h2 className="text-2xl font-semibold text-[var(--text-primary)]">Было</h2>
+                  <p className="mt-3 text-[var(--text-secondary)]">{data.before}</p>
+                </>
+              )}
+
+              <h2 className={data.before ? "mt-10 text-2xl font-semibold text-[var(--text-primary)]" : "text-2xl font-semibold text-[var(--text-primary)]"}>
+                Цель
+              </h2>
               <p className="mt-3 text-[var(--text-secondary)]">{data.goal}</p>
 
-              <h2 className="mt-10 text-2xl font-semibold text-[var(--text-primary)]">Что сделали</h2>
+              <h2 className={data.before ? "mt-10 text-2xl font-semibold text-[var(--text-primary)]" : "text-2xl font-semibold text-[var(--text-primary)]"}>
+                Сделали
+              </h2>
               <p className="mt-3 text-[var(--text-secondary)]">{data.build}</p>
 
-              <h2 className="mt-10 text-2xl font-semibold text-[var(--text-primary)]">Результат</h2>
+              <h2 className="mt-10 text-2xl font-semibold text-[var(--text-primary)]">Стало</h2>
               <ul className="mt-3 list-disc list-inside text-[var(--text-secondary)]">
                 {data.results.map((r) => (
                   <li key={r}>{r}</li>
                 ))}
               </ul>
+              {data.after && <p className="mt-4 text-[var(--text-secondary)]">{data.after}</p>}
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/80 p-6">
+              {data.niche && (
+                <div className="mb-4 inline-flex rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-[var(--text-secondary)]">
+                  {data.niche}
+                </div>
+              )}
               <p className="text-sm text-[var(--text-muted)]">Срок</p>
               <p className="mt-1 text-[var(--text-primary)] font-semibold">{data.timeline}</p>
 

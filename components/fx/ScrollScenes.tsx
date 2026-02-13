@@ -34,8 +34,6 @@ export function ScrollScenes({
     if (reduced || initRef.current || !inView || !sectionRef.current || !thesesRef.current) return;
     initRef.current = true;
 
-    let mounted = true;
-
     const run = async () => {
       const gsap = (await import("gsap")).default;
       const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
@@ -43,7 +41,7 @@ export function ScrollScenes({
 
       const section = sectionRef.current;
       const theses = thesesRef.current;
-      if (!mounted || !section || !theses) return;
+      if (!section || !theses) return;
       const isDesktop = window.innerWidth >= 768;
       if (!isDesktop) return;
 
@@ -71,11 +69,6 @@ export function ScrollScenes({
     };
 
     run();
-    return () => {
-      mounted = false;
-      triggerRef.current?.kill();
-      triggerRef.current = null;
-    };
   }, [reduced, inView, fx.isActive]);
 
   useEffect(() => {
@@ -84,6 +77,13 @@ export function ScrollScenes({
     if (fx.isActive) trigger.enable();
     else trigger.disable();
   }, [fx.isActive]);
+
+  useEffect(() => {
+    return () => {
+      triggerRef.current?.kill();
+      triggerRef.current = null;
+    };
+  }, []);
 
   return (
     <section ref={sectionRef} className={`relative ${className}`}>

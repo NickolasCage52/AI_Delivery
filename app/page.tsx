@@ -1,12 +1,14 @@
 import { HeroScene } from "@/components/sections/HeroScene";
 import { Header } from "@/components/layout/Header";
-import { Proof } from "@/components/sections/Proof";
+import { NumbersProof } from "@/components/sections/NumbersProof";
 import { PainSolution } from "@/components/sections/PainSolution";
+import { AILeveragePanel } from "@/components/sections/AILeveragePanel";
 import { Tasks } from "@/components/sections/Tasks";
 import { Products } from "@/components/sections/Products";
 import { Cases } from "@/components/sections/Cases";
 import { ProcessPanel } from "@/components/sections/ProcessPanel";
 import { Integrations } from "@/components/sections/Integrations";
+import { WhyUs } from "@/components/sections/WhyUs";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTA } from "@/components/sections/CTA";
 import { Footer } from "@/components/sections/Footer";
@@ -42,14 +44,16 @@ export default function Home() {
       <main className="pb-24 md:pb-28">
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <HeroScene />
-        <Proof />
+        <NumbersProof />
         <PainSolution />
+        <AILeveragePanel />
         <Tasks />
         <Products />
         <Cases cases={cases.slice(0, 3)} />
         <Insights items={insights} />
         <ProcessPanel />
         <Integrations />
+        <WhyUs />
         <FAQ />
         <CTA />
         <Footer />

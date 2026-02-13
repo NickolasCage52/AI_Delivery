@@ -1,10 +1,11 @@
 "use client";
 
 import { memo } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { SectionCTA } from "@/components/cta";
 import { Typewriter } from "@/components/ui/Typewriter";
+import { HOME_COPY } from "@/content/site-copy";
 
 const RESULT_LINES = [
   "Заявки начинают приходить уже на MVP",
@@ -42,7 +43,7 @@ function PainSolutionInner() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Что вы получите
+          {HOME_COPY.valueArtifacts.title}
         </motion.h2>
         <motion.p
           className="mt-4 text-[var(--text-secondary)] max-w-2xl"
@@ -51,7 +52,7 @@ function PainSolutionInner() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Результат и артефакты — не «долго и непонятно», а конкретика за дни.
+          {HOME_COPY.valueArtifacts.subtitle}
         </motion.p>
 
         <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -90,6 +91,24 @@ function PainSolutionInner() {
               Быстрый запуск, понятные метрики, автоматизация рутины и прогнозируемые сроки.
             </p>
           </div>
+        </motion.div>
+
+        <motion.div
+          className="mt-10 rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/60 p-6 md:p-8"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.45 }}
+        >
+          <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]">Артефакты</p>
+          <ul className="mt-4 grid gap-3 md:grid-cols-2">
+            {HOME_COPY.valueArtifacts.artifacts.map((a) => (
+              <li key={a} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" aria-hidden />
+                <span>{a}</span>
+              </li>
+            ))}
+          </ul>
         </motion.div>
 
         <motion.div
@@ -133,7 +152,14 @@ function PainSolutionInner() {
           </p>
         </motion.div>
 
-        <SectionCTA />
+        <div className="mt-12 flex flex-wrap gap-6">
+          <Link href="/stack" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+            Показать примеры сценариев →
+          </Link>
+          <Link href="/cases" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+            {HOME_COPY.hero.ctaSecondary} →
+          </Link>
+        </div>
       </Container>
     </section>
   );

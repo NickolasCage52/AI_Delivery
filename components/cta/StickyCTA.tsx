@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useLeadModal } from "./LeadModal";
 import { useEffect, useState } from "react";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { useCookieNotice } from "@/hooks/useCookieNotice";
+import { HOME_COPY } from "@/content/site-copy";
 
 export function StickyCTA() {
-  const openModal = useLeadModal();
+  const { showNotice } = useCookieNotice();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -18,13 +19,14 @@ export function StickyCTA() {
     }
     const observer = new IntersectionObserver(
       ([entry]) => setVisible(!entry.isIntersecting),
-      { rootMargin: "-20% 0px 0px 0px", threshold: 0.1 }
+      // Show after ~1–2 screens (no scroll listeners)
+      { rootMargin: "120% 0px 0px 0px", threshold: 0 }
     );
     observer.observe(trigger);
     return () => observer.disconnect();
   }, []);
 
-  if (!visible) return null;
+  if (!visible || showNotice) return null;
 
   return (
     <motion.div
@@ -33,23 +35,20 @@ export function StickyCTA() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.8, duration: 0.4 }}
     >
-      <span className="hidden text-xs text-[var(--text-secondary)] md:inline">Пилот от 48 ч</span>
-      <button
-        type="button"
-        onClick={() => {
-          trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "sticky" });
-          openModal?.();
-        }}
+      <span className="hidden text-xs text-[var(--text-secondary)] md:inline">{HOME_COPY.hero.offerNote}</span>
+      <Link
+        href="/demo"
+        onClick={() => trackCtaEvent({ action: "click", label: HOME_COPY.hero.ctaPrimary, location: "sticky", href: "/demo" })}
         className="rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
       >
-        Запросить демо
-      </button>
+        {HOME_COPY.hero.ctaPrimary}
+      </Link>
       <Link
         href="/#cases"
-        onClick={() => trackCtaEvent({ action: "click", label: "Смотреть кейсы", location: "sticky", href: "/#cases" })}
+        onClick={() => trackCtaEvent({ action: "click", label: HOME_COPY.hero.ctaSecondary, location: "sticky", href: "/#cases" })}
         className="rounded-lg border border-[var(--accent)]/50 px-4 py-2.5 text-sm font-semibold text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
       >
-        Смотреть кейсы
+        {HOME_COPY.hero.ctaSecondary}
       </Link>
     </motion.div>
   );

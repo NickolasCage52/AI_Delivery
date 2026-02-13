@@ -4,9 +4,14 @@ import { useEffect, useRef, ReactNode, useState } from "react";
 import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
 import { useReducedMotion } from "@/lib/motion";
 import { useFxLifecycle } from "@/hooks/useFxLifecycle";
+import { installScrollDebug, wrapLenisScrollTo } from "@/lib/scroll/debug";
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
-  const lenisRef = useRef<{ destroy: () => void } | null>(null);
+  type LenisLike = {
+    destroy: () => void;
+    raf: (t: number) => void;
+  };
+  const lenisRef = useRef<LenisLike | null>(null);
   const rafUnsubRef = useRef<null | (() => void)>(null);
   const frameRef = useRef<null | ((time: number) => void)>(null);
   const [frameReady, setFrameReady] = useState(false);
@@ -14,11 +19,16 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   const fx = useFxLifecycle({ enabled: !reduced, isInViewport: true });
 
   useEffect(() => {
+    return installScrollDebug();
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
     const init = async () => {
       if (reduced) return;
       const Lenis = (await import("lenis")).default;
       const lenis = new Lenis({ lerp: 0.08, duration: 1.2 });
+      wrapLenisScrollTo(lenis);
       if (!mounted) {
         lenis.destroy();
         return;

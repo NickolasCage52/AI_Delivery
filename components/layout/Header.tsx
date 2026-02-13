@@ -169,21 +169,18 @@ export function Header() {
             >
               Разобрать задачу за 15 минут
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "header" });
-                openModal?.();
-              }}
+            <Link
+              href="/demo"
+              onClick={() => trackCtaEvent({ action: "click", label: "Запросить демо и план", location: "header", href: "/demo" })}
               className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
             >
               Запросить демо
-            </button>
+            </Link>
           </div>
 
           <button
             type="button"
-            className="md:hidden flex flex-col gap-1.5 p-2 text-[var(--text-primary)]"
+            className="md:hidden inline-flex h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-lg text-[var(--text-primary)] hover:bg-white/5 focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             aria-label="Открыть меню"
             onClick={() => setMobileOpen((o) => !o)}
             aria-expanded={mobileOpen}
@@ -274,17 +271,16 @@ export function Header() {
                 >
                   Разобрать задачу за 15 минут
                 </button>
-                <button
-                  type="button"
+                <Link
+                  href="/demo"
                   onClick={() => {
-                    trackCtaEvent({ action: "open-modal", label: "Запросить демо и план", location: "mobile-menu" });
-                    openModal?.();
+                    trackCtaEvent({ action: "click", label: "Запросить демо и план", location: "mobile-menu", href: "/demo" });
                     setMobileOpen(false);
                   }}
                   className="rounded-xl bg-[var(--accent)] py-3 px-4 text-center text-sm font-semibold text-[#09040F]"
                 >
                   Запросить демо
-                </button>
+                </Link>
               </div>
             </motion.nav>
           </motion.div>

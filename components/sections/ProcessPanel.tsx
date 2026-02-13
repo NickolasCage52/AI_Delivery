@@ -4,9 +4,10 @@ import React, { useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
-import { SectionCTA, useLeadModal } from "@/components/cta";
-import { trackCtaEvent } from "@/lib/analytics/cta";
+import { SectionCTA } from "@/components/cta";
 import { useQuality } from "@/hooks/useQuality";
+import { HOME_COPY } from "@/content/site-copy";
+import { useInViewport } from "@/hooks/useInViewport";
 
 const STEPS = [
   {
@@ -80,8 +81,9 @@ function ProcessPanelInner() {
   const stackElsRef = useRef<HTMLElement[]>([]);
   const reduced = useReducedMotion();
   const quality = useQuality();
-  const openModal = useLeadModal();
+  const inView = useInViewport(sectionRef, { rootMargin: "600px", threshold: 0.08 });
   const triggerRef = useRef<{ kill: () => void } | null>(null);
+  const initRef = useRef(false);
   const lastIndexRef = useRef(-1);
   const beamRef = useRef<HTMLDivElement>(null);
 
@@ -124,12 +126,18 @@ function ProcessPanelInner() {
     applyActiveIndex(0);
   }, [applyActiveIndex]);
 
+  // IMPORTANT: do not kill pinned ScrollTrigger on viewport leave.
+  // Killing a pinned section while the user scrolls can remove spacer height and clamp scrollY to page bottom (looks like a "jump to bottom").
   useEffect(() => {
+    if (initRef.current) return;
     if (reduced || quality === "low" || typeof window === "undefined") return;
+    if (!inView) return;
     const section = sectionRef.current;
     if (!section) return;
     const isDesktop = window.innerWidth >= 768;
     if (!isDesktop || quality !== "high") return;
+
+    initRef.current = true;
 
     const run = async () => {
       const gsap = (await import("gsap")).default;
@@ -140,9 +148,9 @@ function ProcessPanelInner() {
       const t = ScrollTrigger.create({
         trigger: section,
         start: "top top",
-        end: isDesktop ? `+=${steps * 80}%` : "+=50%",
-        pin: isDesktop,
-        pinSpacing: isDesktop,
+        end: `+=${steps * 80}%`,
+        pin: true,
+        pinSpacing: true,
         scrub: 1,
         onUpdate: (self) => {
           if (beamRef.current) {
@@ -156,12 +164,15 @@ function ProcessPanelInner() {
     };
 
     run();
+  }, [applyActiveIndex, reduced, quality, inView]);
+
+  useEffect(() => {
     return () => {
       triggerRef.current?.kill?.();
       triggerRef.current = null;
       lastIndexRef.current = -1;
     };
-  }, [applyActiveIndex, reduced, quality]);
+  }, []);
 
   return (
     <section
@@ -177,7 +188,7 @@ function ProcessPanelInner() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Как работаем
+          {HOME_COPY.process.title}
         </motion.h2>
         <motion.p
           className="mt-4 text-[var(--text-secondary)] max-w-2xl"
@@ -186,7 +197,7 @@ function ProcessPanelInner() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Минимум созвонов. Под ключ. Handoff на человека с инструкциями.
+          {HOME_COPY.process.subtitle}
         </motion.p>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-[1fr,1.2fr]">
@@ -259,7 +270,7 @@ function ProcessPanelInner() {
                   data-active={i === 0 ? "true" : "false"}
                   className="absolute inset-0 p-6 md:p-8 transition-all duration-300 opacity-0 translate-x-4 pointer-events-none data-[active=true]:opacity-100 data-[active=true]:translate-x-0 data-[active=true]:pointer-events-auto"
                 >
-                  <p className="text-xs font-medium uppercase tracking-wider text-[var(--accent)]">
+                  <p className="font-mono text-xs font-medium uppercase tracking-wider text-[var(--accent)]">
                     Операционная панель Delivery — {step.panel}
                   </p>
                   <h3 className="mt-4 text-xl font-semibold text-[var(--text-primary)]">{step.title}</h3>
@@ -294,7 +305,7 @@ function ProcessPanelInner() {
                   {/* Mini pipeline graph for Integrations step */}
                   {i === 3 && !reduced && (
                     <div className="mt-6 rounded-xl border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs font-medium text-[var(--text-secondary)] mb-3">Pipeline</p>
+                      <p className="font-mono text-xs font-medium text-[var(--text-secondary)] mb-3">Pipeline</p>
                       <svg viewBox="0 0 200 64" className="w-full h-16 text-[var(--accent)]" aria-hidden>
                         <defs>
                           <linearGradient id="pipe-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -320,23 +331,21 @@ function ProcessPanelInner() {
                     </div>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCtaEvent({ action: "open-modal", label: "План внедрения", location: "process-panel" });
-                      openModal?.();
-                    }}
-                    className="mt-8 w-full rounded-xl bg-[var(--accent)] py-3 font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_24px_rgba(139,92,246,0.35)]"
-                  >
-                    Запросить демо и план
-                  </button>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <SectionCTA primary="Запросить демо и план" />
+        <SectionCTA
+          primary={HOME_COPY.hero.ctaPrimary}
+          options={[
+            { label: HOME_COPY.hero.ctaSecondary, href: "/cases" },
+            { label: "Показать примеры сценариев", href: "/stack" },
+          ]}
+          sourcePage="home"
+          service="process"
+        />
       </Container>
     </section>
   );

@@ -5,7 +5,6 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SpecularCard } from "@/components/fx/SpecularCard";
-import { SectionCTA } from "@/components/cta";
 import type { CaseStudy } from "@/lib/content/cases";
 import { CaseArtifactPreview } from "@/components/cases/CaseArtifact";
 
@@ -45,6 +44,7 @@ function CasesInner({ cases = [] }: { cases?: CaseStudy[] }) {
                 <span className="text-xs font-medium uppercase tracking-wider text-[var(--accent-pink-strong)]">
                   Обезличенный кейс
                 </span>
+                {c.niche && <p className="mt-2 text-xs text-[var(--text-muted)]">{c.niche}</p>}
                 <h3 className="mt-3 font-semibold text-[var(--text-primary)]">{c.title}</h3>
                 <p className="mt-2 text-sm text-[var(--text-secondary)]">{c.context}</p>
                 <div className="mt-4 space-y-2 text-sm text-[var(--text-secondary)]">
@@ -73,7 +73,6 @@ function CasesInner({ cases = [] }: { cases?: CaseStudy[] }) {
           ))}
         </div>
 
-        <SectionCTA />
       </Container>
     </section>
   );

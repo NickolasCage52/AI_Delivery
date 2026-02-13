@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { SectionCTA } from "@/components/cta";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 
 export function FAQ() {
@@ -35,7 +34,6 @@ export function FAQ() {
           ))}
         </div>
 
-        <SectionCTA />
       </Container>
     </section>
   );
