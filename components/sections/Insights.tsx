@@ -19,7 +19,7 @@ export function Insights({ items }: { items: InsightMeta[] }) {
               <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">{item.readingTime}</p>
               <h3 className="mt-3 text-lg font-semibold text-[var(--text-primary)]">{item.title}</h3>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">{item.description}</p>
-              <Link href={`/insights/${item.slug}`} className="mt-4 inline-flex text-sm text-[var(--accent)] hover:underline">
+              <Link href={`/insights/${item.slug}`} className="link-trailing mt-4 inline-flex text-sm text-[var(--accent)]">
                 Читать →
               </Link>
             </SpecularCard>

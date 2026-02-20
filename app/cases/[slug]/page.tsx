@@ -5,10 +5,13 @@ import { Footer } from "@/components/sections/Footer";
 import { Container } from "@/components/ui/Container";
 import { HeroCTA, SectionCTA } from "@/components/cta";
 import { getAllCases, getCaseBySlug } from "@/lib/content/cases";
+import { getCaseBySlugLanding, getCasesLanding } from "@/lib/content/cases-landing";
 import { CaseArtifactPreview } from "@/components/cases/CaseArtifact";
+import { LandingCaseDetailPage } from "@/components/cases-landing/LandingCaseDetailPage";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
+import s from "@/app/cases/cases-landing.module.css";
 
 const CASE_SERVICE_MAP: Record<string, { label: string; href: string }> = {
   "fintech-lead-bot": { label: "ИИ‑боты для лидов и поддержки", href: "/services#bots" },
@@ -17,11 +20,21 @@ const CASE_SERVICE_MAP: Record<string, { label: string; href: string }> = {
 };
 
 export function generateStaticParams() {
-  return getAllCases().map((c) => ({ slug: c.slug }));
+  const legacy = getAllCases().map((c) => ({ slug: c.slug }));
+  const landing = getCasesLanding().map((c) => ({ slug: c.slug }));
+  return [...legacy, ...landing];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const landing = getCaseBySlugLanding(slug);
+  if (landing) {
+    return buildMetadata({
+      title: landing.title,
+      description: `${landing.summary} ${landing.goal}`,
+      path: `/cases/${landing.slug}`,
+    });
+  }
   const data = getCaseBySlug(slug);
   if (!data) {
     return buildMetadata({
@@ -39,6 +52,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const landingCase = getCaseBySlugLanding(slug);
+  if (landingCase) {
+    const allCases = getCasesLanding();
+    return (
+      <>
+        <JsonLd
+          data={getBreadcrumbSchema([
+            { name: "Главная", url: siteConfig.domain },
+            { name: "Кейсы", url: `${siteConfig.domain}/cases` },
+            { name: landingCase.title, url: `${siteConfig.domain}/cases/${landingCase.slug}` },
+          ])}
+        />
+        <Header />
+        <main>
+          <div className={s.wrapper}>
+            <LandingCaseDetailPage caseItem={landingCase} allCases={allCases} />
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   const data = getCaseBySlug(slug);
   if (!data) notFound();
   const relatedService = CASE_SERVICE_MAP[data.slug];

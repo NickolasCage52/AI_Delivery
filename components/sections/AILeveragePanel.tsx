@@ -118,7 +118,7 @@ function AILeveragePanelInner() {
   const activeItem = useMemo(() => ITEMS.find((i) => i.key === active) ?? ITEMS[0], [active]);
 
   return (
-    <SectionShell id="leverage" variant="panel" bg="primary">
+    <SectionShell id="leverage" variant="panel" bg="primary" seamless>
       <motion.h2
         className="text-3xl font-semibold tracking-tight md:text-4xl text-[var(--text-primary)]"
         initial={{ opacity: 0, y: 16 }}

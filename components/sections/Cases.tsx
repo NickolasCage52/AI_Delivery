@@ -65,7 +65,7 @@ function CasesInner({ cases = [] }: { cases?: CaseStudy[] }) {
                     </span>
                   ))}
                 </div>
-                <Link href={`/cases/${c.slug}`} className="mt-4 inline-flex text-sm text-[var(--accent)] hover:underline">
+                <Link href={`/cases/${c.slug}`} className="link-trailing mt-4 inline-flex text-sm text-[var(--accent)]">
                   Смотреть кейс →
                 </Link>
               </SpecularCard>

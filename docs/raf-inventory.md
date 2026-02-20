@@ -26,3 +26,8 @@
 ## Notes
 - Offscreen/hidden now stops RAF work via `useFxLifecycle`.
 - No redundant per‑FX raf loops while offscreen.
+
+## Vincture-style additions (v2)
+- **CursorReactiveGrid**: mousemove-only, no rAF; setState updates mask position (lightweight)
+- **TitleShimmer**: one-time framer-motion animation on mount
+- **Aurora drift**: CSS keyframes (auroraDrift1/2), respects prefers-reduced-motion

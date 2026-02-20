@@ -1,0 +1,269 @@
+[
+  {
+    "id": "case-02",
+    "slug": "miniapp-mvp-online-school",
+    "category": "Онлайн-образование",
+    "filter": "edu",
+    "title": "MiniApp-MVP каталога для онлайн-школы",
+    "summary": "Онлайн-школа запускала новый формат и хотела быстро проверить спрос без долгой сборки продукта.",
+    "goal": "Собрать заявки и измерить интерес к программе",
+    "timeline": "4 дня",
+    "status": "",
+    "featured": true,
+    "images": [
+      "/cases-landing/case-02.png",
+      "/cases-landing/case-02-2.png",
+      "/cases-landing/case-02-3.png",
+      "/cases-landing/case-02-4.png",
+      "/cases-landing/case-02-5.png"
+    ],
+    "caseUrl": "https://nickolascage52.github.io/School_MVP-/",
+    "projectUrl": "https://nickolascage52.github.io/School_MVP-/",
+    "contactUrl": "https://t.me/nikmorus",
+    "kpis": [
+      { "label": "Заявки", "value": "212", "tone": "main" },
+      { "label": "Конверсия", "value": "6.2%", "tone": "main" },
+      { "label": "CPL", "value": "-28%", "tone": "main" },
+      { "label": "Время до MVP", "value": "4 дня", "tone": "secondary" },
+      { "label": "Стоимость итерации", "value": "-19%", "tone": "secondary" }
+    ],
+    "problem": "Нужно было быстро проверить интерес к новому формату без разработки отдельного сайта и долгого цикла согласований.",
+    "solution": "Собрали MiniApp с каталогом и заявкой в Telegram, подключили аналитику и трекинг UTM, настроили маршрутизацию лидов.",
+    "result": "Школа получила валидные заявки в первый запуск и измеримые данные для решения о масштабировании.",
+    "stack": ["Telegram Mini Apps", "JavaScript", "n8n", "Google Sheets", "UTM Analytics"],
+    "process": [
+      { "step": "Discovery", "time": "День 1", "note": "Цели, воронка, карта событий" },
+      { "step": "Prototype", "time": "День 2", "note": "Прототип каталога и формы" },
+      { "step": "Build", "time": "День 3", "note": "Интеграции и сборка сценариев" },
+      { "step": "Launch", "time": "День 4", "note": "Публикация и контроль метрик" }
+    ],
+    "workDone": [
+      "UX-поток каталога и заявки",
+      "Сегментация интереса по программе",
+      "UTM-метки и трекинг конверсий",
+      "Интеграция заявок в таблицу/CRM",
+      "Инструкции для команды продаж"
+    ]
+  },
+  {
+    "id": "case-03",
+    "slug": "b2b-sales-automation",
+    "category": "B2B сервис",
+    "filter": "b2b",
+    "title": "Автоматизация продаж для B2B-сервиса",
+    "summary": "Команда обрабатывала лиды вручную и теряла скорость ответа. Внедрили процесс, который убрал рутину по статусам и КП.",
+    "goal": "Ускорить менеджеров и убрать рутину по статусам/КП",
+    "timeline": "7 дней",
+    "status": "",
+    "featured": true,
+    "images": [
+      "/cases-landing/case-03.png",
+      "/cases-landing/case-03-2.png",
+      "/cases-landing/case-03-3.png",
+      "/cases-landing/case-03-4.png",
+      "/cases-landing/case-03-5.png"
+    ],
+    "caseUrl": "https://t.me/Finance_Technical_Bot",
+    "projectUrl": "https://t.me/Finance_Technical_Bot",
+    "contactUrl": "https://t.me/nikmorus",
+    "kpis": [
+      { "label": "Экономия времени", "value": "18 ч/нед", "tone": "main" },
+      { "label": "Скорость ответа", "value": "20 мин", "tone": "main" },
+      { "label": "Статусы", "value": "100%", "tone": "main" },
+      { "label": "Доля обработанных лидов", "value": "+24%", "tone": "secondary" },
+      { "label": "Ошибки статусов", "value": "-33%", "tone": "secondary" }
+    ],
+    "problem": "Лиды распределялись вручную, менеджеры дублировали действия и пропускали часть обращений в пиковые часы.",
+    "solution": "Настроили pipeline с квалификацией, автопроставлением статусов и автоматической генерацией коммерческих предложений.",
+    "result": "Команда продаж стала отвечать быстрее и работать по прозрачному SLA, а руководитель получил единый контур контроля.",
+    "stack": ["Telegram Bot", "CRM", "n8n", "Webhooks", "Google Docs API"],
+    "process": [
+      { "step": "Discovery", "time": "День 1", "note": "Аудит воронки и SLA" },
+      { "step": "Prototype", "time": "День 2", "note": "Схема маршрутизации лидов" },
+      { "step": "Build", "time": "Дни 3-6", "note": "Интеграции, статусы, КП" },
+      { "step": "Launch", "time": "День 7", "note": "Запуск и handoff продажам" }
+    ],
+    "workDone": [
+      "Карта маршрутов лидов по источникам",
+      "Правила квалификации и приоритетов",
+      "Автопостановка задач менеджерам",
+      "Генерация КП по шаблонам",
+      "Оповещения о рисках SLA"
+    ]
+  },
+  {
+    "id": "case-04",
+    "slug": "modular-houses-website",
+    "category": "E-commerce / Недвижимость",
+    "filter": "ecom",
+    "title": "Сайт для компании по продаже модульных домов",
+    "summary": "Собрали конвертящий сайт с упором на комплектации, квиз и прозрачную структуру модели, чтобы повысить заявки из рекламы.",
+    "goal": "Конвертящий сайт + квиз/форма + аналитика",
+    "timeline": "10 дней",
+    "status": "",
+    "featured": true,
+    "images": [
+      "/cases-landing/case-04.png",
+      "/cases-landing/case-04-2.png",
+      "/cases-landing/case-04-3.png",
+      "/cases-landing/case-04-4.png",
+      "/cases-landing/case-04-5.png"
+    ],
+    "caseUrl": "https://xn--80adi5aimmhr.xn--p1ai/",
+    "projectUrl": "https://xn--80adi5aimmhr.xn--p1ai/",
+    "contactUrl": "https://t.me/nikmorus",
+    "kpis": [
+      { "label": "Конверсия в заявку", "value": "4.1%", "tone": "main" },
+      { "label": "Рост заявок", "value": "+36%", "tone": "main" },
+      { "label": "CPL", "value": "-19%", "tone": "main" },
+      { "label": "Время на сайте", "value": "+27%", "tone": "secondary" },
+      { "label": "Доля квиз-заявок", "value": "41%", "tone": "secondary" }
+    ],
+    "problem": "Трафик шел на старую посадочную страницу с низкой конверсией и неструктурированной подачей комплектаций.",
+    "solution": "Пересобрали архитектуру сайта, выделили оффер и CTA, добавили квиз, формы и аналитический контур по этапам воронки.",
+    "result": "После запуска увеличился объем целевых заявок, а стоимость привлечения снизилась при том же рекламном бюджете.",
+    "stack": ["HTML/CSS/JS", "Quiz Flow", "Yandex Metrica", "GA4", "CRM Integration"],
+    "process": [
+      { "step": "Discovery", "time": "Дни 1-2", "note": "Аудит трафика и оффера" },
+      { "step": "Prototype", "time": "Дни 3-4", "note": "Прототип экранов и квиза" },
+      { "step": "Build", "time": "Дни 5-9", "note": "Верстка, формы, аналитика" },
+      { "step": "Launch", "time": "День 10", "note": "Публикация и QA трафика" }
+    ],
+    "workDone": [
+      "Структура оффера и продуктовой линейки",
+      "Квиз с логикой подбора комплектации",
+      "Формы с валидацией и anti-spam",
+      "События аналитики по этапам",
+      "А/Б-готовые блоки первого экрана"
+    ]
+  },
+  {
+    "id": "case-05",
+    "slug": "retro-lamps-website",
+    "category": "E-commerce",
+    "filter": "ecom",
+    "title": "Сайт по продаже настольных светильников в ретро-стиле",
+    "summary": "Нужен был стильный магазин-лендинг под ретро-бренд с фокусом на визуал, карточки товара и бесшовный заказ.",
+    "goal": "Увеличить продажи и средний чек через UX",
+    "timeline": "8 дней",
+    "status": "",
+    "images": [
+      "/cases-landing/case-05.png",
+      "/cases-landing/case-05-2.png",
+      "/cases-landing/case-05-3.png",
+      "/cases-landing/case-05-4.png",
+      "/cases-landing/case-05-5.png"
+    ],
+    "caseUrl": "https://nickolascage52.github.io/Site_for_pixart/",
+    "projectUrl": "https://nickolascage52.github.io/Site_for_pixart/",
+    "contactUrl": "https://t.me/nikmorus",
+    "kpis": [
+      { "label": "Конверсия", "value": "3.4%", "tone": "main" },
+      { "label": "Средний чек", "value": "+17%", "tone": "main" },
+      { "label": "Добавления в корзину", "value": "+29%", "tone": "main" },
+      { "label": "CTR кнопок CTA", "value": "+22%", "tone": "secondary" },
+      { "label": "Отказы на мобайле", "value": "-14%", "tone": "secondary" }
+    ],
+    "problem": "Продукт визуально сильный, но старый интерфейс не передавал ценность и плохо конвертировал мобильный трафик.",
+    "solution": "Собрали брендовый интерфейс с акцентом на карточки, микроанимации, быстрый путь к покупке и понятный выбор моделей.",
+    "result": "Повысили вовлеченность и рост ключевых e-commerce метрик без увеличения рекламных расходов.",
+    "stack": ["UI Motion", "Vanilla JS", "Catalog UX", "Analytics", "Checkout Flow"],
+    "process": [
+      { "step": "Discovery", "time": "День 1", "note": "Разбор поведения пользователей" },
+      { "step": "Prototype", "time": "Дни 2-3", "note": "Сетка и UI-кит" },
+      { "step": "Build", "time": "Дни 4-7", "note": "Верстка и микровзаимодействия" },
+      { "step": "Launch", "time": "День 8", "note": "Релиз и QA ключевых экранов" }
+    ],
+    "workDone": [
+      "Пересборка hero и каталога",
+      "Карточки товара с акцентом на выгоды",
+      "Микроанимации CTA и hover",
+      "Оптимизация мобильной сетки",
+      "События аналитики на воронку заказа"
+    ]
+  },
+  {
+    "id": "case-06",
+    "slug": "seafood-order-automation",
+    "category": "Логистика / B2B",
+    "filter": "logistics",
+    "title": "Автоматизация заказов по поставке морепродуктов",
+    "summary": "Заказы из мессенджеров и почты терялись, подтверждение занимало много времени. Автоматизировали цепочку заказа и статусов.",
+    "goal": "Автоматизировать прием, подтверждение, документы и статусы",
+    "timeline": "12 дней",
+    "status": "",
+    "images": [
+      "/cases-landing/case-06.png",
+      "/cases-landing/case-06-2.png",
+      "/cases-landing/case-06-3.png",
+      "/cases-landing/case-06-4.png",
+      "/cases-landing/case-06-5.png"
+    ],
+    "caseUrl": "https://nickolascage52.github.io/worldseafood-mvp",
+    "projectUrl": "https://nickolascage52.github.io/worldseafood-mvp",
+    "contactUrl": "https://t.me/nikmorus",
+    "kpis": [
+      { "label": "Обработка заказа", "value": "-44%", "tone": "main" },
+      { "label": "Ошибки в заказах", "value": "-31%", "tone": "main" },
+      { "label": "Подтверждение", "value": "<= 22 мин", "tone": "main" },
+      { "label": "Пропущенные позиции", "value": "-27%", "tone": "secondary" },
+      { "label": "SLA подтверждения", "value": "96%", "tone": "secondary" }
+    ],
+    "problem": "Заказы поступали в разные каналы, менеджеры вручную сводили позиции и часто задерживали подтверждение клиенту.",
+    "solution": "Сделали единый вход заказа, автоматическое подтверждение, генерацию счетов и статусы в реальном времени для команды.",
+    "result": "Операционный цикл стал предсказуемым: меньше ошибок, быстрее подтверждение и прозрачная логистика по этапам.",
+    "stack": ["MiniApp", "Telegram", "n8n", "CRM", "Docs API", "Webhooks"],
+    "process": [
+      { "step": "Discovery", "time": "Дни 1-2", "note": "Аудит каналов заказов" },
+      { "step": "Prototype", "time": "Дни 3-4", "note": "Схема статусов и документов" },
+      { "step": "Build", "time": "Дни 5-11", "note": "Сборка автоматизаций" },
+      { "step": "Launch", "time": "День 12", "note": "Обучение команды и запуск" }
+    ],
+    "workDone": [
+      "Единый формат приема заказа",
+      "Проверка наличия и валидация позиций",
+      "Автогенерация счета и накладной",
+      "Статусы заказа в реальном времени",
+      "Уведомления менеджерам и клиенту"
+    ]
+  },
+  {
+    "id": "case-01",
+    "slug": "cleaning-company-website",
+    "category": "Клининг / Услуги",
+    "filter": "ecom",
+    "title": "Многостраничный сайт для компании по Клинингу",
+    "summary": "Нужен понятный многостраничный сайт с пошаговой заявкой на уборку, выбором типа и площади, акциями и отзывами с агрегаторов.",
+    "goal": "Конвертящий сайт с заявкой и доверием (отзывы, оффер)",
+    "timeline": "10 дней",
+    "status": "",
+    "images": [
+      "/cases-landing/case-01.png",
+      "/cases-landing/case-01-2.png",
+      "/cases-landing/case-01-3.png",
+      "/cases-landing/case-01-4.png",
+      "/cases-landing/case-01-5.png"
+    ],
+    "caseUrl": "https://nickolascage52.github.io/KliningCompany_MVP_site/",
+    "projectUrl": "https://nickolascage52.github.io/KliningCompany_MVP_site/",
+    "contactUrl": "https://t.me/nikmorus",
+    "kpis": [],
+    "problem": "Клининговая компания работала без единого сайта: заявки терялись, не было понятного выбора типа уборки и прозрачных условий.",
+    "solution": "Собрали многостраничный сайт с пошаговой формой (тип уборки, площадь, дата, доп. услуги), блоком спецпредложений с таймером и блоком отзывов с Яндекс, Авито, 2GIS, Profi.ru, Google.",
+    "result": "Единая точка входа для заявок, рост конверсии и прозрачный путь от выбора услуги до заказа обратного звонка.",
+    "stack": ["HTML/CSS/JS", "Многошаговая форма", "Таймер акций", "Блок отзывов", "Адаптив"],
+    "process": [
+      { "step": "Discovery", "time": "Дни 1–2", "note": "Структура страниц и сценарий заявки" },
+      { "step": "Prototype", "time": "День 3", "note": "Шаги формы и блоки доверия" },
+      { "step": "Build", "time": "Дни 4–8", "note": "Верстка, форма, таймер, отзывы" },
+      { "step": "Launch", "time": "Дни 9–10", "note": "Публикация и проверка заявок" }
+    ],
+    "workDone": [
+      "Пошаговая форма заявки (тип уборки, площадь, дата, доп. услуги)",
+      "Блок «Специальное предложение» с таймером и кнопкой «Обратный звонок»",
+      "Блок отзывов с агрегаторов (Яндекс, Авито, 2GIS, Profi.ru, Google)",
+      "Разделы «Для частных клиентов» и «Для бизнеса»",
+      "Адаптивная верстка и передача заявок в CRM/менеджеру"
+    ]
+  }
+]

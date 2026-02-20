@@ -102,11 +102,14 @@ function IntegrationsInner() {
         </div>
 
         <div className="mt-12 flex flex-wrap gap-6">
-          <Link href="/stack" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+          <Link href="/stack" className="link-trailing inline-flex text-sm text-[var(--accent)]">
             Смотреть стек и интеграции →
           </Link>
-          <Link href="/cases" className="inline-flex text-sm text-[var(--accent)] hover:underline">
+          <Link href="/cases" className="link-trailing inline-flex text-sm text-[var(--accent)]">
             {HOME_COPY.hero.ctaSecondary} →
+          </Link>
+          <Link href="/demo" className="link-trailing inline-flex text-sm text-[var(--accent)]">
+            Запросить демо →
           </Link>
         </div>
       </Container>

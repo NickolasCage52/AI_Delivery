@@ -33,7 +33,7 @@ export function SectionCTA({
       <Link
         href={primaryHref}
         onClick={() => trackCtaEvent({ action: "click", label: primary, location: "section-cta", href: primaryHref })}
-        className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)] min-h-[44px] inline-flex items-center justify-center"
+        className="rounded-xl bg-gradient-to-r from-[var(--accent)] to-[#7C3AED] px-5 py-2.5 text-sm font-semibold text-[#09040F] shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-200 hover:shadow-[0_0_28px_rgba(139,92,246,0.4)] hover:-translate-y-0.5 min-h-[44px] inline-flex items-center justify-center"
       >
         {primary}
       </Link>

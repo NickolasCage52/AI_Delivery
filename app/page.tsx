@@ -1,18 +1,18 @@
 import { HeroScene } from "@/components/sections/HeroScene";
 import { Header } from "@/components/layout/Header";
-import { NumbersProof } from "@/components/sections/NumbersProof";
+import { GrowthStory } from "@/components/sections/GrowthStory";
 import { PainSolution } from "@/components/sections/PainSolution";
 import { AILeveragePanel } from "@/components/sections/AILeveragePanel";
 import { Tasks } from "@/components/sections/Tasks";
 import { Products } from "@/components/sections/Products";
-import { Cases } from "@/components/sections/Cases";
+import { FeaturedCases } from "@/components/sections/FeaturedCases";
 import { ProcessPanel } from "@/components/sections/ProcessPanel";
 import { Integrations } from "@/components/sections/Integrations";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTA } from "@/components/sections/CTA";
 import { Footer } from "@/components/sections/Footer";
-import { getAllCases } from "@/lib/content/cases";
+import { getFeaturedCases } from "@/lib/cases/getCases";
 import { getAllInsights } from "@/lib/content/insights";
 import { Insights } from "@/components/sections/Insights";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -28,7 +28,7 @@ export const metadata = buildMetadata({
 });
 
 export default function Home() {
-  const cases = getAllCases();
+  const featuredCases = getFeaturedCases(3);
   const insights = getAllInsights().slice(0, 3);
   return (
     <>
@@ -44,12 +44,12 @@ export default function Home() {
       <main className="pb-24 md:pb-28">
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <HeroScene />
-        <NumbersProof />
+        <GrowthStory />
         <PainSolution />
         <AILeveragePanel />
         <Tasks />
         <Products />
-        <Cases cases={cases.slice(0, 3)} />
+        <FeaturedCases cases={featuredCases} />
         <Insights items={insights} />
         <ProcessPanel />
         <Integrations />

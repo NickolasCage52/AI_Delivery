@@ -5,12 +5,10 @@ import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
 import { useReducedMotion } from "@/lib/motion";
 import { useFxLifecycle } from "@/hooks/useFxLifecycle";
 import { installScrollDebug, wrapLenisScrollTo } from "@/lib/scroll/debug";
+import { LenisRefContext } from "@/lib/scroll/LenisContext";
+import type { LenisLike } from "@/lib/scroll/LenisContext";
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
-  type LenisLike = {
-    destroy: () => void;
-    raf: (t: number) => void;
-  };
   const lenisRef = useRef<LenisLike | null>(null);
   const rafUnsubRef = useRef<null | (() => void)>(null);
   const frameRef = useRef<null | ((time: number) => void)>(null);
@@ -26,7 +24,16 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     let mounted = true;
     const init = async () => {
       if (reduced) return;
-      const Lenis = (await import("lenis")).default;
+      const [LenisMod, gsapMod, stMod] = await Promise.all([
+        import("lenis"),
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      const Lenis = LenisMod.default;
+      const gsap = gsapMod.default;
+      const ScrollTrigger = stMod.default;
+      gsap.registerPlugin(ScrollTrigger);
+      if (typeof gsap.ticker?.lagSmoothing === "function") gsap.ticker.lagSmoothing(0);
       const lenis = new Lenis({ lerp: 0.08, duration: 1.2 });
       wrapLenisScrollTo(lenis);
       if (!mounted) {
@@ -34,14 +41,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         return;
       }
       lenisRef.current = lenis;
-      let scrollTrigger: { update: () => void } | null = null;
-      import("gsap/ScrollTrigger").then((mod) => {
-        if (mounted) scrollTrigger = mod.default;
-      });
       frameRef.current = (time: number) => {
         if (!mounted) return;
         lenis.raf(time);
-        scrollTrigger?.update();
+        ScrollTrigger.update();
       };
       setFrameReady(true);
     };
@@ -73,5 +76,5 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     };
   }, [fx.isActive, reduced, frameReady]);
 
-  return <>{children}</>;
+  return <LenisRefContext.Provider value={lenisRef}>{children}</LenisRefContext.Provider>;
 }

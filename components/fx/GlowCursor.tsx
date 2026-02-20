@@ -45,9 +45,9 @@ export function GlowCursor() {
 
     const update = () => {
       rafId = 0;
-      const scaleVal = hover ? 1.15 : 1;
+      const scaleVal = hover ? 1.2 : 1;
       dot.style.transform = `translate3d(${target.x}px, ${target.y}px, 0) translate(-50%,-50%) scale(${scaleVal})`;
-      dot.style.setProperty("--cursor-glow", hover ? "1" : "0.7");
+      dot.style.setProperty("--cursor-glow", hover ? "1" : "0.75");
     };
 
     const onMove = (e: MouseEvent) => {

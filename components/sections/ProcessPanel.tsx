@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
 import { SectionCTA } from "@/components/cta";
 import { useQuality } from "@/hooks/useQuality";
 import { HOME_COPY } from "@/content/site-copy";
-import { useInViewport } from "@/hooks/useInViewport";
 
 const STEPS = [
   {
@@ -74,6 +73,9 @@ const STEPS = [
   },
 ];
 
+const SCROLL_DEBUG = typeof process !== "undefined" && process.env.NEXT_PUBLIC_SCROLL_DEBUG === "1";
+const RESIZE_DEBOUNCE_MS = 150;
+
 function ProcessPanelInner() {
   const sectionRef = useRef<HTMLElement>(null);
   const stepElsRef = useRef<HTMLElement[]>([]);
@@ -81,11 +83,9 @@ function ProcessPanelInner() {
   const stackElsRef = useRef<HTMLElement[]>([]);
   const reduced = useReducedMotion();
   const quality = useQuality();
-  const inView = useInViewport(sectionRef, { rootMargin: "600px", threshold: 0.08 });
-  const triggerRef = useRef<{ kill: () => void } | null>(null);
-  const initRef = useRef(false);
   const lastIndexRef = useRef(-1);
   const beamRef = useRef<HTMLDivElement>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   const applyActiveIndex = useCallback((index: number) => {
     if (index === lastIndexRef.current) return;
@@ -117,7 +117,8 @@ function ProcessPanelInner() {
     });
   }, []);
 
-  useEffect(() => {
+  // Populate refs synchronously so GSAP init can use them
+  useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
     stepElsRef.current = Array.from(section.querySelectorAll<HTMLElement>("[data-process-step]"));
@@ -126,53 +127,89 @@ function ProcessPanelInner() {
     applyActiveIndex(0);
   }, [applyActiveIndex]);
 
-  // IMPORTANT: do not kill pinned ScrollTrigger on viewport leave.
-  // Killing a pinned section while the user scrolls can remove spacer height and clamp scrollY to page bottom (looks like a "jump to bottom").
-  useEffect(() => {
-    if (initRef.current) return;
-    if (reduced || quality === "low" || typeof window === "undefined") return;
-    if (!inView) return;
+  // Single init: gsap.context + useLayoutEffect, refresh after init and on resize, cleanup via revert()
+  useLayoutEffect(() => {
     const section = sectionRef.current;
-    if (!section) return;
+    if (!section || reduced || quality !== "high" || typeof window === "undefined") return;
     const isDesktop = window.innerWidth >= 768;
-    if (!isDesktop || quality !== "high") return;
+    if (!isDesktop) return;
 
-    initRef.current = true;
-
+    let cancelled = false;
     const run = async () => {
       const gsap = (await import("gsap")).default;
       const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
       gsap.registerPlugin(ScrollTrigger);
 
+      if (cancelled) return;
+      const sec = sectionRef.current;
+      if (!sec) return;
+
       const steps = STEPS.length;
-      const t = ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: `+=${steps * 80}%`,
-        pin: true,
-        pinSpacing: true,
-        scrub: 1,
-        onUpdate: (self) => {
-          if (beamRef.current) {
-            beamRef.current.style.transform = `scaleX(${self.progress})`;
-          }
-          const index = Math.min(steps - 1, Math.max(0, Math.floor(self.progress * steps * 1.01)));
-          applyActiveIndex(index);
-        },
+      const ctx = gsap.context(() => {
+        ScrollTrigger.create({
+          trigger: sec,
+          start: "top top",
+          end: `+=${steps * 80}%`,
+          pin: true,
+          pinSpacing: true,
+          scrub: 1,
+          onUpdate(self) {
+            if (beamRef.current) {
+              beamRef.current.style.transform = `scaleX(${self.progress})`;
+            }
+            const index = Math.min(steps - 1, Math.max(0, Math.floor(self.progress * steps * 1.01)));
+            applyActiveIndex(index);
+          },
+          ...(SCROLL_DEBUG
+            ? {
+                onEnter: () => console.log("[HowWeWork] onEnter"),
+                onLeave: () => console.log("[HowWeWork] onLeave"),
+                onRefresh: () => console.log("[HowWeWork] onRefresh"),
+              }
+            : {}),
+        });
+        if (SCROLL_DEBUG) {
+          console.log("[HowWeWork] init", "ScrollTrigger.getAll().length =", ScrollTrigger.getAll().length);
+        }
+      }, sectionRef);
+
+      requestAnimationFrame(() => {
+        if (!cancelled) ScrollTrigger.refresh();
       });
-      triggerRef.current = t as unknown as { kill: () => void };
+      document.fonts?.ready?.then(() => {
+        if (!cancelled) ScrollTrigger.refresh();
+      });
+
+      let resizeId: ReturnType<typeof setTimeout> | null = null;
+      const onResize = () => {
+        if (resizeId) clearTimeout(resizeId);
+        resizeId = setTimeout(() => {
+          resizeId = null;
+          if (!cancelled) ScrollTrigger.refresh();
+        }, RESIZE_DEBOUNCE_MS);
+      };
+      window.addEventListener("resize", onResize);
+
+      const cleanup = () => {
+        window.removeEventListener("resize", onResize);
+        if (resizeId) clearTimeout(resizeId);
+        ctx.revert();
+        lastIndexRef.current = -1;
+      };
+      if (cancelled) {
+        cleanup();
+        return;
+      }
+      cleanupRef.current = cleanup;
     };
 
     run();
-  }, [applyActiveIndex, reduced, quality, inView]);
-
-  useEffect(() => {
     return () => {
-      triggerRef.current?.kill?.();
-      triggerRef.current = null;
-      lastIndexRef.current = -1;
+      cancelled = true;
+      cleanupRef.current?.();
+      cleanupRef.current = null;
     };
-  }, []);
+  }, [reduced, quality, applyActiveIndex]);
 
   return (
     <section

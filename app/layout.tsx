@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { PageTransition } from "@/components/ui/PageTransition";
 import { GlowCursor } from "@/components/fx/GlowCursor";
 import { EffectsDebugOverlay } from "@/components/fx/EffectsDebugOverlay";
 import { NoiseOverlay } from "@/components/fx/NoiseOverlay";
@@ -12,6 +13,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/lib/seo/metadata";
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/seo/schema";
 import { UiDebugTools } from "@/components/ui/UiDebugTools";
+import { ScrollToTopOnRouteChange } from "@/components/behavior/ScrollToTopOnRouteChange";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-sans", display: "swap" });
 const spaceGrotesk = Space_Grotesk({
@@ -75,7 +77,10 @@ export default function RootLayout({
           <ScrollVelocityBlur />
           <EffectsDebugOverlay />
           <UiDebugTools />
-          <SmoothScroll>{children}</SmoothScroll>
+          <SmoothScroll>
+            <ScrollToTopOnRouteChange />
+            <PageTransition>{children}</PageTransition>
+          </SmoothScroll>
           <StickyCTA />
           <CookieNotice />
         </LeadModalProvider>

@@ -15,31 +15,31 @@ export function Footer() {
             </p>
           </div>
           <nav className="flex flex-wrap gap-6 text-sm">
-            <Link href="/services" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/services" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Услуги
             </Link>
-            <Link href="/cases" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/cases" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Кейсы
             </Link>
-            <Link href="/about" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/about" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               О нас
             </Link>
-            <Link href="/stack" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/stack" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Стек
             </Link>
-            <Link href="/contact" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/contact" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Контакты
             </Link>
-            <Link href="/demo" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/demo" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Демо
             </Link>
-            <Link href="/#process" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/#process" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Процесс
             </Link>
-            <Link href="/privacy" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/privacy" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Конфиденциальность
             </Link>
-            <Link href="/cookies" className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/cookies" className="link-trailing text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
               Cookies
             </Link>
           </nav>

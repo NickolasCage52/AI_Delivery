@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { MagneticButton } from "@/components/fx/MagneticButton";
 import ShaderBackground from "@/components/ui/shader-background";
 import { BusinessCoverageGraph } from "@/components/hero/BusinessCoverageGraph";
+import { CursorReactiveGrid } from "@/components/hero/CursorReactiveGrid";
 import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
 import { getHeroBlurClass } from "@/lib/perf/quality";
@@ -18,31 +19,33 @@ const HeroFXLayer = memo(function HeroFXLayer() {
   const quality = useQuality();
   const blurClass = getHeroBlurClass(quality);
   const shaderOpacity =
-    quality === "low" ? "opacity-[0.35]" : quality === "medium" ? "opacity-[0.55]" : "opacity-[0.65]";
+    quality === "low" ? "opacity-[0.28]" : quality === "medium" ? "opacity-[0.42]" : "opacity-[0.50]";
   return (
     <>
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)]"
         aria-hidden
       />
-      {/* Subtle grid only in hero (depth, not cyberpunk) */}
+      {/* Base grid (static fallback) — reduced contrast */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.22]"
+        className="pointer-events-none absolute inset-0 opacity-[0.09]"
         aria-hidden
         style={{
           backgroundImage:
-            "linear-gradient(rgba(139,92,246,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(236,72,153,0.08) 1px, transparent 1px)",
+            "linear-gradient(rgba(139,92,246,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(236,72,153,0.06) 1px, transparent 1px)",
           backgroundSize: "72px 72px",
           maskImage: "radial-gradient(circle at 40% 35%, black 0%, transparent 70%)",
           WebkitMaskImage: "radial-gradient(circle at 40% 35%, black 0%, transparent 70%)",
         }}
       />
+      <CursorReactiveGrid />
+      {/* Aurora blobs — reduced intensity (25–40%) */}
       <div
-        className={`pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.08] ${blurClass.orb1}`}
+        className={`pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.05] ${blurClass.orb1} animate-[auroraDrift1_18s_ease-in-out_infinite]`}
         aria-hidden
       />
       <div
-        className={`pointer-events-none absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.05] ${blurClass.orb2}`}
+        className={`pointer-events-none absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.03] ${blurClass.orb2} animate-[auroraDrift2_22s_ease-in-out_infinite]`}
         aria-hidden
       />
       <ShaderBackground className={`absolute inset-0 z-0 h-full w-full ${shaderOpacity}`} />
@@ -55,10 +58,15 @@ const HeroContent = memo(function HeroContent() {
 
   return (
     <>
-      <Container className="relative z-10 py-24 md:py-32 flex flex-col lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+      <Container className="relative z-10 py-20 md:py-28 flex flex-col lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
+        {/* Safe area: soft gradient under text for readability */}
+        <div
+          className="pointer-events-none absolute left-0 top-0 bottom-0 w-full max-w-[min(100%,720px)] bg-gradient-to-r from-[var(--bg-primary)]/85 via-[var(--bg-primary)]/40 to-transparent z-[1]"
+          aria-hidden
+        />
         {/* Left: copy */}
-        <div className="flex-1 max-w-2xl order-2 lg:order-1">
-          <div className="relative rounded-3xl border border-white/10 bg-black/40 p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+        <div className="relative z-10 flex-1 max-w-2xl order-2 lg:order-1">
+          <div className="relative rounded-2xl border border-white/[0.08] bg-black/50 backdrop-blur-sm p-6 md:p-8 shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
             <motion.h1
               className="text-4xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-5xl lg:text-6xl leading-[1.05] drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
               initial={reduced ? false : { opacity: 0, y: 12 }}
@@ -68,24 +76,16 @@ const HeroContent = memo(function HeroContent() {
               {HERO.title}
             </motion.h1>
             <motion.p
-              className="mt-6 text-lg text-[var(--text-primary)]/80 md:text-xl max-w-xl leading-relaxed"
+              className="mt-6 text-lg text-[var(--text-primary)]/90 md:text-xl max-w-[62ch] leading-relaxed"
               initial={reduced ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.08 }}
             >
               {HERO.subtitle}
             </motion.p>
-            <motion.p
-              className="mt-4 text-xs font-medium text-[var(--text-muted)]"
-              initial={reduced ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.14 }}
-            >
-              {HERO.speedLine}
-            </motion.p>
-            {/* Benefit bullets */}
+            {/* Benefit bullets — max 3 on first screen */}
             <ul className="mt-6 md:mt-8 space-y-2 max-w-lg">
-              {HERO.bullets.map((b, i) => (
+              {(HERO.bullets.slice(0, 3)).map((b, i) => (
                 <motion.li
                   key={b}
                   className="flex items-center gap-2 text-sm text-[var(--text-primary)]/75"
@@ -99,7 +99,7 @@ const HeroContent = memo(function HeroContent() {
               ))}
             </ul>
             <motion.p
-              className="mt-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
+              className="mt-4 text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]/90"
               initial={reduced ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
@@ -128,7 +128,7 @@ const HeroContent = memo(function HeroContent() {
         </div>
 
         {/* Right: integration graph (brand visual) */}
-        <div className="flex-shrink-0 flex items-center justify-center order-1 lg:order-2 w-full mx-auto lg:mx-0 lg:flex-1">
+        <div className="min-w-0 flex-shrink-0 flex items-center justify-center order-1 lg:order-2 w-full mx-auto lg:mx-0 lg:flex-1">
           <BusinessCoverageGraph />
         </div>
       </Container>

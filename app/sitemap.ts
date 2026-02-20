@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo/metadata";
 import { getAllCases } from "@/lib/content/cases";
+import { getCasesLanding } from "@/lib/content/cases-landing";
 import { getAllInsights } from "@/lib/content/insights";
 import { getAllDirections } from "@/lib/content/directions";
 
@@ -15,11 +16,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/cases",
     "/about",
     "/contact",
+    "/demo",
     "/stack",
     "/insights",
   ];
 
-  const caseRoutes = getAllCases().map((item) => `/cases/${item.slug}`);
+  const caseRoutes = [
+    ...getAllCases().map((item) => `/cases/${item.slug}`),
+    ...getCasesLanding().map((item) => `/cases/${item.slug}`),
+  ];
   const insightRoutes = getAllInsights().map((item) => `/insights/${item.slug}`);
   const directionRoutes = getAllDirections().map((item) => `/directions/${item.slug}`);
 

@@ -27,6 +27,17 @@
   75% { transform: translate(0, 1px); }
 }
 
+@keyframes auroraDrift1 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0); }
+  33% { transform: translate(-50%, -50%) translate(12px, -8px); }
+  66% { transform: translate(-50%, -50%) translate(-8px, 10px); }
+}
+
+@keyframes auroraDrift2 {
+  0%, 100% { transform: translateY(-50%) translate(0, 0); }
+  50% { transform: translateY(-50%) translate(-15px, 6px); }
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 96px;
@@ -78,6 +89,11 @@ h3 {
   scroll-margin-top: 96px;
 }
 
+/* Readable line length for lead/description text */
+.prose-width {
+  max-width: 62ch;
+}
+
 .scroll-locked {
   overscroll-behavior: contain;
 }
@@ -97,6 +113,24 @@ h3 {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Trailing underline for links (vincture-like) */
+.link-trailing {
+  position: relative;
+}
+.link-trailing::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-pink));
+  transition: width 0.25s ease-out;
+}
+.link-trailing:hover::after {
+  width: 100%;
 }
 
 /* Section highlight after scroll-from-hero chip (800ms) */
@@ -120,6 +154,11 @@ h3 {
 @keyframes caret-blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
+}
+
+@keyframes sparkline-draw {
+  from { stroke-dashoffset: var(--sparkline-length, 100); }
+  to { stroke-dashoffset: 0; }
 }
 
 @keyframes sectionHighlight {

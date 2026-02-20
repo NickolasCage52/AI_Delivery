@@ -283,7 +283,7 @@ const ShaderBackground = ({ className = "" }: ShaderBackgroundProps) => {
     <canvas
       ref={canvasRef}
       className={`pointer-events-none ${className}`}
-      style={{ opacity: 0.75, transition: "opacity 200ms ease" }}
+      style={{ transition: "opacity 200ms ease" }}
       aria-hidden
     />
   );
