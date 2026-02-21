@@ -161,6 +161,12 @@ h3 {
   to { stroke-dashoffset: 0; }
 }
 
+/* Hero graph orbital — pulse for related nodes */
+@keyframes pulse-ring {
+  0%, 100% { stroke-opacity: 0.35; }
+  50% { stroke-opacity: 0.7; }
+}
+
 @keyframes sectionHighlight {
   0% {
     box-shadow: 0 0 0 0 var(--section-highlight-color);
