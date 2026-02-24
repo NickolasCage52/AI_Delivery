@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useLeadModal } from "./LeadModal";
 import { trackCtaEvent } from "@/lib/analytics/cta";
 import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { TelegramLeadButton } from "./TelegramLeadButton";
+import { FormStatus } from "@/components/forms/FormStatus";
 
-type Status = "idle" | "loading" | "success";
+type Status = "idle" | "loading" | "success" | "error";
 
 export function InlineLeadForm({
   title = "Запросить оценку",
@@ -20,6 +21,8 @@ export function InlineLeadForm({
   compact?: boolean;
 }) {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const submittedRef = useRef(false);
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [_hp, setHp] = useState("");
@@ -28,12 +31,16 @@ export function InlineLeadForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setStatus("loading");
+    setErrorMessage("");
     trackCtaEvent({ action: "submit", label: "InlineLeadForm", location: "inline" });
     const result = await submitLead({
       name,
       contact,
       sourcePage: pathname ?? "/",
+      formId: "inline_form",
       utm: collectUtm(),
       _hp,
     });
@@ -42,8 +49,9 @@ export function InlineLeadForm({
       setName("");
       setContact("");
     } else {
-      setStatus("idle");
-      alert(result.error);
+      submittedRef.current = false;
+      setStatus("error");
+      setErrorMessage(result.message);
     }
   };
 
@@ -57,7 +65,7 @@ export function InlineLeadForm({
         <p className="text-[var(--accent-pink-strong)]">Спасибо! Мы свяжемся с вами в ближайшее время.</p>
         <button
           type="button"
-          onClick={() => setStatus("idle")}
+          onClick={() => { setStatus("idle"); submittedRef.current = false; }}
           className="mt-3 text-sm text-[var(--accent)] hover:underline"
         >
           Отправить ещё
@@ -77,6 +85,7 @@ export function InlineLeadForm({
       <h3 className="text-lg font-semibold text-[var(--text-primary)]">{title}</h3>
       {!compact && <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>}
       <form onSubmit={handleSubmit} className="mt-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
+        <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} className="w-full basis-full" />
         <div className="sr-only" aria-hidden>
           <label htmlFor="inline-hp">Не заполняйте</label>
           <input id="inline-hp" type="text" tabIndex={-1} autoComplete="off" value={_hp} onChange={(e) => setHp(e.target.value)} />

@@ -7,6 +7,7 @@ import s from "@/app/cases/cases-landing.module.css";
 import { FILTERS, getDisplayImages, type CaseItem } from "./cases-data";
 import { GalleryLightbox } from "./GalleryLightbox";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
+import { FormStatus } from "@/components/forms/FormStatus";
 
 const CONTACT_URL = "https://t.me/nikmorus";
 
@@ -360,9 +361,11 @@ export function CaseDetailView({
 function CTAFormBlock() {
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [statusMsg, setStatusMsg] = useState("");
+  const submittedRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submittedRef.current) return;
     const fd = new FormData(e.currentTarget);
     const name = (fd.get("name") as string)?.trim() || "";
     const contact = (fd.get("contact") as string)?.trim() || "";
@@ -386,6 +389,7 @@ function CTAFormBlock() {
       return;
     }
 
+    submittedRef.current = true;
     setFormState("loading");
     setStatusMsg("");
 
@@ -395,15 +399,18 @@ function CTAFormBlock() {
       contact,
       message,
       sourcePage: "/cases",
+      formId: "cases_form",
       utm: collectUtm(),
     });
     if (result.ok) {
       setFormState("success");
-      setStatusMsg("Спасибо! Мы свяжемся с вами в ближайшее время.");
+      setStatusMsg("Заявка отправлена. Мы свяжемся в течение 24 часов.");
+      submittedRef.current = false;
       (e.target as HTMLFormElement).reset();
     } else {
+      submittedRef.current = false;
       setFormState("error");
-      setStatusMsg(result.error);
+      setStatusMsg(result.message);
     }
   };
 
@@ -431,9 +438,10 @@ function CTAFormBlock() {
                 <label htmlFor="cl-company">Компания</label>
                 <input id="cl-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
               </div>
-              <div className={`${s.formStatus} ${formState === "success" ? s.formStatusSuccess : formState === "error" ? s.formStatusError : ""}`} role="status" aria-live="polite">
-                {statusMsg}
-              </div>
+              <FormStatus
+                variant={formState === "success" ? "success" : formState === "error" ? "error" : "idle"}
+                message={statusMsg}
+              />
               <div className="flex flex-col sm:flex-row gap-3">
                 <button type="submit" className={`${s.btn} ${s.btnPrimary} ${s.pulse} flex-1`} disabled={formState === "loading"}>
                   {formState === "loading" ? "Отправка…" : "Отправить заявку"}

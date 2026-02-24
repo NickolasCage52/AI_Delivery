@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { trackCtaEvent } from "@/lib/analytics/cta";
 import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
+import { FormStatus } from "@/components/forms/FormStatus";
 
 const IMPROVE_OPTIONS = [
   "Заявки и лиды",
@@ -24,10 +25,12 @@ const CHAOS_OPTIONS = [
   "Другое",
 ] as const;
 
-type Status = "idle" | "loading";
+type Status = "idle" | "loading" | "error";
 
 export function DemoForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const submittedRef = useRef(false);
   const [form, setForm] = useState({
     name: "",
     contact: "",
@@ -42,8 +45,10 @@ export function DemoForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.agreed) return;
+    if (!form.agreed || submittedRef.current) return;
+    submittedRef.current = true;
     setStatus("loading");
+    setErrorMessage("");
     trackCtaEvent({ action: "submit", label: "Demo Form", location: "demo-page" });
     const result = await submitLead({
       name: form.name,
@@ -52,14 +57,16 @@ export function DemoForm() {
       improve: form.improve,
       chaos: form.chaos,
       sourcePage: pathname ?? "/demo",
+      formId: "demo_page",
       utm: collectUtm(),
       _hp: form._hp,
     });
     if (result.ok) {
       router.push("/thank-you");
     } else {
-      setStatus("idle");
-      alert(result.error);
+      submittedRef.current = false;
+      setStatus("error");
+      setErrorMessage(result.message);
     }
   };
 
@@ -167,6 +174,7 @@ export function DemoForm() {
           </Link>
         </label>
       </div>
+      <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           type="submit"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -10,11 +10,14 @@ import { trackCtaEvent } from "@/lib/analytics/cta";
 import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { HOME_COPY } from "@/content/site-copy";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
+import { FormStatus } from "@/components/forms/FormStatus";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export function CTA() {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const submittedRef = useRef(false);
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
@@ -30,7 +33,10 @@ export function CTA() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setStatus("loading");
+    setErrorMessage("");
     trackCtaEvent({ action: "submit", label: "Home CTA", location: "home-final" });
     const result = await submitLead({
       name: form.name,
@@ -39,6 +45,7 @@ export function CTA() {
       need: form.need,
       timeline: form.deadline,
       sourcePage: pathname ?? "/",
+      formId: "home_cta",
       utm: collectUtm(),
       _hp: form._hp,
     });
@@ -47,8 +54,9 @@ export function CTA() {
       setForm({ name: "", contact: "", niche: "", need: "", deadline: "", _hp: "" });
       setTimeout(() => router.push("/thank-you"), 400);
     } else {
+      submittedRef.current = false;
       setStatus("error");
-      alert(result.error);
+      setErrorMessage(result.message);
     }
   };
 
@@ -90,6 +98,7 @@ export function CTA() {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+              <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
               <div className="sr-only" aria-hidden>
                 <label htmlFor="cta-hp">Не заполняйте</label>
                 <input id="cta-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />

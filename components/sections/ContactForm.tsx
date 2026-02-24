@@ -1,23 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { trackCtaEvent } from "@/lib/analytics/cta";
 import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
+import { FormStatus } from "@/components/forms/FormStatus";
 
-type Status = "idle" | "loading";
+type Status = "idle" | "loading" | "error";
 
 export function ContactForm({ sourcePage, service }: { sourcePage?: string; service?: string }) {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const submittedRef = useRef(false);
   const [form, setForm] = useState({ name: "", contact: "", task: "", sphere: "", timeline: "", _hp: "" });
   const router = useRouter();
   const pathname = usePathname();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setStatus("loading");
+    setErrorMessage("");
     trackCtaEvent({ action: "submit", label: "Contact Form", location: "contact-page" });
     const result = await submitLead({
       name: form.name,
@@ -26,14 +32,16 @@ export function ContactForm({ sourcePage, service }: { sourcePage?: string; serv
       sphere: form.sphere,
       timeline: form.timeline,
       sourcePage: sourcePage ?? pathname ?? "/contact",
+      formId: "contact_page",
       utm: collectUtm(),
       _hp: form._hp,
     });
     if (result.ok) {
       router.push("/thank-you");
     } else {
-      setStatus("idle");
-      alert(result.error);
+      submittedRef.current = false;
+      setStatus("error");
+      setErrorMessage(result.message);
     }
   };
 
@@ -115,6 +123,7 @@ export function ContactForm({ sourcePage, service }: { sourcePage?: string; serv
           />
         </div>
       </div>
+      <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
       <div className="flex flex-col sm:flex-row gap-3 pt-2">
         <button
           type="submit"

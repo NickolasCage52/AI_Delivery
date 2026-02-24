@@ -60,14 +60,15 @@ export const LeadSchema = z
     // Мета
     source: LeadSourceEnum.default("website"),
     sourcePage: z.string().max(256).default("/"),
+    formId: z.string().max(64).optional(),
     utm: z.record(z.string(), z.string()).optional(),
     createdAt: z.string().datetime().optional(),
 
-    // Honeypot (reject если заполнен)
-    honeypot: z.string().max(0).optional(),
-    _hp: z.string().max(0).optional(),
-    website: z.string().max(0).optional(),
-    company: z.string().max(0).optional(),
+  // Honeypot (reject если заполнен — спам)
+  honeypot: z.string().max(0).optional(),
+  _hp: z.string().max(0).optional(),
+  website: z.string().max(0).optional(),
+  company: z.string().max(0).optional(),
   })
   .transform((data) => {
     const msg = data.message ?? data.task ?? data.need ?? "";

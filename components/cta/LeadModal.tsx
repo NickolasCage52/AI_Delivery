@@ -9,6 +9,7 @@ import { trackCtaEvent } from "@/lib/analytics/cta";
 import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/ui/scrollLock";
 import { TelegramLeadButton } from "./TelegramLeadButton";
+import { FormStatus } from "@/components/forms/FormStatus";
 
 type LeadModalContextType = ((context?: { sourcePage?: string; service?: string }) => void) | null;
 
@@ -25,6 +26,8 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
   const [closing, setClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const submittedRef = useRef(false);
   const [form, setForm] = useState({ name: "", contact: "", need: "", sphere: "", timeline: "", _hp: "" });
   const [context, setContext] = useState({ sourcePage: "", service: "" });
   const [showMore, setShowMore] = useState(false);
@@ -57,7 +60,10 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setStatus("loading");
+    setErrorMessage("");
     trackCtaEvent({ action: "submit", label: "LeadModal", location: "modal" });
     const result = await submitLead({
       name: form.name,
@@ -66,6 +72,7 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
       sphere: form.sphere,
       timeline: form.timeline,
       sourcePage: context.sourcePage || pathname || "/",
+      formId: "lead_modal",
       utm: collectUtm(),
       _hp: form._hp,
     });
@@ -73,8 +80,9 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
       setStatus("success");
       setForm({ name: "", contact: "", need: "", sphere: "", timeline: "", _hp: "" });
     } else {
+      submittedRef.current = false;
       setStatus("error");
-      alert(result.error);
+      setErrorMessage(result.message);
     }
   };
 
@@ -203,6 +211,7 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                  <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
                   <div className="sr-only" aria-hidden>
                     <label htmlFor="modal-hp">Не заполняйте</label>
                     <input id="modal-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />

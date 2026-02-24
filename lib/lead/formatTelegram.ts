@@ -47,5 +47,7 @@ export function formatLeadForTelegram(lead: NormalizedLead): string {
   parts.push("");
   parts.push(`🕐 ${lead.createdAt.replace("T", " ").slice(0, 16)}`);
 
-  return parts.join("\n");
+  const full = parts.join("\n");
+  // Telegram limit 4096 bytes (UTF-8)
+  return full.length > 4090 ? full.slice(0, 4087) + "…" : full;
 }
