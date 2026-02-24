@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import Image from "next/image";
+import { CaseImage } from "@/components/ui/CaseImage";
 import Link from "next/link";
 import s from "@/app/cases/cases-landing.module.css";
 import { FILTERS, getDisplayImages, type CaseItem } from "./cases-data";
@@ -166,11 +166,12 @@ function CaseCard({
             }}
             aria-label="Открыть галерею"
           >
-            <Image
+            <CaseImage
               src={displayImages[0]}
               alt={`Скриншот: ${item.title}`}
               width={800}
               height={500}
+              className="object-cover w-full h-full"
               style={{ objectFit: "cover", width: "100%", height: "100%" }}
               loading="lazy"
             />
@@ -250,11 +251,12 @@ export function CaseDetailView({
               }}
               aria-label={`Открыть фото ${idx + 1} из ${displayImages.length}`}
             >
-              <Image
+              <CaseImage
                 src={src}
                 alt={`${caseItem.title} — фото ${idx + 1}`}
                 width={800}
                 height={500}
+                className="object-cover w-full h-full"
                 style={{ objectFit: "cover", width: "100%", height: "100%" }}
                 loading="lazy"
               />

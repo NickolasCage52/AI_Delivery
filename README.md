@@ -50,7 +50,12 @@ npm run dev
 ## Деплой
 
 - **Vercel**: подключите репозиторий, сборка `npm run build`, запуск `npm run start`. Добавьте `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` в настройках Environment Variables.
+- **GitHub Pages**: статический экспорт. При сборке задайте `GITHUB_PAGES=true` и `NEXT_PUBLIC_BASE_PATH=/имя-репозитория`. Подробнее — [docs/github-pages-deploy.md](docs/github-pages-deploy.md).
 - **Self-hosted**: выполните `npm run build`, затем `npm run start` на сервере.
+
+### Изображения кейсов
+
+Скриншоты лежат в `public/cases-landing/`: `case-01.png` … `case-06.png` и `case-01-2.png` … `case-06-5.png`. Если файла нет, отображается placeholder «Скриншот проекта».
 
 ## Стек
 

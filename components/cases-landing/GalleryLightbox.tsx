@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import s from "@/app/cases/cases-landing.module.css";
+import { getImageSrc } from "@/lib/utils/imagePath";
 
 export function GalleryLightbox({
   images,
@@ -58,7 +59,17 @@ export function GalleryLightbox({
       </button>
       <div className={s.lightboxContent}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={images[index]} alt={`Фото ${index + 1} из ${images.length}`} />
+        <img
+          src={getImageSrc(images[index])}
+          alt={`Фото ${index + 1} из ${images.length}`}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src =
+              "data:image/svg+xml," +
+              encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect fill="%2312082A" width="800" height="500"/><text x="400" y="250" text-anchor="middle" fill="%238B5CF6" font-size="18">Скриншот проекта</text></svg>'
+              );
+          }}
+        />
       </div>
       <button type="button" className={`${s.lightboxBtn} ${s.lightboxNext}`} aria-label="Следующее фото" onClick={goNext}>
         ›

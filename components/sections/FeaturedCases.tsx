@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { CaseImage } from "@/components/ui/CaseImage";
 import { motion } from "framer-motion";
 import { SectionShell } from "@/components/layout/SectionShell";
 import { SpecularCard } from "@/components/fx/SpecularCard";
@@ -28,9 +28,9 @@ function FeaturedCaseCard({ caseItem, index }: { caseItem: Case; index: number }
         <SpecularCard accent="violet" className="h-full flex flex-col overflow-hidden">
           {cover ? (
             <div className="relative w-full aspect-[16/10] overflow-hidden rounded-t-xl -mt-px -mx-px">
-              <Image
+              <CaseImage
                 src={cover}
-                alt=""
+                alt={caseItem.title}
                 width={640}
                 height={400}
                 className="object-cover w-full h-full transition duration-300 group-hover:scale-[1.02]"
