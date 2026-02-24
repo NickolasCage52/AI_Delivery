@@ -117,12 +117,12 @@ export default async function InsightDetailPage({ params }: { params: Promise<{ 
             <div className="mt-12 rounded-2xl border border-[var(--accent)]/25 bg-[var(--accent)]/5 p-6 md:p-8">
               <h2 className="text-2xl font-semibold text-[var(--text-primary)]">Подходит вам?</h2>
               <p className="mt-3 text-[var(--text-secondary)]">
-                Если хотите внедрить аналогичный сценарий под свой бизнес — покажем демо и соберём план внедрения.
+                Если хотите внедрить аналогичный сценарий под свой бизнес — пришлём MVP за 24 часа и соберём план внедрения.
               </p>
               <div className="mt-6 flex flex-wrap gap-4">
                 <Link
                   href="/services"
-                  className="rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10"
+                  className="btn-glow rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10"
                 >
                   Посмотреть услуги
                 </Link>
@@ -130,11 +130,11 @@ export default async function InsightDetailPage({ params }: { params: Promise<{ 
                   href="/contact"
                   className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#09040F] hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
                 >
-                  Получить план внедрения
+                  Получить бесплатное демо
                 </Link>
               </div>
             </div>
-            <SectionCTA primary="Запросить демо и план" />
+            <SectionCTA />
           </Container>
         </section>
       </main>

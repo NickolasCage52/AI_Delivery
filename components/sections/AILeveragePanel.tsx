@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HOME_COPY } from "@/content/site-copy";
 import { SectionShell } from "@/components/layout/SectionShell";
@@ -58,9 +58,11 @@ function Icon({ k }: { k: Key }) {
 function MobileAccordion({
   active,
   setActive,
+  onUserInteraction,
 }: {
   active: Key;
   setActive: (k: Key) => void;
+  onUserInteraction?: () => void;
 }) {
   const reduced = useReducedMotion();
   return (
@@ -71,7 +73,10 @@ function MobileAccordion({
           <div key={item.key} className="rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/55 overflow-hidden">
             <button
               type="button"
-              onClick={() => setActive(open ? item.key : item.key)}
+              onClick={() => {
+                onUserInteraction?.();
+                setActive(item.key);
+              }}
               className="w-full px-5 py-4 flex items-center justify-between text-left"
             >
               <div className="flex items-center gap-3">
@@ -111,11 +116,32 @@ function MobileAccordion({
   );
 }
 
+const KEYS: Key[] = ["speed", "capacity", "control"];
+const INTERVAL_MS = 5000;
+
 function AILeveragePanelInner() {
   const reduced = useReducedMotion();
   const [active, setActive] = useState<Key>("speed");
+  const autoRotateStoppedRef = useRef(false);
 
   const activeItem = useMemo(() => ITEMS.find((i) => i.key === active) ?? ITEMS[0], [active]);
+
+  useEffect(() => {
+    if (reduced || autoRotateStoppedRef.current) return;
+    const id = setInterval(() => {
+      if (autoRotateStoppedRef.current) return;
+      setActive((prev) => {
+        const i = KEYS.indexOf(prev);
+        return KEYS[(i + 1) % KEYS.length];
+      });
+    }, INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [reduced]);
+
+  const handleTabClick = (key: Key) => {
+    autoRotateStoppedRef.current = true;
+    setActive(key);
+  };
 
   return (
     <SectionShell id="leverage" variant="panel" bg="primary" seamless>
@@ -138,34 +164,64 @@ function AILeveragePanelInner() {
         {HOME_COPY.leverage.subtitle}
       </motion.p>
 
-      <div className="mt-12 hidden md:grid grid-cols-[0.45fr,0.55fr] gap-6">
+      <div
+        className="mt-12 hidden md:grid grid-cols-[0.45fr,0.55fr] gap-6"
+        onClick={() => { autoRotateStoppedRef.current = true; }}
+      >
         {/* Left: segments */}
-        <div className="rounded-3xl border border-white/10 bg-[var(--bg-elevated)]/55 p-3">
+        <div
+          className="rounded-3xl border border-white/10 bg-[var(--bg-elevated)]/55 p-3 flex flex-col gap-2"
+          role="tablist"
+          aria-label="Выберите направление"
+        >
           {ITEMS.map((item) => {
             const isActive = item.key === active;
             return (
-              <button
+              <motion.button
                 key={item.key}
                 type="button"
-                onClick={() => setActive(item.key)}
-                className={`w-full rounded-2xl px-4 py-4 text-left transition-colors ${
-                  isActive ? "bg-[var(--accent)]/10" : "hover:bg-white/5"
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`leverage-panel-${item.key}`}
+                id={`leverage-tab-${item.key}`}
+                onClick={() => handleTabClick(item.key)}
+                className={`relative w-full rounded-2xl px-4 py-4 text-left cursor-pointer overflow-hidden transition-colors duration-200 ${
+                  isActive ? "bg-[var(--accent)]/10" : "bg-transparent hover:bg-white/5"
                 }`}
+                whileHover={reduced ? undefined : { scale: 1.01 }}
+                whileTap={reduced ? undefined : { scale: 0.99 }}
+                transition={{ duration: 0.2 }}
               >
-                <div className="flex items-center gap-3">
+                {/* Активная полоска слева — плавно переезжает при смене вкладки */}
+                {isActive && (
+                  <motion.span
+                    layoutId="leverage-active-indicator"
+                    className="absolute left-2 top-2 bottom-2 w-1 rounded-full bg-[var(--accent)]"
+                    transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                    aria-hidden
+                  />
+                )}
+                <div className="flex items-center gap-3 relative">
                   <Icon k={item.key} />
                   <div className="min-w-0">
-                    <p className={`font-semibold ${isActive ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"}`}>{item.title}</p>
+                    <p className={`font-semibold transition-colors duration-200 ${isActive ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"}`}>
+                      {item.title}
+                    </p>
                     <p className="mt-1 text-xs text-[var(--text-muted)] line-clamp-2">{item.subtitle}</p>
                   </div>
                 </div>
-              </button>
+              </motion.button>
             );
           })}
         </div>
 
         {/* Right: active panel */}
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[rgba(11,6,32,0.55)] p-8">
+        <div
+          id={`leverage-panel-${activeItem.key}`}
+          role="tabpanel"
+          aria-labelledby={`leverage-tab-${activeItem.key}`}
+          className="relative overflow-hidden rounded-3xl border border-white/10 bg-[rgba(11,6,32,0.55)] p-8"
+        >
           <div
             className="pointer-events-none absolute inset-0 opacity-65"
             aria-hidden
@@ -184,10 +240,10 @@ function AILeveragePanelInner() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeItem.key}
-                initial={reduced ? false : { opacity: 0, y: 8 }}
+                initial={reduced ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? undefined : { opacity: 0, y: -6 }}
-                transition={{ duration: 0.22 }}
+                exit={reduced ? undefined : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
                 className="mt-5"
               >
                 <p className="text-sm text-[var(--text-secondary)]">{activeItem.subtitle}</p>
@@ -206,7 +262,7 @@ function AILeveragePanelInner() {
       </div>
 
       <div className="mt-10 md:hidden">
-        <MobileAccordion active={active} setActive={setActive} />
+        <MobileAccordion active={active} setActive={setActive} onUserInteraction={() => { autoRotateStoppedRef.current = true; }} />
       </div>
     </SectionShell>
   );

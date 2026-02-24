@@ -13,10 +13,8 @@ const WHAT_OPTIONS = [
 ];
 
 const DEADLINE_OPTIONS = [
-  { value: "48-72", label: "48–72 часа" },
-  { value: "3-5", label: "3–5 дней" },
-  { value: "5-7", label: "5–7 дней" },
-  { value: "7-10", label: "7–10 дней" },
+  { value: "24h", label: "24 часа (MVP)" },
+  { value: "3-10", label: "3–10 дней (боевой запуск)" },
 ];
 
 const INTEGRATIONS_OPTIONS = [
@@ -27,9 +25,9 @@ const INTEGRATIONS_OPTIONS = [
 
 function getEstimate(what: string, deadline: string, integrations: string): string {
   if (!what || !deadline) return "Выберите «Что нужно» и «Срок»";
-  const d = deadline === "48-72" ? "быстрый" : deadline === "7-10" ? "комплексный" : "средний";
+  const d = deadline === "24h" ? "MVP за 24 часа (1 сценарий)" : "боевой запуск 3–10 дней";
   const i = integrations === "3+" ? ", несколько интеграций" : integrations === "1-2" ? ", 1–2 интеграции" : "";
-  return `Ориентир: ${d} запуск${i}. Демо и план — после 15-минутного брифа.`;
+  return `Ориентир: ${d}${i}. MVP и план — после 15-минутного брифа.`;
 }
 
 export function EstimateBlock() {
@@ -93,10 +91,10 @@ export function EstimateBlock() {
       <p className="mt-4 text-sm text-[var(--accent)]">{estimate}</p>
       <Link
         href="/demo"
-        onClick={() => trackCtaEvent({ action: "click", label: "Запросить демо и план", location: "estimate", href: "/demo" })}
+        onClick={() => trackCtaEvent({ action: "click", label: "Получить бесплатное демо", location: "estimate", href: "/demo" })}
         className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
       >
-        Запросить демо и план
+        Получить бесплатное демо
       </Link>
     </motion.div>
   );

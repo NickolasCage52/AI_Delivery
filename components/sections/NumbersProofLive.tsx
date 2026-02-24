@@ -4,6 +4,7 @@ import { memo, useMemo, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HOME_COPY } from "@/content/site-copy";
+import { DISCLAIMER_DEMO } from "@/lib/constants/messaging";
 import { useInViewport } from "@/hooks/useInViewport";
 import { useLiveMetrics } from "@/hooks/useLiveMetrics";
 import type { MetricConfig } from "@/hooks/useLiveMetrics";
@@ -150,6 +151,9 @@ function NumbersProofLiveInner({ enabled, compact = false }: NumbersProofLivePro
 
   return (
     <div ref={hostRef} className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[rgba(11,6,32,0.6)] p-4 md:p-5">
+      <p className="relative text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+        {DISCLAIMER_DEMO}
+      </p>
       <div className="pointer-events-none absolute inset-0 opacity-50" aria-hidden style={{ background: "radial-gradient(400px 150px at 50% 0%, rgba(139,92,246,0.15) 0%, transparent 70%)" }} />
       <div className="relative flex flex-wrap items-center gap-2 mb-3">
         <span className="inline-flex items-center gap-1 rounded border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-violet-300">
@@ -191,10 +195,16 @@ function NumbersProofLiveInner({ enabled, compact = false }: NumbersProofLivePro
         </div>
       </div>
       {!compact && (
-        <div className="relative mt-5 flex flex-wrap items-center gap-4">
-          <p className="text-xs text-[var(--text-muted)]">{HOME_COPY.proof.footnote}</p>
-          <Link href="/cases" className="text-xs text-[var(--accent)] hover:underline">{HOME_COPY.proof.casesLink ?? HOME_COPY.hero.ctaSecondary} →</Link>
-        </div>
+        <>
+          <div className="relative mt-5 flex flex-wrap items-center gap-4">
+            <p className="text-xs text-[var(--text-muted)]">{HOME_COPY.proof.footnote}</p>
+            <Link href="/cases" className="text-xs text-[var(--accent)] hover:underline">{HOME_COPY.proof.casesLink ?? HOME_COPY.hero.ctaSecondary} →</Link>
+          </div>
+          <div className="relative mt-5 rounded-lg border border-white/[0.06] bg-[rgba(11,6,32,0.4)] p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--accent)]">Как мы измеряем успех на реальных проектах</p>
+            <p className="mt-2 text-[11px] text-[var(--text-secondary)]">На старте фиксируем: скорость первого ответа клиенту (мин/часы), долю обработанных лидов без потерь (%), конверсию в запись / встречу / заказ (%), время менеджера на рутинные задачи (часы/день), долю повторных покупок (для опта/дистрибуции). После запуска сравниваем с этими же метриками.</p>
+          </div>
+        </>
       )}
     </div>
   );

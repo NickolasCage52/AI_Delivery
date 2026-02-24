@@ -82,7 +82,7 @@ export default function AboutPage() {
                 </SpecularCard>
               ))}
             </div>
-            <SectionCTA primary="Запросить демо и план" />
+            <SectionCTA />
           </Container>
         </section>
 
@@ -115,7 +115,7 @@ export default function AboutPage() {
                   </div>
                 ))}
               </div>
-              <SectionCTA primary="Запросить демо и план" />
+              <SectionCTA />
             </div>
           </Container>
         </section>

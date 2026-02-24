@@ -41,7 +41,7 @@ export function SectionShell({
   return (
     <section
       id={id}
-      className={`relative ${spacing} ${bgClass} ${seamless ? seamOverlay : ""} ${className}`}
+      className={`relative overflow-hidden ${spacing} ${bgClass} ${seamless ? seamOverlay : ""} ${className}`}
     >
       <div className={seamless ? "relative z-[1]" : undefined}>
         <Container>{children}</Container>

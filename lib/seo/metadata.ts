@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() ?? "";
-const domain = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "https://ai-delivery.studio";
+const domain = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://ai-delivery.studio";
 const siteUrl = new URL(basePath || "/", domain).toString().replace(/\/$/, "");
 const withBasePath = (path: string) => `${basePath}${path}`;
 
@@ -9,7 +9,7 @@ export const siteConfig = {
   name: "AI Delivery",
   title: "AI Delivery — ИИ-решения под ключ за 3–10 дней",
   description:
-    "Боты, сайты, Telegram MiniApps и n8n-автоматизации под ключ. Запуск за 48–72 часа или MVP за 3–7 дней с интеграциями и измеримым результатом.",
+    "Бесплатный MVP за 24 часа (1 сценарий). Боевой запуск за 3–10 дней. Боты, сайты, Telegram MiniApps и n8n‑автоматизации с интеграциями и измеримым результатом.",
   domain,
   siteUrl,
   basePath,

@@ -14,6 +14,7 @@ import { siteConfig } from "@/lib/seo/metadata";
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/seo/schema";
 import { UiDebugTools } from "@/components/ui/UiDebugTools";
 import { ScrollToTopOnRouteChange } from "@/components/behavior/ScrollToTopOnRouteChange";
+import { UnhandledRejectionHandler } from "@/components/behavior/UnhandledRejectionHandler";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-sans", display: "swap" });
 const spaceGrotesk = Space_Grotesk({
@@ -72,6 +73,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] aurora-bg" suppressHydrationWarning>
         <JsonLd data={[getOrganizationSchema(), getWebSiteSchema()]} />
         <LeadModalProvider>
+          <UnhandledRejectionHandler />
           <GlowCursor />
           <NoiseOverlay />
           <ScrollVelocityBlur />

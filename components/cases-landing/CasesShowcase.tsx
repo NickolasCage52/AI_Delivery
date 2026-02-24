@@ -6,6 +6,7 @@ import Link from "next/link";
 import s from "@/app/cases/cases-landing.module.css";
 import { FILTERS, getDisplayImages, type CaseItem } from "./cases-data";
 import { GalleryLightbox } from "./GalleryLightbox";
+import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
 
 const CONTACT_URL = "https://t.me/nikmorus";
 
@@ -358,7 +359,7 @@ function CTAFormBlock() {
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [statusMsg, setStatusMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const name = (fd.get("name") as string)?.trim() || "";
@@ -386,12 +387,22 @@ function CTAFormBlock() {
     setFormState("loading");
     setStatusMsg("");
 
-    const tgLink = `https://t.me/nikmorus`;
-    setTimeout(() => {
+    const { submitLead, collectUtm } = await import("@/lib/lead/submitLead");
+    const result = await submitLead({
+      name,
+      contact,
+      message,
+      sourcePage: "/cases",
+      utm: collectUtm(),
+    });
+    if (result.ok) {
       setFormState("success");
-      setStatusMsg("Спасибо! Свяжитесь с нами напрямую в Telegram для быстрого ответа.");
-      window.open(tgLink, "_blank");
-    }, 500);
+      setStatusMsg("Спасибо! Мы свяжемся с вами в ближайшее время.");
+      (e.target as HTMLFormElement).reset();
+    } else {
+      setFormState("error");
+      setStatusMsg(result.error);
+    }
   };
 
   return (
@@ -421,9 +432,12 @@ function CTAFormBlock() {
               <div className={`${s.formStatus} ${formState === "success" ? s.formStatusSuccess : formState === "error" ? s.formStatusError : ""}`} role="status" aria-live="polite">
                 {statusMsg}
               </div>
-              <button type="submit" className={`${s.btn} ${s.btnPrimary} ${s.pulse}`} disabled={formState === "loading"}>
-                {formState === "loading" ? "Отправка…" : "Отправить заявку"}
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button type="submit" className={`${s.btn} ${s.btnPrimary} ${s.pulse} flex-1`} disabled={formState === "loading"}>
+                  {formState === "loading" ? "Отправка…" : "Отправить заявку"}
+                </button>
+                <TelegramLeadButton location="cases-form" />
+              </div>
               <p className={s.disclaimer}>Нажимая кнопку, вы соглашаетесь на обработку данных для обратной связи.</p>
             </form>
           </div>

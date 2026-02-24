@@ -8,9 +8,9 @@ import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata = buildMetadata({
-  title: "Контакты — запросить демо и план",
+  title: "Контакты — разобрать задачу за 15 минут",
   description:
-    "Оставьте заявку: разберём задачу, покажем демо и предложим план внедрения. Минимум полей и быстрый ответ в течение рабочего дня.",
+    "Оставьте заявку: разберём задачу, пришлём MVP за 24 часа и предложим план внедрения. Минимум полей и быстрый ответ в течение рабочего дня.",
   path: "/contact",
 });
 
@@ -30,13 +30,13 @@ export default function ContactPage() {
           <Container>
             <p className="text-sm text-[var(--accent)] uppercase tracking-widest">Контакты</p>
             <h1 className="mt-3 text-4xl md:text-5xl font-semibold text-[var(--text-primary)]">
-              Разберём задачу за 15 минут и покажем демо
+              Разберём задачу за 15 минут
             </h1>
             <p className="mt-4 max-w-2xl text-[var(--text-secondary)]">
               Заполните форму — ответим в течение рабочего дня и пришлём план внедрения. Без лишних созвонов, только по делу.
             </p>
             <HeroCTA
-              primary="Запросить демо и план"
+              primary="Получить бесплатное демо"
               secondary="Перейти к форме"
               secondaryHref="/contact#contact-form"
               location="contact-hero"
@@ -61,7 +61,7 @@ export default function ContactPage() {
               <ul className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
                 <li>• Уточним цель и канал</li>
                 <li>• Согласуем scope и сроки</li>
-                <li>• Отправим демо, план внедрения и ориентир по стоимости</li>
+                <li>• Отправим MVP (прототип), план внедрения и ориентир по стоимости</li>
               </ul>
               <div className="mt-8">
                 <p className="text-sm text-[var(--text-muted)]">Альтернативные каналы</p>

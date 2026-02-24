@@ -9,33 +9,33 @@ import { HOME_COPY } from "@/content/site-copy";
 const TASKS = [
   {
     title: "Лиды и поддержка 24/7",
-    timing: "5–7 дней",
+    timing: "24ч MVP • 3–10 дней запуск",
     id: "bots",
-    desc: "Квалификация, ответы, передача в CRM.",
+    desc: "Квалификация + ответы 24/7 + передача лида в CRM без участия менеджера.",
     icon: "◎",
     accent: "violet",
   },
   {
     title: "Лендинг под трафик",
-    timing: "48–72 часа",
+    timing: "24ч MVP • 3–10 дней запуск",
     id: "sites",
-    desc: "Быстрый запуск и аналитика.",
+    desc: "Лендинг под тест гипотезы с аналитикой и заявками в CRM.",
     icon: "↗",
     accent: "pink",
   },
   {
     title: "n8n‑автоматизации",
-    timing: "5–7 дней",
+    timing: "24ч MVP • 3–10 дней запуск",
     id: "n8n",
-    desc: "Лид → CRM → отчёты без рутины.",
+    desc: "Лид → CRM → уведомления → задачи → отчёты без ручных действий.",
     icon: "▣",
     accent: "soft",
   },
   {
     title: "Telegram MiniApp MVP",
-    timing: "3–5 дней",
+    timing: "24ч MVP • 3–10 дней запуск",
     id: "miniapps",
-    desc: "Каталог/анкета/форма в Telegram.",
+    desc: "MVP в Telegram для проверки спроса (каталог / анкета / заказ).",
     icon: "◈",
     accent: "pink",
   },
@@ -121,7 +121,7 @@ function TasksInner() {
         <div className="mt-10">
           <Link
             href="/services"
-            className="inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+            className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
           >
             Все услуги и пакеты
           </Link>

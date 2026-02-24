@@ -4,8 +4,11 @@ import { createContext, useContext, useState, useCallback, ReactNode, useEffect,
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/ui/scrollLock";
+import { TelegramLeadButton } from "./TelegramLeadButton";
 
 type LeadModalContextType = ((context?: { sourcePage?: string; service?: string }) => void) | null;
 
@@ -22,7 +25,7 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
   const [closing, setClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
-  const [form, setForm] = useState({ name: "", contact: "", need: "", sphere: "", timeline: "" });
+  const [form, setForm] = useState({ name: "", contact: "", need: "", sphere: "", timeline: "", _hp: "" });
   const [context, setContext] = useState({ sourcePage: "", service: "" });
   const [showMore, setShowMore] = useState(false);
   const router = useRouter();
@@ -50,13 +53,29 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
     setShowMore(false);
   }, []);
 
+  const pathname = usePathname();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 600));
-    setStatus("success");
-    setForm({ name: "", contact: "", need: "", sphere: "", timeline: "" });
     trackCtaEvent({ action: "submit", label: "LeadModal", location: "modal" });
+    const result = await submitLead({
+      name: form.name,
+      contact: form.contact,
+      need: form.need,
+      sphere: form.sphere,
+      timeline: form.timeline,
+      sourcePage: context.sourcePage || pathname || "/",
+      utm: collectUtm(),
+      _hp: form._hp,
+    });
+    if (result.ok) {
+      setStatus("success");
+      setForm({ name: "", contact: "", need: "", sphere: "", timeline: "", _hp: "" });
+    } else {
+      setStatus("error");
+      alert(result.error);
+    }
   };
 
   const visible = open || closing;
@@ -172,18 +191,22 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
                     Спасибо! Мы свяжемся с вами в ближайшее время.
                   </p>
                   <p className="text-sm text-[var(--text-secondary)]">
-                    В течение рабочего дня напишем или позвоним. Предложим короткий бриф (15 мин), демо и план внедрения.
+                    В течение рабочего дня напишем или позвоним. Пришлём MVP (рабочий прототип) за 24 часа и план внедрения.
                   </p>
                   <button
                     type="button"
                     onClick={() => router.push("/thank-you")}
-                    className="mt-4 w-full rounded-lg border border-[var(--accent)]/40 py-2.5 text-sm font-medium text-[var(--accent)]"
+                    className="btn-glow mt-4 w-full rounded-lg border border-[var(--accent)]/40 py-2.5 text-sm font-medium text-[var(--accent)]"
                   >
                     Перейти на страницу «Спасибо»
                   </button>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                  <div className="sr-only" aria-hidden>
+                    <label htmlFor="modal-hp">Не заполняйте</label>
+                    <input id="modal-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />
+                  </div>
                   <input type="hidden" name="sourcePage" value={context.sourcePage} />
                   <input type="hidden" name="service" value={context.service} />
                   <div>
@@ -264,21 +287,24 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
                       </div>
                     </div>
                   )}
-                  <div className="flex gap-3 pt-2">
-                    <button
-                      type="submit"
-                      disabled={status === "loading"}
-                      className="flex-1 rounded-lg bg-[var(--accent)] py-3 font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)] disabled:opacity-70"
-                    >
-                      {status === "loading" ? "Отправка…" : "Отправить"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={closeModal}
-                      className="rounded-lg border border-white/20 px-4 py-3 text-[var(--text-secondary)] hover:bg-white/5"
-                    >
-                      Отмена
-                    </button>
+                  <div className="flex flex-col gap-3 pt-2">
+                    <div className="flex gap-3">
+                      <button
+                        type="submit"
+                        disabled={status === "loading"}
+                        className="flex-1 rounded-lg bg-[var(--accent)] py-3 font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)] disabled:opacity-70"
+                      >
+                        {status === "loading" ? "Отправка…" : "Отправить"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={closeModal}
+                        className="rounded-lg border border-white/20 px-4 py-3 text-[var(--text-secondary)] hover:bg-white/5"
+                      >
+                        Отмена
+                      </button>
+                    </div>
+                    <TelegramLeadButton location="lead-modal" variant="outline" />
                   </div>
                 </form>
               )}

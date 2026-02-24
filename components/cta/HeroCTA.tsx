@@ -6,7 +6,7 @@ import { trackCtaEvent } from "@/lib/analytics/cta";
 
 export function HeroCTA({
   primary = "Получить план внедрения",
-  secondary = "Разобрать задачу за 15 минут",
+  secondary = "Разобрать задачу",
   secondaryHref = "/contact",
   primaryHref = "/demo",
   location = "hero",

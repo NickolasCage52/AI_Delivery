@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogoMark } from "@/components/brand/LogoMark";
 import { Container } from "@/components/ui/Container";
-import { useLeadModal } from "@/components/cta";
 import { trackCtaEvent } from "@/lib/analytics/cta";
 import { useQuality } from "@/hooks/useQuality";
+import { CTA_PRIMARY, CTA_SECONDARY } from "@/lib/constants/messaging";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/ui/scrollLock";
 
 const ROUTES = [
@@ -25,6 +25,7 @@ const HOME_ANCHORS = [
   { label: "Цифры", id: "proof" },
   { label: "Результаты", id: "results" },
   { label: "Услуги", id: "services" },
+  { label: "Кому подходит", id: "who-fits" },
   { label: "Кейсы", id: "cases" },
   { label: "Insights", id: "insights" },
   { label: "Процесс", id: "process" },
@@ -36,8 +37,8 @@ export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeAnchor, setActiveAnchor] = useState("results");
-  const openModal = useLeadModal();
   const quality = useQuality();
+
   const menuRef = useRef<HTMLElement>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
   const isHome = pathname === "/";
@@ -159,22 +160,21 @@ export function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
-            <button
-              type="button"
+            <Link
+              href={pathname === "/" ? "/#contact" : "/contact"}
               onClick={() => {
-                trackCtaEvent({ action: "open-modal", label: "Разобрать задачу", location: "header" });
-                openModal?.();
+                trackCtaEvent({ action: "click", label: CTA_SECONDARY, location: "header", href: pathname === "/" ? "/#contact" : "/contact" });
               }}
-              className="rounded-lg border border-[var(--accent)]/40 px-4 py-2 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+              className="btn-glow rounded-lg border border-[var(--accent)]/40 px-4 py-2 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
             >
-              Разобрать задачу за 15 минут
-            </button>
+              {CTA_SECONDARY}
+            </Link>
             <Link
               href="/demo"
-              onClick={() => trackCtaEvent({ action: "click", label: "Запросить демо и план", location: "header", href: "/demo" })}
+              onClick={() => trackCtaEvent({ action: "click", label: CTA_PRIMARY, location: "header", href: "/demo" })}
               className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
             >
-              Запросить демо
+              {CTA_PRIMARY}
             </Link>
           </div>
 
@@ -260,26 +260,25 @@ export function Header() {
                 </div>
               )}
               <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6">
-                <button
-                  type="button"
+                <Link
+                  href={isHome ? "/#contact" : "/contact"}
                   onClick={() => {
-                    trackCtaEvent({ action: "open-modal", label: "Разобрать задачу", location: "mobile-menu" });
-                    openModal?.();
+                    trackCtaEvent({ action: "click", label: CTA_SECONDARY, location: "mobile-menu", href: isHome ? "/#contact" : "/contact" });
                     setMobileOpen(false);
                   }}
                   className="rounded-xl border border-[var(--accent)]/40 py-3 px-4 text-center text-sm font-medium text-[var(--accent)]"
                 >
-                  Разобрать задачу за 15 минут
-                </button>
+                  {CTA_SECONDARY}
+                </Link>
                 <Link
                   href="/demo"
                   onClick={() => {
-                    trackCtaEvent({ action: "click", label: "Запросить демо и план", location: "mobile-menu", href: "/demo" });
+                    trackCtaEvent({ action: "click", label: CTA_PRIMARY, location: "mobile-menu", href: "/demo" });
                     setMobileOpen(false);
                   }}
                   className="rounded-xl bg-[var(--accent)] py-3 px-4 text-center text-sm font-semibold text-[#09040F]"
                 >
-                  Запросить демо
+                  {CTA_PRIMARY}
                 </Link>
               </div>
             </motion.nav>

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useRef, useState, useEffect, forwardRef, Fragment } from "react";
+import { memo, useRef, useState, useEffect, Fragment } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HOME_COPY } from "@/content/site-copy";
@@ -164,14 +164,11 @@ function BuildScene({
 }
 
 const FLOW_LABELS = ["Лид", "Бот", "CRM", "Отчёты"] as const;
-const FLOW_PULSE_INTERVAL_MS = 2800;
+const FLOW_PULSE_INTERVAL_MS = 900;
 
 function AutomationScene({ inView }: { inView: boolean }) {
   const reduced = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
-  const rowRef = useRef<HTMLDivElement>(null);
-  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [packetStyle, setPacketStyle] = useState<{ left: number; top: number } | null>(null);
 
   useEffect(() => {
     if (!inView || reduced) return;
@@ -180,19 +177,6 @@ function AutomationScene({ inView }: { inView: boolean }) {
     }, FLOW_PULSE_INTERVAL_MS);
     return () => clearInterval(t);
   }, [inView, reduced]);
-
-  useEffect(() => {
-    if (!inView || reduced) return;
-    const row = rowRef.current;
-    const node = nodeRefs.current[activeIndex];
-    if (!row || !node) return;
-    const rowRect = row.getBoundingClientRect();
-    const nodeRect = node.getBoundingClientRect();
-    setPacketStyle({
-      left: nodeRect.left - rowRect.left + nodeRect.width / 2,
-      top: nodeRect.top - rowRect.top + nodeRect.height / 2,
-    });
-  }, [inView, reduced, activeIndex]);
 
   return (
     <motion.div
@@ -205,11 +189,10 @@ function AutomationScene({ inView }: { inView: boolean }) {
       <p className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">
         Automation in motion
       </p>
-      <div ref={rowRef} className="relative flex flex-wrap items-center justify-center gap-4 md:gap-6 min-h-[3rem]">
+      <div className="relative flex flex-wrap items-center justify-center gap-4 md:gap-6 min-h-[3rem]">
         {FLOW_LABELS.map((label, i) => (
           <Fragment key={label}>
             <FlowNode
-              ref={(el) => { nodeRefs.current[i] = el; }}
               label={label}
               isActive={activeIndex === i}
               reducedMotion={reduced}
@@ -217,38 +200,32 @@ function AutomationScene({ inView }: { inView: boolean }) {
             {i < 3 && <FlowArrow isActive={activeIndex === i} reducedMotion={reduced} />}
           </Fragment>
         ))}
-        {inView && !reduced && packetStyle !== null && (
-          <span
-            className="absolute w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_8px_var(--accent)] pointer-events-none -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out"
-            style={{ left: packetStyle.left, top: packetStyle.top }}
-            aria-hidden
-          />
-        )}
       </div>
       {inView && (
-        <LiveStatusTicker messages={AUTOMATION_MESSAGES} intervalMs={2200} />
+        <LiveStatusTicker messages={AUTOMATION_MESSAGES} activeIndex={activeIndex} />
       )}
     </motion.div>
   );
 }
 
 const FlowNode = memo(
-  forwardRef<HTMLDivElement, { label: string; isActive: boolean; reducedMotion: boolean }>(
-    function FlowNode({ label, isActive, reducedMotion }, ref) {
-      return (
-        <div
-          ref={ref}
-          className={`rounded-lg border px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-all duration-300 ${
-            isActive
-              ? "border-violet-400/60 bg-violet-500/20 shadow-[0_0_20px_rgba(139,92,246,0.25)]"
-              : "border-violet-500/30 bg-violet-500/10"
-          } ${reducedMotion && isActive ? "ring-2 ring-violet-400/50" : ""}`}
-        >
+  function FlowNode({ label, isActive, reducedMotion }: { label: string; isActive: boolean; reducedMotion: boolean }) {
+    return (
+      <motion.div
+        className={`rounded-lg border px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-colors duration-150 ${
+          isActive
+            ? "border-violet-400/80 bg-violet-500/25 shadow-[0_0_28px_rgba(139,92,246,0.4),0_0_0_1px_rgba(139,92,246,0.3)]"
+            : "border-violet-500/25 bg-violet-500/8"
+        } ${reducedMotion && isActive ? "ring-2 ring-violet-400/50" : ""}`}
+        animate={isActive && !reducedMotion ? { scale: [1, 1.03, 1] } : {}}
+        transition={{ duration: 0.2 }}
+      >
+        <span className={isActive ? "drop-shadow-[0_0_6px_rgba(139,92,246,0.6)]" : ""}>
           {label}
-        </div>
-      );
-    }
-  )
+        </span>
+      </motion.div>
+    );
+  }
 );
 
 function FlowArrow({ isActive, reducedMotion }: { isActive: boolean; reducedMotion: boolean }) {
@@ -259,7 +236,7 @@ function FlowArrow({ isActive, reducedMotion }: { isActive: boolean; reducedMoti
       viewBox="0 0 24 16"
       fill="none"
       aria-hidden
-      className={`flex-shrink-0 transition-all duration-300 ${isActive ? "text-violet-300 drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" : "text-violet-400/70"}`}
+      className={`flex-shrink-0 transition-all duration-150 ${isActive ? "text-violet-300 drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]" : "text-violet-400/60"}`}
     >
       <path
         d="M0 8h18m0 0l-5-5m5 5l-5 5"
@@ -272,14 +249,14 @@ function FlowArrow({ isActive, reducedMotion }: { isActive: boolean; reducedMoti
   );
 }
 
-function LiveStatusTicker({ messages, intervalMs }: { messages: string[]; intervalMs: number }) {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => {
-      setIndex((i) => (i + 1) % messages.length);
-    }, intervalMs);
-    return () => clearInterval(t);
-  }, [messages.length, intervalMs]);
+function LiveStatusTicker({
+  messages,
+  activeIndex,
+}: {
+  messages: string[];
+  activeIndex: number;
+}) {
+  const index = activeIndex % messages.length;
   return (
     <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
       <span className="text-violet-300">{messages[index]}</span>
@@ -325,7 +302,7 @@ function MetricsScene({
         )}
       </div>
       <p className="text-[11px] text-[var(--text-muted)] mb-4">
-        На основе обезличенных кейсов · симуляция роста
+        {HOME_COPY.proof.liveDemoLabelRu}
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2].map((i) => (
@@ -367,7 +344,7 @@ function GrowthStoryInner() {
             "radial-gradient(900px 400px at 20% 0%, rgba(139,92,246,0.12) 0%, transparent 55%), radial-gradient(700px 350px at 80% 10%, rgba(236,72,153,0.08) 0%, transparent 50%)",
         }}
       />
-      <div ref={hostRef} className="relative space-y-16 md:space-y-20">
+      <div ref={hostRef} className="relative space-y-16 md:space-y-20 p-6 md:p-8">
         {/* Scene 1 — Build */}
         <BuildScene inView={inView} copy={copy} />
 

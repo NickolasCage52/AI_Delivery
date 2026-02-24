@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { submitLead, collectUtm } from "@/lib/lead/submitLead";
 import { HOME_COPY } from "@/content/site-copy";
+import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -19,18 +22,34 @@ export function CTA() {
     niche: "",
     need: "",
     deadline: "",
+    _hp: "",
   });
+  const pathname = usePathname();
   const sourcePage = "home";
   const service = "general";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 800));
-    setStatus("success");
-    setForm({ name: "", contact: "", niche: "", need: "", deadline: "" });
     trackCtaEvent({ action: "submit", label: "Home CTA", location: "home-final" });
-    setTimeout(() => router.push("/thank-you"), 400);
+    const result = await submitLead({
+      name: form.name,
+      contact: form.contact,
+      niche: form.niche,
+      need: form.need,
+      timeline: form.deadline,
+      sourcePage: pathname ?? "/",
+      utm: collectUtm(),
+      _hp: form._hp,
+    });
+    if (result.ok) {
+      setStatus("success");
+      setForm({ name: "", contact: "", niche: "", need: "", deadline: "", _hp: "" });
+      setTimeout(() => router.push("/thank-you"), 400);
+    } else {
+      setStatus("error");
+      alert(result.error);
+    }
   };
 
   return (
@@ -66,11 +85,15 @@ export function CTA() {
                 Спасибо! Мы свяжемся с вами в ближайшее время.
               </p>
                 <p className="text-sm text-[var(--text-secondary)]">
-                  Что дальше: в течение рабочего дня напишем или позвоним. Предложим короткий бриф (15 минут), демо и план внедрения под вашу задачу.
+                  Что дальше: в течение рабочего дня напишем или позвоним. Пришлём рабочий прототип (1 сценарий) в течение 24 часов и план внедрения под вашу задачу.
                 </p>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+              <div className="sr-only" aria-hidden>
+                <label htmlFor="cta-hp">Не заполняйте</label>
+                <input id="cta-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />
+              </div>
               <input type="hidden" name="sourcePage" value={sourcePage} />
               <input type="hidden" name="service" value={service} />
               <div>
@@ -140,15 +163,17 @@ export function CTA() {
                   placeholder="Например: до конца месяца"
                 />
               </div>
-              <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button
                   type="submit"
                   variant="primary"
                   size="large"
                   disabled={status === "loading"}
+                  className="flex-1 sm:flex-initial"
                 >
-                  {status === "loading" ? "Отправка…" : "Получить план внедрения"}
+                  {status === "loading" ? "Отправка…" : "Получить бесплатное демо"}
                 </Button>
+                <TelegramLeadButton location="home-cta" className="sm:w-auto" />
               </div>
             </form>
           )}

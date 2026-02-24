@@ -7,20 +7,20 @@ import { getBreadcrumbSchema } from "@/lib/seo/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata = buildMetadata({
-  title: "Запросить демо — бесплатный MVP за 24 часа",
+  title: "Получить бесплатный MVP за 24 часа",
   description:
-    "Бесплатный MVP или прототип за 24 часа. Заявка → уточнение → демо через 24ч → созвон и план. Без лишних полей.",
+    "Бесплатный MVP за 24 часа — 1 сценарий. Заявка → уточнение → прототип через 24ч → созвон и план доработки или боевого запуска.",
   path: "/demo",
 });
 
 const DEMO_STEPS = [
   { num: 1, title: "Заявка", desc: "Оставьте контакт и краткое описание задачи" },
   { num: 2, title: "Уточнение", desc: "Уточним детали в течение рабочего дня" },
-  { num: 3, title: "Демо через 24ч", desc: "Отправим рабочий демо/MVP" },
+  { num: 3, title: "MVP через 24ч", desc: "Отправим рабочий прототип (1 сценарий)" },
   {
     num: 4,
     title: "Созвон и план",
-    desc: "Обсудим, договор, доработка или запуск",
+    desc: "Обсудим, договор, доработка или боевой запуск",
   },
 ];
 
@@ -30,7 +30,7 @@ export default function DemoPage() {
       <JsonLd
         data={getBreadcrumbSchema([
           { name: "Главная", url: siteConfig.domain },
-          { name: "Запросить демо", url: `${siteConfig.domain}/demo` },
+          { name: "Получить MVP", url: `${siteConfig.domain}/demo` },
         ])}
       />
       <Header />
@@ -38,13 +38,13 @@ export default function DemoPage() {
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <section className="pt-28 pb-12 md:pt-32 md:pb-16 bg-[var(--bg-primary)]">
           <Container>
-            <p className="text-sm text-[var(--accent)] uppercase tracking-widest">Демо</p>
+            <p className="text-sm text-[var(--accent)] uppercase tracking-widest">MVP</p>
             <h1 className="mt-3 text-4xl md:text-5xl font-semibold text-[var(--text-primary)]">
-              Бесплатный MVP/прототип за 24 часа
+              Бесплатный MVP за 24 часа — 1 сценарий
             </h1>
             <p className="mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
-              Короткая заявка → уточнение → демо в течение 24 часов с момента получения вводных →
-              созвон, договор и план доработки или запуска.
+              Короткая заявка → уточнение → рабочий прототип в течение 24 часов с момента получения вводных →
+              созвон, договор и план доработки или боевого запуска за 3–10 дней.
             </p>
           </Container>
         </section>
@@ -52,7 +52,7 @@ export default function DemoPage() {
         <section className="py-12 md:py-16 bg-[var(--bg-secondary)]/40">
           <Container>
             <h2 className="text-2xl font-semibold text-[var(--text-primary)]">
-              4 шага до демо
+              4 шага до MVP
             </h2>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {DEMO_STEPS.map((s) => (
@@ -77,8 +77,8 @@ export default function DemoPage() {
           <Container>
             <h2 className="text-2xl font-semibold text-[var(--text-primary)]">Условия</h2>
             <ul className="mt-4 space-y-2 text-[var(--text-secondary)]">
-              <li>• 24 часа — с момента получения вводных до отправки демо</li>
-              <li>• Демо/MVP — рабочий прототип для проверки гипотезы</li>
+              <li>• 24 часа — с момента получения вводных до отправки MVP (1 сценарий)</li>
+              <li>• MVP — рабочий прототип для проверки гипотезы</li>
               <li>• Ограничение по объёму — простые сценарии, без глубокой интеграции</li>
               <li>• Бесплатно — для первичной оценки и доверия</li>
             </ul>
@@ -105,7 +105,7 @@ export default function DemoPage() {
               <ul className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
                 <li>• Ответим в течение рабочего дня</li>
                 <li>• Уточним scope и канал связи</li>
-                <li>• Отправим демо в течение 24 часов</li>
+                <li>• Отправим MVP (рабочий прототип) в течение 24 часов</li>
                 <li>• Согласуем созвон, договор и план</li>
               </ul>
               <div className="mt-8">

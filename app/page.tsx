@@ -3,8 +3,8 @@ import { Header } from "@/components/layout/Header";
 import { GrowthStory } from "@/components/sections/GrowthStory";
 import { PainSolution } from "@/components/sections/PainSolution";
 import { AILeveragePanel } from "@/components/sections/AILeveragePanel";
-import { Tasks } from "@/components/sections/Tasks";
 import { Products } from "@/components/sections/Products";
+import { WhoFits } from "@/components/sections/WhoFits";
 import { FeaturedCases } from "@/components/sections/FeaturedCases";
 import { ProcessPanel } from "@/components/sections/ProcessPanel";
 import { Integrations } from "@/components/sections/Integrations";
@@ -23,7 +23,7 @@ import { FAQ_ITEMS } from "@/lib/content/faq";
 export const metadata = buildMetadata({
   title: "AI Delivery — ИИ‑боты, сайты и автоматизация под ключ",
   description:
-    "Быстро внедряем ИИ‑ботов, лендинги, Telegram MiniApps и n8n‑автоматизации. Пилот за 48–72 часа или MVP за 3–7 дней с измеримым результатом.",
+    "Бесплатный MVP за 24 часа (1 сценарий). Боевой запуск за 3–10 дней. Боты, лендинги, Telegram MiniApps и n8n‑автоматизации с измеримым результатом.",
   path: "/",
 });
 
@@ -47,13 +47,13 @@ export default function Home() {
         <GrowthStory />
         <PainSolution />
         <AILeveragePanel />
-        <Tasks />
         <Products />
+        <WhoFits />
         <FeaturedCases cases={featuredCases} />
-        <Insights items={insights} />
         <ProcessPanel />
         <Integrations />
         <WhyUs />
+        <Insights items={insights} />
         <FAQ />
         <CTA />
         <Footer />

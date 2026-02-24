@@ -19,16 +19,16 @@ const HeroFXLayer = memo(function HeroFXLayer() {
   const quality = useQuality();
   const blurClass = getHeroBlurClass(quality);
   const shaderOpacity =
-    quality === "low" ? "opacity-[0.28]" : quality === "medium" ? "opacity-[0.42]" : "opacity-[0.50]";
+    quality === "low" ? "opacity-[0.2]" : quality === "medium" ? "opacity-[0.32]" : "opacity-[0.38]";
   return (
     <>
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)]"
         aria-hidden
       />
-      {/* Base grid (static fallback) — reduced contrast */}
+      {/* Base grid (static fallback) — reduced contrast (-30%) */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.09]"
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
         aria-hidden
         style={{
           backgroundImage:
@@ -41,11 +41,11 @@ const HeroFXLayer = memo(function HeroFXLayer() {
       <CursorReactiveGrid />
       {/* Aurora blobs — reduced intensity (25–40%) */}
       <div
-        className={`pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.05] ${blurClass.orb1} animate-[auroraDrift1_18s_ease-in-out_infinite]`}
+        className={`pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[820px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/[0.035] ${blurClass.orb1} animate-[auroraDrift1_18s_ease-in-out_infinite]`}
         aria-hidden
       />
       <div
-        className={`pointer-events-none absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.03] ${blurClass.orb2} animate-[auroraDrift2_22s_ease-in-out_infinite]`}
+        className={`pointer-events-none absolute right-0 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-[var(--accent-pink)]/[0.02] ${blurClass.orb2} animate-[auroraDrift2_22s_ease-in-out_infinite]`}
         aria-hidden
       />
       <ShaderBackground className={`absolute inset-0 z-0 h-full w-full ${shaderOpacity}`} />
@@ -61,12 +61,12 @@ const HeroContent = memo(function HeroContent() {
       <Container className="relative z-10 py-20 md:py-28 flex flex-col lg:flex-row lg:items-center lg:gap-12 xl:gap-16">
         {/* Safe area: soft gradient under text for readability */}
         <div
-          className="pointer-events-none absolute left-0 top-0 bottom-0 w-full max-w-[min(100%,720px)] bg-gradient-to-r from-[var(--bg-primary)]/85 via-[var(--bg-primary)]/40 to-transparent z-[1]"
+          className="pointer-events-none absolute left-0 top-0 bottom-0 w-full max-w-[min(100%,800px)] bg-gradient-to-r from-[var(--bg-primary)]/90 via-[var(--bg-primary)]/50 to-transparent z-[1]"
           aria-hidden
         />
         {/* Left: copy */}
         <div className="relative z-10 flex-1 max-w-2xl order-2 lg:order-1">
-          <div className="relative rounded-2xl border border-white/[0.08] bg-black/50 backdrop-blur-sm p-6 md:p-8 shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
+          <div className="relative rounded-2xl border border-white/[0.06] bg-black/40 backdrop-blur-[6px] p-6 md:p-8 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
             <motion.h1
               className="text-4xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-5xl lg:text-6xl leading-[1.05] drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
               initial={reduced ? false : { opacity: 0, y: 12 }}
@@ -120,7 +120,12 @@ const HeroContent = memo(function HeroContent() {
               >
                 {HERO.ctaPrimary}
               </MagneticButton>
-              <MagneticButton href="/#cases" variant="secondary" size="large">
+              <MagneticButton
+                href="/#contact"
+                variant="secondary"
+                size="large"
+                onClick={() => trackCtaEvent({ action: "click", label: HERO.ctaSecondary, location: "hero", href: "/#contact" })}
+              >
                 {HERO.ctaSecondary}
               </MagneticButton>
             </motion.div>

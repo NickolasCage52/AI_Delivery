@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { useLeadModal } from "./LeadModal";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { submitLead, collectUtm } from "@/lib/lead/submitLead";
+import { TelegramLeadButton } from "./TelegramLeadButton";
 
 type Status = "idle" | "loading" | "success";
 
@@ -19,16 +22,29 @@ export function InlineLeadForm({
   const [status, setStatus] = useState<Status>("idle");
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
+  const [_hp, setHp] = useState("");
   const openModal = useLeadModal();
+  const pathname = usePathname();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 500));
-    setStatus("success");
-    setName("");
-    setContact("");
     trackCtaEvent({ action: "submit", label: "InlineLeadForm", location: "inline" });
+    const result = await submitLead({
+      name,
+      contact,
+      sourcePage: pathname ?? "/",
+      utm: collectUtm(),
+      _hp,
+    });
+    if (result.ok) {
+      setStatus("success");
+      setName("");
+      setContact("");
+    } else {
+      setStatus("idle");
+      alert(result.error);
+    }
   };
 
   if (status === "success") {
@@ -60,7 +76,11 @@ export function InlineLeadForm({
     >
       <h3 className="text-lg font-semibold text-[var(--text-primary)]">{title}</h3>
       {!compact && <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>}
-      <form onSubmit={handleSubmit} className="mt-4 flex flex-wrap items-end gap-3">
+      <form onSubmit={handleSubmit} className="mt-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
+        <div className="sr-only" aria-hidden>
+          <label htmlFor="inline-hp">Не заполняйте</label>
+          <input id="inline-hp" type="text" tabIndex={-1} autoComplete="off" value={_hp} onChange={(e) => setHp(e.target.value)} />
+        </div>
         <input
           type="text"
           required
@@ -84,6 +104,7 @@ export function InlineLeadForm({
         >
           {status === "loading" ? "…" : "Отправить"}
         </button>
+        <TelegramLeadButton location="inline-form" className="shrink-0" />
       </form>
       <p className="mt-3 text-xs text-[var(--text-muted)]">
         Или{" "}

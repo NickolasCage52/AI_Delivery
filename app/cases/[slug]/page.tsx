@@ -166,7 +166,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
                 </p>
               </div>
             )}
-            <SectionCTA primary="Запросить демо и план" />
+            <SectionCTA />
           </Container>
         </section>
       </main>

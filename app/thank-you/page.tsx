@@ -24,7 +24,7 @@ export default function ThankYouPage() {
               Мы получили вашу заявку
             </h1>
             <p className="mt-4 text-[var(--text-secondary)]">
-              В течение рабочего дня свяжемся с вами, уточним детали и отправим демо и план внедрения.
+              В течение рабочего дня свяжемся с вами, уточним детали и отправим MVP (рабочий прототип) и план внедрения.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
@@ -35,7 +35,7 @@ export default function ThankYouPage() {
               </Link>
               <Link
                 href="/cases"
-                className="rounded-lg border border-[var(--accent)]/50 px-6 py-3 text-sm font-semibold text-[var(--accent)] hover:bg-[var(--accent)]/10"
+                className="btn-glow rounded-lg border border-[var(--accent)]/50 px-6 py-3 text-sm font-semibold text-[var(--accent)] hover:bg-[var(--accent)]/10"
               >
                 Смотреть кейсы
               </Link>

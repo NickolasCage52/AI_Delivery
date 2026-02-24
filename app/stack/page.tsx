@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/sections/Footer";
 import { Container } from "@/components/ui/Container";
 import { HeroCTA, SectionCTA } from "@/components/cta";
+import { TechStackBlock } from "@/components/stack/TechStackBlock";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
@@ -12,17 +13,6 @@ export const metadata = buildMetadata({
     "Работаем с n8n, Telegram/MiniApps, CRM, аналитикой и вебом. Подбираем стек под задачу, интегрируемся с вашими системами.",
   path: "/stack",
 });
-
-const STACK = [
-  "n8n",
-  "Telegram / MiniApps",
-  "CRM (amoCRM, Bitrix24)",
-  "Google Sheets / Notion",
-  "Next.js",
-  "Аналитика (GA4, Метрика)",
-  "OpenAI / LLM‑провайдеры",
-  "Email / SMS / Webhooks",
-];
 
 export default function StackPage() {
   return (
@@ -51,20 +41,14 @@ export default function StackPage() {
 
         <section className="py-20 bg-[var(--bg-secondary)]/40">
           <Container>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {STACK.map((item) => (
-                <div key={item} className="rounded-xl border border-white/10 bg-[var(--bg-elevated)]/70 p-4 text-[var(--text-secondary)]">
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/80 p-6">
+            <TechStackBlock />
+            <div className="mt-14 rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/80 p-6">
               <p className="text-sm text-[var(--text-muted)]">Пример пайплайна</p>
               <p className="mt-2 text-[var(--text-secondary)]">
                 Лид → бот → квалификация → CRM → задача менеджеру → отчёт в Telegram.
               </p>
             </div>
-            <SectionCTA primary="Запросить демо и план" />
+            <SectionCTA />
           </Container>
         </section>
       </main>

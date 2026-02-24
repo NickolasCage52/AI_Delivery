@@ -8,6 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        xs: ["0.8125rem", { lineHeight: "1.35" }],   /* 13px → более читабельно */
+        sm: ["0.9375rem", { lineHeight: "1.5" }],    /* 15px вместо 14px */
+        base: ["1.0625rem", { lineHeight: "1.6" }],   /* 17px вместо 16px */
+      },
       colors: {
         primary: "#070A0F",
         "neon-cyan": "#56F0FF",

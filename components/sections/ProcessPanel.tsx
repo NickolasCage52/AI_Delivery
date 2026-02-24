@@ -31,7 +31,7 @@ const STEPS = [
       "Интеграции и риски",
       "План работ",
     ],
-    get: "1–2 страницы плана + список интеграций + тайминг 48–72ч / 3–5 / 5–7 / 7–10 дней",
+    get: "1–2 страницы плана + список интеграций + тайминг 24ч MVP / 3–10 дней боевой запуск",
     time: "2–6 часов",
     fromYou: ["Подтверждение scope", "Доступы к ключевым системам (если нужно)"],
   },
@@ -43,7 +43,7 @@ const STEPS = [
       "Прототип / бот / лендинг / miniapp",
       "База знаний и сценарии",
     ],
-    get: "Рабочая версия + демо",
+    get: "Рабочая версия MVP",
     time: "1–5 дней (по пакету)",
     fromYou: ["Доступы при необходимости", "Материалы: контент, логотипы"],
   },
@@ -69,7 +69,7 @@ const STEPS = [
     ],
     get: "Доступы, документация, видео/гайд, поддержка на старт",
     time: "2–8 часов",
-    fromYou: ["Фидбек по демо", "Назначение ответственных"],
+    fromYou: ["Фидбек по MVP", "Назначение ответственных"],
   },
 ];
 
@@ -102,10 +102,11 @@ function ProcessPanelInner() {
       const stepIndex = Number(el.dataset.stepIndex || 0);
       const depth = index - stepIndex;
       if (depth >= 1 && depth <= 2) {
-        const translateX = depth * 12;
-        const translateY = depth * 8;
-        const scale = 1 - depth * 0.02;
-        const opacity = 0.4 - depth * 0.1;
+        const offset = depth * 32;
+        const translateX = offset;
+        const translateY = offset * 0.6;
+        const scale = 1 - depth * 0.08;
+        const opacity = depth === 1 ? 0.15 : 0.06;
         el.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
         el.style.opacity = String(opacity);
         el.style.zIndex = String(5 - depth);
@@ -281,17 +282,18 @@ function ProcessPanelInner() {
           <div className="relative min-h-[520px] md:min-h-[560px]">
             {/* Stack depth: 1–2 back panels (OS-style) */}
             {!reduced && (
-              <div className="absolute right-0 top-0 w-full h-full pointer-events-none" aria-hidden>
+              <div className="absolute right-0 top-0 w-full h-full pointer-events-none overflow-visible" aria-hidden>
                 {STEPS.map((s, i) => (
                   <div
                     key={s.panel}
                     data-process-stack
                     data-step-index={i}
-                    className="absolute right-0 top-0 h-full w-full rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/50 transition-all duration-300"
-                    style={{ opacity: 0, visibility: "hidden", transform: "translate(0px,0px) scale(1)" }}
+                    className="absolute right-0 top-0 w-[calc(100%-24px)] h-[calc(100%-20px)] rounded-2xl border border-white/[0.06] bg-[var(--bg-elevated)]/40 backdrop-blur-sm transition-all duration-300"
+                    style={{ opacity: 0, visibility: "hidden", transform: "translate(0px,0px) scale(1)", transformOrigin: "top right" }}
                   >
-                    <div className="p-4">
-                      <span className="text-xs font-medium uppercase tracking-wider text-[var(--accent)]/60">{s.panel}</span>
+                    <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                      <span className="h-7 w-7 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{s.num}</span>
+                      <span className="text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]/70">{s.panel}</span>
                     </div>
                   </div>
                 ))}
@@ -377,7 +379,8 @@ function ProcessPanelInner() {
         <SectionCTA
           primary={HOME_COPY.hero.ctaPrimary}
           options={[
-            { label: HOME_COPY.hero.ctaSecondary, href: "/cases" },
+            { label: HOME_COPY.hero.ctaSecondary, href: "/contact" },
+            { label: HOME_COPY.proof.casesLink, href: "/cases" },
             { label: "Показать примеры сценариев", href: "/stack" },
           ]}
           sourcePage="home"

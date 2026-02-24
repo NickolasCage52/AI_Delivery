@@ -219,7 +219,7 @@ export function Process() {
           </div>
         </div>
 
-        <SectionCTA primary="Запросить демо и план" />
+        <SectionCTA />
       </Container>
     </section>
   );

@@ -59,12 +59,12 @@ function MetricCardInner({
         <div className="relative mb-2">
           {showLive && (
             <span className="inline-flex items-center gap-1 rounded border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-violet-300">
-              <span className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" aria-hidden />
+              <span className="h-1 w-1 rounded-full bg-violet-400 animate-pulse" aria-hidden />
               Live
             </span>
           )}
           {stabilityBadge && !showLive && (
-            <span className="inline-flex items-center gap-1 rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-medium text-emerald-300">
+            <span className="inline-flex items-center gap-1 rounded border border-violet-500/40 bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-medium text-violet-300">
               {stabilityBadge}
             </span>
           )}

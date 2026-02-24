@@ -257,7 +257,7 @@ export default function ServicesPage() {
                     </div>
                   );
                 })()}
-                <SectionCTA primary="Запросить демо и план" sourcePage="services" service={s.id} />
+                <SectionCTA sourcePage="services" service={s.id} />
               </div>
             ))}
           </Container>
@@ -294,7 +294,7 @@ export default function ServicesPage() {
                 </ul>
               </div>
             </div>
-            <SectionCTA primary="Запросить демо и план" sourcePage="services" />
+            <SectionCTA sourcePage="services" />
           </Container>
         </section>
       </main>

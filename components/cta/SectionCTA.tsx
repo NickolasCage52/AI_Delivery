@@ -4,15 +4,15 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLeadModal } from "./LeadModal";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { CTA_PRIMARY, CTA_SECONDARY } from "@/lib/constants/messaging";
 
 const CTA_OPTIONS = [
   { label: "Смотреть кейсы", href: "/cases" },
-  { label: "Хочу MVP", href: "/services#miniapps" },
-  { label: "Разобрать задачу", href: "/contact" },
+  { label: CTA_SECONDARY, href: "/contact" },
 ];
 
 export function SectionCTA({
-  primary = "Получить план внедрения",
+  primary = CTA_PRIMARY,
   options = CTA_OPTIONS,
   useModal = false,
   primaryHref = "/demo",
@@ -71,7 +71,7 @@ export function SectionCTA({
           key={opt.label}
           href={opt.href}
           onClick={() => trackCtaEvent({ action: "click", label: opt.label, location: "section-cta", href: opt.href })}
-          className="rounded-lg border border-[var(--accent)]/40 px-4 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10 min-h-[44px] inline-flex items-center"
+          className="btn-glow rounded-lg border border-[var(--accent)]/40 px-4 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10 min-h-[44px] inline-flex items-center"
         >
           {opt.label}
         </a>

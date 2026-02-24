@@ -2,25 +2,47 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { trackCtaEvent } from "@/lib/analytics/cta";
+import { submitLead, collectUtm } from "@/lib/lead/submitLead";
+import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
 
 type Status = "idle" | "loading";
 
 export function ContactForm({ sourcePage, service }: { sourcePage?: string; service?: string }) {
   const [status, setStatus] = useState<Status>("idle");
-  const [form, setForm] = useState({ name: "", contact: "", task: "", sphere: "", timeline: "" });
+  const [form, setForm] = useState({ name: "", contact: "", task: "", sphere: "", timeline: "", _hp: "" });
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 700));
     trackCtaEvent({ action: "submit", label: "Contact Form", location: "contact-page" });
-    router.push("/thank-you");
+    const result = await submitLead({
+      name: form.name,
+      contact: form.contact,
+      task: form.task,
+      sphere: form.sphere,
+      timeline: form.timeline,
+      sourcePage: sourcePage ?? pathname ?? "/contact",
+      utm: collectUtm(),
+      _hp: form._hp,
+    });
+    if (result.ok) {
+      router.push("/thank-you");
+    } else {
+      setStatus("idle");
+      alert(result.error);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="sr-only" aria-hidden>
+        <label htmlFor="contact-hp">Не заполняйте</label>
+        <input id="contact-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />
+      </div>
       <input type="hidden" name="sourcePage" value={sourcePage ?? ""} />
       <input type="hidden" name="service" value={service ?? ""} />
       <div>
@@ -93,13 +115,16 @@ export function ContactForm({ sourcePage, service }: { sourcePage?: string; serv
           />
         </div>
       </div>
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="w-full min-h-[48px] rounded-lg bg-[var(--accent)] py-3 text-base font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_24px_rgba(139,92,246,0.35)] disabled:opacity-70"
-      >
-        {status === "loading" ? "Отправка…" : "Отправить"}
-      </button>
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="flex-1 min-h-[48px] rounded-lg bg-[var(--accent)] py-3 text-base font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_24px_rgba(139,92,246,0.35)] disabled:opacity-70"
+        >
+          {status === "loading" ? "Отправка…" : "Отправить"}
+        </button>
+        <TelegramLeadButton location="contact-form" className="sm:w-auto" />
+      </div>
     </form>
   );
 }

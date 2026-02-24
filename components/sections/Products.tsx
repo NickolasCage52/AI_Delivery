@@ -3,113 +3,126 @@
 import { memo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Container } from "@/components/ui/Container";
-import { SpecularCard } from "@/components/fx/SpecularCard";
+import { SectionShell } from "@/components/layout/SectionShell";
+import { CTA_PRIMARY } from "@/lib/constants/messaging";
 
-const PRODUCTS = [
+const SERVICES = [
   {
     title: "ИИ-бот «Лиды и поддержка»",
-    duration: "5–7 дней",
-    result: "Лиды в CRM, ответы 24/7, квалификация без вашего участия",
+    id: "bots",
+    result: "Квалификация + ответы 24/7 + передача лида в CRM без участия менеджера.",
+    icon: "◎",
     accent: "violet" as const,
-    cta: "Запросить демо",
-    anchorId: "bots",
   },
   {
     title: "Лендинг / сайт под трафик",
-    duration: "48–72 часа",
-    result: "Готовый лендинг под рекламу и заявки",
+    id: "sites",
+    result: "Лендинг под тест гипотезы с аналитикой и заявками в CRM.",
+    icon: "↗",
     accent: "pink" as const,
-    cta: "Запустить за 72 часа",
-    anchorId: "sites",
   },
   {
     title: "n8n «Автоматизация процессов»",
-    duration: "5–7 дней",
-    result: "Лиды → CRM → уведомления → задачи → отчёты без рутины",
+    id: "n8n",
+    result: "Лид → CRM → уведомления → задачи → отчёты без ручных действий.",
+    icon: "▣",
     accent: "soft" as const,
-    cta: "Узнать цену",
-    anchorId: "n8n",
   },
   {
     title: "Telegram MiniApp MVP",
-    duration: "3–5 дней",
-    result: "Рабочий MVP в Telegram для быстрой проверки гипотезы",
+    id: "miniapps",
+    result: "MVP в Telegram для проверки спроса (каталог / анкета / заказ).",
+    icon: "◈",
     accent: "pink" as const,
-    cta: "Хочу MVP",
-    anchorId: "miniapps",
   },
 ];
 
-const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
+const ACCENT_GRADIENTS: Record<string, string> = {
+  violet: "radial-gradient(320px 200px at 20% 0%, rgba(139,92,246,0.18) 0%, transparent 70%)",
+  pink: "radial-gradient(320px 200px at 20% 0%, rgba(236,72,153,0.18) 0%, transparent 70%)",
+  soft: "radial-gradient(320px 200px at 20% 0%, rgba(167,139,250,0.14) 0%, transparent 70%)",
+};
 
 function ProductsInner() {
   return (
-    <section id="products" className="relative py-24 md:py-32 bg-[var(--bg-secondary)]/50">
-      <Container>
-        <motion.h2
-          className="text-3xl font-semibold tracking-tight md:text-4xl text-[var(--text-primary)]"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-        >
-          Услуги и пакеты
-        </motion.h2>
-        <motion.p
-          className="mt-4 text-[var(--text-secondary)] max-w-2xl"
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          4 продукта под ключ — сроки, результат и прозрачный состав работ.
-        </motion.p>
+    <SectionShell id="services" variant="panel" bg="secondary" seamless>
+      <motion.h2
+        className="text-3xl font-semibold tracking-tight md:text-4xl text-[var(--text-primary)]"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        Услуги и пакеты
+      </motion.h2>
+      <motion.p
+        className="mt-4 text-[var(--text-secondary)] max-w-2xl"
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        4 направления под ключ — прозрачные сроки и состав работ.
+      </motion.p>
 
-        <motion.div
-          className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-        >
-          {PRODUCTS.map((p) => (
-            <motion.div key={p.title} variants={item} className="scroll-mt-24">
-              <SpecularCard
-                accent={p.accent}
-                className="min-h-[260px]"
-                revealContent={
-                  <div className="space-y-3">
-                    <p>{p.result}</p>
-                    <Link href={`/directions/${p.anchorId}`} className="inline-flex text-xs text-[var(--accent)]">
-                      Подробнее →
-                    </Link>
-                  </div>
-                }
-              >
-                <span className="text-xs font-medium uppercase tracking-wider text-[var(--accent)]">
-                  {p.duration}
-                </span>
-                <h3 className="mt-3 text-lg font-semibold text-[var(--text-primary)]">{p.title}</h3>
-                <p className="mt-2 text-sm text-[var(--text-secondary)] line-clamp-2">{p.result}</p>
-                <Link href={`/directions/${p.anchorId}`} className="mt-3 inline-flex text-xs text-[var(--accent)]/80 hover:text-[var(--accent)]">
-                  Подробнее →
-                </Link>
-              </SpecularCard>
-            </motion.div>
-          ))}
-        </motion.div>
-        <div className="mt-10">
-          <Link
-            href="/services"
-            className="inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {SERVICES.map((s, i) => (
+          <motion.div
+            key={s.id}
+            className="scroll-mt-24 flex"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.4, delay: i * 0.05 }}
           >
-            Все услуги и пакеты
-          </Link>
-        </div>
-      </Container>
-    </section>
+            <div
+              id={s.id}
+              className="group relative flex flex-col w-full h-full min-h-[220px] overflow-hidden rounded-2xl border border-white/10 bg-[var(--bg-elevated)]/60 p-6 transition-all hover:border-[var(--accent)]/25 hover:bg-[var(--bg-elevated)]/75"
+            >
+              <div
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                aria-hidden
+                style={{ background: ACCENT_GRADIENTS[s.accent] }}
+              />
+              <div className="relative flex flex-col flex-1 min-h-0">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-semibold text-[var(--text-primary)] leading-snug">{s.title}</h3>
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black/20 text-lg text-[var(--accent)]">
+                    {s.icon}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed flex-1">
+                  {s.result}
+                </p>
+                <div className="mt-5 pt-4 border-t border-white/5">
+                  <Link
+                    href={`/directions/${s.id}`}
+                    className="text-sm font-medium text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+                  >
+                    Подробнее о направлении →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="mt-10 flex flex-wrap items-center gap-3">
+        <Link
+          href="/services"
+          className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+        >
+          Все услуги и пакеты
+        </Link>
+        <Link
+          href="/demo"
+          className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+        >
+          {CTA_PRIMARY}
+        </Link>
+      </div>
+    </SectionShell>
   );
 }
 

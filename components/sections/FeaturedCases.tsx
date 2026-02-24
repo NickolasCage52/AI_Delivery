@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Container } from "@/components/ui/Container";
+import { SectionShell } from "@/components/layout/SectionShell";
 import { SpecularCard } from "@/components/fx/SpecularCard";
 import type { Case } from "@/lib/cases/getCases";
 
@@ -38,7 +38,9 @@ function FeaturedCaseCard({ caseItem, index }: { caseItem: Case; index: number }
                 loading="lazy"
               />
             </div>
-          ) : null}
+          ) : (
+            <div className="w-full aspect-[16/10] rounded-t-xl border border-white/10 bg-[var(--bg-elevated)]/50 -mt-px -mx-px" aria-hidden />
+          )}
           <div className="p-5 md:p-6 flex flex-col flex-1">
             <span className="text-xs font-medium uppercase tracking-wider text-[var(--accent)]">
               {caseItem.category}
@@ -80,7 +82,7 @@ export function FeaturedCases({ cases }: { cases: Case[] }) {
   if (!cases.length) return null;
 
   return (
-    <section id="cases" className="relative py-24 md:py-32 bg-[var(--bg-secondary)]/40 overflow-x-hidden">
+    <SectionShell id="cases" variant="panel" bg="secondary" seamless className="overflow-x-hidden">
       <div
         className="absolute inset-0 pointer-events-none opacity-70"
         aria-hidden
@@ -89,7 +91,7 @@ export function FeaturedCases({ cases }: { cases: Case[] }) {
             "radial-gradient(900px 400px at 10% 50%, rgba(139,92,246,0.06) 0%, transparent 50%), radial-gradient(700px 350px at 90% 50%, rgba(236,72,153,0.04) 0%, transparent 50%)",
         }}
       />
-      <Container className="relative">
+      <div className="relative">
         <motion.h2
           className="text-3xl font-semibold tracking-tight md:text-4xl text-[var(--text-primary)]"
           initial={{ opacity: 0, y: 16 }}
@@ -124,12 +126,12 @@ export function FeaturedCases({ cases }: { cases: Case[] }) {
         >
           <Link
             href="/cases"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-6 py-3 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors"
+            className="btn-glow inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-6 py-3 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors"
           >
             Смотреть все кейсы →
           </Link>
         </motion.div>
-      </Container>
-    </section>
+      </div>
+    </SectionShell>
   );
 }

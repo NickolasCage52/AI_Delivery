@@ -57,7 +57,7 @@ export default function DirectionsPage() {
                 </SpecularCard>
               ))}
             </div>
-            <SectionCTA primary="Запросить демо и план" />
+            <SectionCTA />
           </Container>
         </section>
       </main>

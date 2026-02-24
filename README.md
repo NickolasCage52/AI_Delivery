@@ -33,12 +33,23 @@ npm run dev
 | `NEXT_PUBLIC_SCROLL_DEBUG` | Отладка скролла (dev) | — |
 | `NEXT_PUBLIC_BASE_PATH` | Базовый путь для поддиректории | — |
 | `NEXT_PUBLIC_SITE_URL` | URL сайта (SEO, sitemap) | `https://ai-delivery.studio` |
+| `TELEGRAM_BOT_TOKEN` | Токен Telegram-бота (заявки) | — |
+| `TELEGRAM_CHAT_ID` | Chat ID для заявок | — |
 
-Все переменные опциональны. Для локальной разработки достаточно `npm run dev` без `.env.local`.
+Все переменные опциональны, кроме **Leads to Telegram**: для работы форм заявок нужны `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`. Подробнее — в [docs/telegram-setup.md](docs/telegram-setup.md).
+
+## Leads to Telegram
+
+Все формы сайта (главная, демо, контакты, кейсы, модалки) отправляют заявки в Telegram-чат через `POST /api/lead`. Для настройки:
+
+1. Создайте бота через [@BotFather](https://t.me/BotFather), получите токен.
+2. Узнайте Chat ID (личный чат, группа или канал) — см. [docs/telegram-setup.md](docs/telegram-setup.md).
+3. Добавьте в `.env.local`: `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`.
+4. Защита: honeypot, rate limit (5 запросов / 10 мин), валидация Zod.
 
 ## Деплой
 
-- **Vercel**: подключите репозиторий, сборка `npm run build`, запуск `npm run start`.
+- **Vercel**: подключите репозиторий, сборка `npm run build`, запуск `npm run start`. Добавьте `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` в настройках Environment Variables.
 - **Self-hosted**: выполните `npm run build`, затем `npm run start` на сервере.
 
 ## Стек

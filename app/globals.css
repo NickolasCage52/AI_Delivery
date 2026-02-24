@@ -61,7 +61,8 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Inter, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 17px;
+  line-height: 1.6;
   color-scheme: dark;
   overflow-x: hidden;
 }
@@ -115,6 +116,15 @@ h3 {
   outline-offset: 2px;
 }
 
+/* Hover glow for accent buttons (лёгкое свечение, не перегружает) */
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
+  transition: box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-glow {
+  transition: box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
 /* Trailing underline for links (vincture-like) */
 .link-trailing {
   position: relative;
@@ -143,12 +153,23 @@ h3 {
 
 /* IntegrationGraph center breathing */
 .integration-graph-breath {
-  transform-origin: 200px 200px;
+  transform-origin: 210px 210px;
   animation: integrationBreath 4s ease-in-out infinite;
 }
 @keyframes integrationBreath {
   0%, 100% { transform: scale(1); opacity: 0.6; }
   50% { transform: scale(1.03); opacity: 1; }
+}
+
+/* IntegrationGraph node pulse (Apple-style focus ring) */
+.integration-graph-node-pulse {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: integrationNodePulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes integrationNodePulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.12; transform: scale(1.2); }
 }
 
 @keyframes caret-blink {

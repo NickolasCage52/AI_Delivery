@@ -28,7 +28,7 @@ export function Insights({ items }: { items: InsightMeta[] }) {
         <div className="mt-10">
           <Link
             href="/insights"
-            className="inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10"
+            className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10"
           >
             Все материалы
           </Link>
