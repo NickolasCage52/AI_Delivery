@@ -43,14 +43,31 @@ export function SnapStory({ children, onActiveIndexChange, scrollRef: externalRe
     return () => el.removeEventListener("scroll", handleScroll);
   }, [onActiveIndexChange]);
 
+  useEffect(() => {
+    const el = internalRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      if (!el.contains(e.target as Node)) return;
+      el.scrollBy({ top: e.deltaY, behavior: "auto" });
+      e.preventDefault();
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
   return (
     <div
       ref={setRef}
       tabIndex={0}
       role="region"
       aria-label="Сцены сценария работы"
-      className="overflow-y-auto overflow-x-hidden snap-y snap-mandatory overscroll-contain will-change-scroll"
+      className="fixed inset-x-0 overflow-y-auto overflow-x-hidden snap-y snap-mandatory overscroll-contain will-change-scroll"
       style={{
+        top: HEADER_H,
+        bottom: 0,
         height: `calc(100svh - ${HEADER_H}px)`,
         scrollBehavior: "smooth",
         WebkitOverflowScrolling: "touch",

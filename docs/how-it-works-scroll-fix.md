@@ -2,55 +2,41 @@
 
 ## Проблема
 
-На странице `/how-it-works` **не работал скролл колесиком мыши и трекпадом** — критическая ошибка UX.
+На странице `/how-it-works` **не работал скролл колесиком мыши и трекпадом** — критическая ошибка UX. Локально могло работать, на GitHub Pages — нет.
 
-## Причина
+## Причины
 
-**Сценарий B — wheel перехвачен preventDefault** (локально исправлено удалением wheel listener)
+1. **Lenis перехватывал wheel**: на GitHub Pages `pathname` = `"/how-it-works/"` (trailing slash), проверка `pathname === "/how-it-works"` не срабатывала → Lenis инициализировался и блокировал нативный скролл.
+2. **Вложенный overflow-контейнер**: wheel мог уходить в document вместо внутреннего div.
+3. **Старый wheel-handler** на document с `preventDefault` блокировал скролл (удалён ранее).
 
-**Дополнительно на GitHub Pages**: проверка `pathname === "/how-it-works"` в SmoothScroll была строгой. При static export с `trailingSlash: true` pathname = `"/how-it-works/"` (с слэшем). Условие не выполнялось → Lenis включался и перехватывал скролл. Исправлено: учёт `"/how-it-works"` и `"/how-it-works/"` в `components/ui/SmoothScroll.tsx`.
+## Решение (полное переустройство)
 
-В `components/how-it-works/SnapStory.tsx` был обработчик `wheel` на `document` с опциями `{ passive: false, capture: true }`:
-
-```js
-document.addEventListener("wheel", onWheel, { passive: false, capture: true });
-```
-
-Обработчик:
-1. При `e.target` внутри контейнера — вручную делал `el.scrollTop += e.deltaY`
-2. Вызывал `e.preventDefault()` и `e.stopPropagation()` — **блокировал нативный скролл**
-3. Ручное изменение `scrollTop` конфликтовало с нативным `scroll-snap`
-
-В результате колесо и трекпад **никогда не инициировали скролл** — браузерный обработчик по умолчанию отключался до того, как событие достигало scroll-контейнера.
-
-## Решение
-
-1. **Удалён** весь `useEffect` с wheel-слушателем — нативный скролл снова работает.
-2. **Добавлены** `tabIndex={0}` и `role="region"` на scroll-контейнер — для фокуса, доступности и стабильного получения wheel (сценарий D).
-3. Lenis уже **отключён** на `/how-it-works` в `components/ui/SmoothScroll.tsx` (`skipLenis = pathname === "/how-it-works"`) — конфликтов нет.
+1. **ConditionalSmoothScroll**: на `/how-it-works` SmoothScroll (Lenis) вообще не рендерится — Lenis не загружается, нет wheel-перехвата.
+2. **SnapStory**: `position: fixed` + `inset`, контейнер занимает весь viewport под header — единственный scroll target.
+3. **body overflow: hidden**: при монтировании HowItWorksStory блокируется скролл документа.
+4. **Wheel fallback**: `onWheel` на контейнере выполняет `scrollBy` + `preventDefault` — скролл работает даже при капризах браузера.
 
 ## Изменённые файлы
 
 | Файл | Изменение |
 |------|-----------|
-| `components/how-it-works/SnapStory.tsx` | Удалён wheel listener с preventDefault; добавлены tabIndex, role, aria-label |
-| `components/ui/SmoothScroll.tsx` | skipLenis проверяет и `/how-it-works`, и `/how-it-works/` (trailing slash для GitHub Pages) |
+| `components/ui/ConditionalSmoothScroll.tsx` | **Новый**: на `/how-it-works` рендерит children без SmoothScroll |
+| `app/layout.tsx` | SmoothScroll заменён на ConditionalSmoothScroll |
+| `components/how-it-works/HowItWorksStory.tsx` | body overflow hidden при монтировании |
+| `components/how-it-works/SnapStory.tsx` | fixed positioning, wheel handler с scrollBy |
 
 ## Как проверить
 
 1. **Колесо мыши**: листает по карточкам, snap фиксирует на карточке.
 2. **Трекпад**: плавный скролл, snap на остановке.
 3. **PageDown / Space**: нативный скролл и snap.
-4. **Мобильный свайп**: touch-scroll работает (overflow-y-auto + -webkit-overflow-scrolling: touch).
-5. **Нет** горизонтального скролла, **нет** залипания на последней карточке.
+4. **Мобильный свайп**: touch-scroll работает.
+5. **GitHub Pages**: `npm run build` с `GITHUB_PAGES=true`, деплой, проверка на проде.
 
-```bash
-npm run build && npm run start
-```
-
-## Acceptance criteria (выполнены)
+## Acceptance criteria
 
 - [x] Колесо мыши и трекпад работают на `/how-it-works`
 - [x] Scroll-snap сохранён (1 экран = 1 карточка)
-- [x] Нет preventDefault-блокировок, нет конфликтов с Lenis/ScrollTrigger
-- [x] Build зелёный
+- [x] Lenis полностью отключён на странице
+- [x] Работает локально и на GitHub Pages

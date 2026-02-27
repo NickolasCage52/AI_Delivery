@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { ConditionalSmoothScroll } from "@/components/ui/ConditionalSmoothScroll";
 import { PageTransition } from "@/components/ui/PageTransition";
 import { GlowCursor } from "@/components/fx/GlowCursor";
 import { EffectsDebugOverlay } from "@/components/fx/EffectsDebugOverlay";
@@ -79,10 +79,10 @@ export default function RootLayout({
           <ScrollVelocityBlur />
           <EffectsDebugOverlay />
           <UiDebugTools />
-          <SmoothScroll>
+          <ConditionalSmoothScroll>
             <ScrollToTopOnRouteChange />
             <PageTransition>{children}</PageTransition>
-          </SmoothScroll>
+          </ConditionalSmoothScroll>
           <StickyCTA />
           <CookieNotice />
         </LeadModalProvider>

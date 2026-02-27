@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { StoryCard } from "./StoryCard";
 import { SnapStory } from "./SnapStory";
 import { StoryRail } from "./StoryRail";
@@ -94,6 +94,14 @@ export function HowItWorksStory() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   const scrollToCard = useCallback((index: number) => {
     const el = scrollRef.current;
     if (!el) return;
@@ -108,7 +116,7 @@ export function HowItWorksStory() {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative min-h-[calc(100svh-4rem)]">
       <StoryRail activeIndex={activeIndex} onDotClick={scrollToCard} />
 
       <SnapStory onActiveIndexChange={handleActiveChange} scrollRef={scrollRef}>
