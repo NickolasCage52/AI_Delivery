@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, ReactNode, useState } from "react";
+import { usePathname } from "next/navigation";
 import { rafLoopSubscribe } from "@/lib/perf/rafLoop";
 import { useReducedMotion } from "@/lib/motion";
 import { useFxLifecycle } from "@/hooks/useFxLifecycle";
@@ -9,12 +10,16 @@ import { LenisRefContext } from "@/lib/scroll/LenisContext";
 import type { LenisLike } from "@/lib/scroll/LenisContext";
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const lenisRef = useRef<LenisLike | null>(null);
   const rafUnsubRef = useRef<null | (() => void)>(null);
   const frameRef = useRef<null | ((time: number) => void)>(null);
   const [frameReady, setFrameReady] = useState(false);
   const reduced = useReducedMotion();
   const fx = useFxLifecycle({ enabled: !reduced, isInViewport: true });
+
+  /** На /how-it-works отключаем Lenis — там свой scroll-snap контейнер */
+  const skipLenis = pathname === "/how-it-works";
 
   useEffect(() => {
     return installScrollDebug();
@@ -23,7 +28,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
     const init = async () => {
-      if (reduced) return;
+      if (reduced || skipLenis) return;
       const [LenisMod, gsapMod, stMod] = await Promise.all([
         import("lenis"),
         import("gsap"),
@@ -58,7 +63,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       lenisRef.current?.destroy();
       lenisRef.current = null;
     };
-  }, [reduced]);
+  }, [reduced, skipLenis]);
 
   useEffect(() => {
     if (reduced) return;

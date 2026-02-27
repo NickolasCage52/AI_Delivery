@@ -177,6 +177,12 @@ h3 {
   51%, 100% { opacity: 0; }
 }
 
+/* How-it-works: блоковый скролл 1 экран = 1 карточка */
+.snap-story-card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 @keyframes sparkline-draw {
   from { stroke-dashoffset: var(--sparkline-length, 100); }
   to { stroke-dashoffset: 0; }
