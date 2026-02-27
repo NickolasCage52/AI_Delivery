@@ -6,7 +6,9 @@
 
 ## Причина
 
-**Сценарий B — wheel перехвачен preventDefault**
+**Сценарий B — wheel перехвачен preventDefault** (локально исправлено удалением wheel listener)
+
+**Дополнительно на GitHub Pages**: проверка `pathname === "/how-it-works"` в SmoothScroll была строгой. При static export с `trailingSlash: true` pathname = `"/how-it-works/"` (с слэшем). Условие не выполнялось → Lenis включался и перехватывал скролл. Исправлено: учёт `"/how-it-works"` и `"/how-it-works/"` в `components/ui/SmoothScroll.tsx`.
 
 В `components/how-it-works/SnapStory.tsx` был обработчик `wheel` на `document` с опциями `{ passive: false, capture: true }`:
 
@@ -32,6 +34,7 @@ document.addEventListener("wheel", onWheel, { passive: false, capture: true });
 | Файл | Изменение |
 |------|-----------|
 | `components/how-it-works/SnapStory.tsx` | Удалён wheel listener с preventDefault; добавлены tabIndex, role, aria-label |
+| `components/ui/SmoothScroll.tsx` | skipLenis проверяет и `/how-it-works`, и `/how-it-works/` (trailing slash для GitHub Pages) |
 
 ## Как проверить
 

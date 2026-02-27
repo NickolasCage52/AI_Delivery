@@ -18,8 +18,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
   const fx = useFxLifecycle({ enabled: !reduced, isInViewport: true });
 
-  /** На /how-it-works отключаем Lenis — там свой scroll-snap контейнер */
-  const skipLenis = pathname === "/how-it-works";
+  /** На /how-it-works отключаем Lenis — там свой scroll-snap контейнер.
+   * Учитываем trailing slash: на GitHub Pages (static export) pathname = "/how-it-works/" */
+  const skipLenis =
+    pathname === "/how-it-works" || pathname === "/how-it-works/";
 
   useEffect(() => {
     return installScrollDebug();
