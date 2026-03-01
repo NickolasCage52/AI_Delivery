@@ -1,0 +1,429 @@
+/* How it works — animations. prefers-reduced-motion handled in globals.css globally. */
+
+/* Card 1: Leads flow — one-shot per cycle (~3s) */
+.leadsFlowItem {
+  animation: leadsFlowItem 3s ease-out forwards;
+}
+
+.leadsFlowItemLost {
+  animation: leadsFlowItemLost 3s ease-out forwards;
+}
+
+@keyframes leadsFlowItem {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  33% {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+
+@keyframes leadsFlowItemLost {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 0.5;
+    transform: translateX(0);
+  }
+  33% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+.hiwSystemPulse {
+  animation: hiwSystemPulse 5.5s ease-out 0.3s infinite;
+}
+
+/* Card 4: Metrics — grid background breathe */
+.metricsGridBg {
+  position: relative;
+}
+
+.metricsGridBg::before {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  background-image: linear-gradient(
+      to right,
+      rgba(139, 92, 246, 0.5) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(139, 92, 246, 0.5) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes metricsGridBreathe {
+  0%,
+  100% {
+    opacity: 0.04;
+  }
+  50% {
+    opacity: 0.08;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .metricsGridBg::before {
+    animation: metricsGridBreathe 6s ease-in-out infinite;
+  }
+}
+
+/* Card 2: Pipeline nodes — staggered fade-in */
+.pipelineNode {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.pipelineNodeActive {
+  animation: pipelineNodeIn 0.4s ease-out forwards;
+}
+
+@keyframes pipelineNodeIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Card 3: Live chat messages — stagger 600ms */
+.liveChatMsg {
+  opacity: 0;
+}
+
+.liveChatMsgUser {
+  transform: translateX(20px);
+}
+
+.liveChatMsgAi {
+  transform: translateX(-20px);
+}
+
+.liveChatMsgActive {
+  animation: liveChatMsgIn 0.4s ease-out forwards;
+}
+
+.liveChatMsgReduced {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.liveChatTyping {
+  animation: liveChatTyping 0.8s ease-out forwards;
+}
+
+@keyframes liveChatTyping {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
+
+@keyframes liveChatMsgIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Card 5: Services cards — staggered + hover */
+.servicesCard {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.servicesCardActive {
+  animation: servicesCardIn 0.4s ease-out forwards;
+}
+
+@keyframes servicesCardIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.servicesCardHover:hover,
+.servicesCardHover:focus-visible,
+.servicesCardHover:active {
+  transform: scale(1.03);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.25);
+}
+
+.servicesCardSpotlight {
+  transform: scale(1.03);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.servicesCardReduced {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.servicesCardIcon {
+  display: inline-block;
+}
+
+.servicesCardIconActive {
+  animation: servicesCardIconIn 0.4s ease-out forwards;
+}
+
+@keyframes servicesCardIconIn {
+  0% {
+    transform: rotate(0deg) scale(0.9);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Card 6: Objections — stagger 300ms, answer 200ms after question */
+.objectionRow {
+  opacity: 0;
+}
+
+.objectionRowActive {
+  animation: objectionRowIn 0.35s ease-out forwards;
+}
+
+@keyframes objectionRowIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Card 7: Timeline — line draws, steps appear */
+.timelineLine {
+  transform-origin: top;
+  transform: scaleY(0);
+}
+
+.timelineLineActive {
+  animation: timelineLineDraw 2.4s ease-out forwards;
+}
+
+@keyframes timelineLineDraw {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.timelineStep {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+.timelineStepActive {
+  animation: timelineStepIn 0.4s ease-out forwards;
+}
+
+@keyframes timelineStepIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.timelineDot {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.timelineStepActive .timelineDot {
+  animation: timelineDotIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes timelineDotIn {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.timelineRipple {
+  opacity: 0;
+  transform: scale(1);
+}
+
+.timelineStepActive .timelineRipple {
+  animation: timelineRippleOut 1s ease-out forwards;
+}
+
+@keyframes timelineRippleOut {
+  0% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.timelineAmbient {
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    rgba(139, 92, 246, 0.06) 0%,
+    transparent 70%
+  );
+}
+
+.timelineLineReduced {
+  transform: scaleY(1) !important;
+}
+
+.timelineStepReduced {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+.timelineStepReduced .timelineDot {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .servicesCardHover:hover,
+  .servicesCardSpotlight {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Ambient light flash on card change */
+.hiwAmbientFlash {
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(139, 92, 246, 0.06) 0%,
+    transparent 70%
+  );
+  filter: blur(80px);
+  animation: ambientFlash 600ms ease-out forwards;
+}
+
+@keyframes ambientFlash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Noise overlay - use :global to target when class passed via SnapStory */
+
+/* Noise overlay wrapper - ::before creates the overlay */
+.hiwNoiseWrapper {
+  position: relative;
+}
+
+.hiwNoiseWrapper::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  top: 64px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hiwAmbientFlash {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@keyframes hiwSystemPulse {
+  0%,
+  30%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.2);
+  }
+  15% {
+    box-shadow: 0 0 12px 2px rgba(139, 92, 246, 0.3);
+  }
+}
+
+/* Card 8: CTA gradient */
+.ctaGradientBg {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.12) 0%,
+    rgba(236, 72, 153, 0.08) 50%,
+    rgba(139, 92, 246, 0.08) 100%
+  );
+  background-size: 200% 200%;
+  animation: ctaGradient 8s ease-in-out infinite;
+}
+
+@keyframes ctaGradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.ctaButtonPulse {
+  animation: ctaButtonPulse 3s ease-in-out infinite;
+}
+
+@keyframes ctaButtonPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+

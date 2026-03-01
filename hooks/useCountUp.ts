@@ -8,8 +8,22 @@ type Options = {
   inView?: boolean;
 };
 
-function easeOutCubic(t: number) {
-  return 1 - Math.pow(1 - t, 3);
+/** Cubic-bezier(0.25, 0.46, 0.45, 0.94) — smooth ease-out for counters. */
+function easeOutBezier(t: number) {
+  const [p1x, p1y, p2x, p2y] = [0.25, 0.46, 0.45, 0.94];
+  const sample = (x: number) => {
+    const t1 = 1 - x;
+    return 3 * t1 * t1 * x * p1x + 3 * t1 * x * x * p2x + x * x * x;
+  };
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 10; i++) {
+    const mid = (lo + hi) / 2;
+    if (sample(mid) < t) lo = mid;
+    else hi = mid;
+  }
+  const x = (lo + hi) / 2;
+  const t1 = 1 - x;
+  return 3 * t1 * t1 * x * p1y + 3 * t1 * x * x * p2y + x * x * x;
 }
 
 export function useCountUp(target: number, { durationMs = 900, decimals = 0, startOnView = true, inView = true }: Options) {
@@ -41,7 +55,7 @@ export function useCountUp(target: number, { durationMs = 900, decimals = 0, sta
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / durationMs);
-      const eased = easeOutCubic(t);
+      const eased = easeOutBezier(t);
       const next = from + (to - from) * eased;
       setValue(next);
       if (t < 1) raf = requestAnimationFrame(tick);
