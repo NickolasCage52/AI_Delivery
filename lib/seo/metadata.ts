@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() ?? "";
-const domain = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://ai-delivery.studio";
-const siteUrl = new URL(basePath || "/", domain).toString().replace(/\/$/, "");
+const isGitHubPages = process.env.GITHUB_PAGES === "true";
+const basePath =
+  process.env.NEXT_PUBLIC_BASE_PATH?.trim() || (isGitHubPages ? "/AI_Delivery" : "");
+const domain =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+  (isGitHubPages ? "https://nickolascage52.github.io" : "https://ai-delivery.studio");
+const siteUrl = basePath
+  ? `${domain.replace(/\/$/, "")}${basePath.startsWith("/") ? basePath : `/${basePath}`}`.replace(/\/$/, "")
+  : domain.replace(/\/$/, "");
 const withBasePath = (path: string) => `${basePath}${path}`;
 
 export const siteConfig = {
   name: "AI Delivery",
-  title: "AI Delivery — ИИ-решения под ключ за 3–10 дней",
+  title: "Автоматизация бизнеса под ключ — Москва и СПб",
   description:
-    "Бесплатный MVP за 24 часа (1 сценарий). Боевой запуск за 3–10 дней. Боты, сайты, Telegram MiniApps и n8n‑автоматизации с интеграциями и измеримым результатом.",
+    "Внедряем автоматизацию продаж, лидогенерации и CRM-интеграций за 24 часа. Чат-боты, n8n, MiniApps. Бесплатный MVP. Работаем с бизнесом в Москве и Санкт-Петербурге.",
   domain,
   siteUrl,
   basePath,
   ogImage: withBasePath("/og.svg"),
   logo: withBasePath("/logo.svg"),
+  favicon: withBasePath("/favicon.svg"),
   locale: "ru_RU",
   email: "hello@ai-delivery.studio",
   telegram: "https://t.me/ai_delivery",
@@ -37,7 +44,7 @@ export function buildMetadata({
   ogTitle,
   ogDescription,
 }: MetadataInput): Metadata {
-  const url = new URL(path, siteConfig.siteUrl).toString();
+  const url = path === "/" ? `${siteConfig.siteUrl}/` : `${siteConfig.siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
   const resolvedTitle = title;
   const resolvedDescription = description;
 

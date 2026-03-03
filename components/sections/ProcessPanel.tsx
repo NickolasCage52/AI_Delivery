@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useCallback, useRef, useLayoutEffect } from "react";
+import React, { useCallback, useRef, useLayoutEffect, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { useReducedMotion } from "@/lib/motion";
 import { SectionCTA } from "@/components/cta";
 import { useQuality } from "@/hooks/useQuality";
+import { useInViewport } from "@/hooks/useInViewport";
 import { HOME_COPY } from "@/content/site-copy";
+import styles from "./process-panel.module.css";
 
 const STEPS = [
   {
@@ -86,6 +88,12 @@ function ProcessPanelInner() {
   const lastIndexRef = useRef(-1);
   const beamRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
+  const sectionInView = useInViewport(sectionRef, { rootMargin: "120px", threshold: 0.15 });
+  const [connectorAnimate, setConnectorAnimate] = useState(false);
+
+  useEffect(() => {
+    if (sectionInView && !connectorAnimate) setConnectorAnimate(true);
+  }, [sectionInView, connectorAnimate]);
 
   const applyActiveIndex = useCallback((index: number) => {
     if (index === lastIndexRef.current) return;
@@ -149,7 +157,7 @@ function ProcessPanelInner() {
       const ctx = gsap.context(() => {
         ScrollTrigger.create({
           trigger: sec,
-          start: "top top",
+          start: "top 5%",
           end: `+=${steps * 80}%`,
           pin: true,
           pinSpacing: true,
@@ -212,35 +220,37 @@ function ProcessPanelInner() {
     };
   }, [reduced, quality, applyActiveIndex]);
 
+  const showMotion = !reduced;
+
   return (
     <section
       id="process"
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden bg-[var(--bg-primary)] py-24 md:py-32"
+      className={`relative min-h-screen overflow-hidden bg-[var(--bg-primary)] ${styles.section}`}
     >
       <Container className="relative z-10">
-        <motion.h2
-          className="text-3xl font-semibold tracking-tight md:text-4xl text-[var(--text-primary)]"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          {HOME_COPY.process.title}
-        </motion.h2>
-        <motion.p
-          className="mt-4 text-[var(--text-secondary)] max-w-2xl"
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          {HOME_COPY.process.subtitle}
-        </motion.p>
+        <header className={styles.header}>
+          <motion.h2
+            className="text-3xl font-semibold tracking-tight md:text-4xl text-[var(--text-primary)]"
+            initial={showMotion ? { clipPath: "inset(0 0 100% 0)" } : false}
+            animate={showMotion && sectionInView ? { clipPath: "inset(0 0 0% 0)" } : false}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            {HOME_COPY.process.title}
+          </motion.h2>
+          <motion.p
+            className="mt-4 text-[var(--text-secondary)]"
+            initial={showMotion ? { opacity: 0, y: 16 } : false}
+            animate={showMotion && sectionInView ? { opacity: 1, y: 0 } : false}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {HOME_COPY.process.subtitle}
+          </motion.p>
+        </header>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-[1fr,1.2fr]">
           {/* Left: steps nav + progress beam */}
-          <div className="space-y-4">
+          <div className={styles.stepsList}>
             {!reduced && quality === "high" && (
               <div className="mb-6 h-1 w-full rounded-full bg-white/5 overflow-visible">
                 <div
@@ -255,6 +265,11 @@ function ProcessPanelInner() {
                 />
               </div>
             )}
+            {/* Mobile: vertical connector */}
+            <div className={`${styles.stepsConnector} ${connectorAnimate ? styles.animate : ""}`} aria-hidden>
+              <div className={styles.stepsConnectorProgress} />
+            </div>
+            <div className="space-y-4">
             {STEPS.map((s, i) => (
               <button
                 key={s.num}
@@ -263,19 +278,20 @@ function ProcessPanelInner() {
                 data-step-index={i}
                 data-active={i === 0 ? "true" : "false"}
                 onClick={() => applyActiveIndex(i)}
-                className="w-full rounded-xl border p-4 text-left transition-all border-white/10 bg-[var(--bg-elevated)]/60 hover:border-[var(--accent)]/20 data-[active=true]:border-[var(--accent)]/40 data-[active=true]:bg-[var(--accent)]/5 data-[active=true]:shadow-[0_0_24px_rgba(139,92,246,0.12)]"
+                className={`${styles.stepCard} w-full rounded-xl border border-white/10 bg-[var(--bg-elevated)]/60 p-4 text-left cursor-default border-white/10 hover:border-[var(--accent)]/20 data-[active=true]:border-[var(--accent)]/40 data-[active=true]:bg-[var(--accent)]/5 data-[active=true]:shadow-[0_0_24px_rgba(139,92,246,0.12)] ${sectionInView ? styles.visible : ""}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)]/20 text-sm font-semibold text-[var(--accent)]">
+                  <span className={`${styles.stepIconWrapper} ${styles.stepIcon} flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)]/20 text-sm font-semibold text-[var(--accent)]`}>
                     {s.num}
                   </span>
                   <div>
-                    <span className="font-semibold text-[var(--text-primary)]">{s.title}</span>
+                    <span className={`${styles.stepTitle} font-semibold text-[var(--text-primary)] min-[768px]:text-base`}>{s.title}</span>
                     <span className="ml-2 text-xs text-[var(--accent)]">{s.time}</span>
                   </div>
                 </div>
               </button>
             ))}
+            </div>
           </div>
 
           {/* Right: stack of panels (OS-style) + main card */}
@@ -307,7 +323,7 @@ function ProcessPanelInner() {
                   data-process-panel
                   data-step-index={i}
                   data-active={i === 0 ? "true" : "false"}
-                  className="absolute inset-0 p-6 md:p-8 transition-all duration-300 opacity-0 translate-x-4 pointer-events-none data-[active=true]:opacity-100 data-[active=true]:translate-x-0 data-[active=true]:pointer-events-auto"
+                  className={`${styles.panel} absolute inset-0 p-6 md:p-8`}
                 >
                   <p className="font-mono text-xs font-medium uppercase tracking-wider text-[var(--accent)]">
                     Операционная панель Delivery — {step.panel}
@@ -341,51 +357,34 @@ function ProcessPanelInner() {
                     </div>
                   </div>
 
-                  {/* Mini pipeline graph for Integrations step */}
-                  {i === 3 && !reduced && (
-                    <div className="mt-6 rounded-xl border border-white/10 bg-black/20 p-4">
-                      <p className="font-mono text-xs font-medium text-[var(--text-secondary)] mb-3">Pipeline</p>
-                      <svg viewBox="0 0 200 64" className="w-full h-16 text-[var(--accent)]" aria-hidden>
-                        <defs>
-                          <linearGradient id="pipe-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.6" />
-                            <stop offset="100%" stopColor="#F472B6" stopOpacity="0.6" />
-                          </linearGradient>
-                        </defs>
-                        <path d="M 30 32 L 60 32" stroke="url(#pipe-grad)" strokeWidth="2" fill="none" />
-                        <path d="M 70 32 L 95 20" stroke="url(#pipe-grad)" strokeWidth="2" fill="none" />
-                        <path d="M 70 32 L 95 32" stroke="url(#pipe-grad)" strokeWidth="2" fill="none" />
-                        <path d="M 70 32 L 95 44" stroke="url(#pipe-grad)" strokeWidth="2" fill="none" />
-                        <circle cx="30" cy="32" r="10" fill="#0B0620" stroke="#8B5CF6" strokeWidth="1.5" className="drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
-                        <circle cx="70" cy="32" r="10" fill="#0B0620" stroke="#F472B6" strokeWidth="1.5" className="drop-shadow-[0_0_6px_rgba(244,114,182,0.4)]" />
-                        <circle cx="95" cy="20" r="8" fill="#0B0620" stroke="#8B5CF6" strokeWidth="1" />
-                        <circle cx="95" cy="32" r="8" fill="#0B0620" stroke="#8B5CF6" strokeWidth="1" />
-                        <circle cx="95" cy="44" r="8" fill="#0B0620" stroke="#8B5CF6" strokeWidth="1" />
-                        <text x="30" y="36" textAnchor="middle" fontSize="8" fill="#8B5CF6">n8n</text>
-                        <text x="70" y="36" textAnchor="middle" fontSize="8" fill="#F472B6">Flow</text>
-                        <text x="95" y="17" textAnchor="middle" fontSize="6" fill="#A1A1B5">CRM</text>
-                        <text x="95" y="35" textAnchor="middle" fontSize="6" fill="#A1A1B5">Sheets</text>
-                        <text x="95" y="47" textAnchor="middle" fontSize="6" fill="#A1A1B5">TG</text>
-                      </svg>
-                    </div>
-                  )}
-
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <SectionCTA
-          primary={HOME_COPY.hero.ctaPrimary}
-          options={[
-            { label: HOME_COPY.hero.ctaSecondary, href: "/contact" },
-            { label: HOME_COPY.proof.casesLink, href: "/cases" },
-            { label: "Показать примеры сценариев", href: "/stack" },
-          ]}
-          sourcePage="home"
-          service="process"
-        />
+        <div className={`${styles.ctaBlock} ${sectionInView ? styles.visible : ""} mt-16`}>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] md:text-xl">
+            {HOME_COPY.process.ctaTitle}
+          </h3>
+          <p className="mt-2 text-sm text-[var(--text-secondary)] md:text-base md:opacity-90">
+            {HOME_COPY.process.ctaSubtitle}
+          </p>
+          <SectionCTA
+            primary={HOME_COPY.process.ctaPrimary}
+            primaryHref="/demo"
+            options={[
+              { label: HOME_COPY.hero.ctaSecondary, href: "/contact" },
+              { label: HOME_COPY.proof.casesLink, href: "/cases" },
+              { label: "Показать примеры сценариев", href: "/stack" },
+            ]}
+            sourcePage="home"
+            service="process"
+          />
+          <p className="mt-3 text-xs text-[var(--text-muted)]">
+            {HOME_COPY.process.ctaMicro}
+          </p>
+        </div>
       </Container>
     </section>
   );

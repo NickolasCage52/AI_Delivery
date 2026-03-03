@@ -64,6 +64,18 @@
   position: relative;
 }
 
+.metricsCard {
+  /* Card styling via Tailwind */
+}
+
+.metricsBar {
+  /* Bar animation via inline styles */
+}
+
+.metricsSuffix {
+  /* Suffix styling via Tailwind */
+}
+
 .metricsGridBg::before {
   content: "";
   position: absolute;
@@ -179,6 +191,20 @@
 .servicesCardHover:active {
   transform: scale(1.03);
   box-shadow: 0 0 24px rgba(139, 92, 246, 0.25);
+}
+
+/* Service card as link — hover/active for clickable cards */
+.serviceCardLink {
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.serviceCardLink:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+}
+.serviceCardLink:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease;
 }
 
 .servicesCardSpotlight {
@@ -326,9 +352,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .servicesCardHover:hover,
-  .servicesCardSpotlight {
+  .servicesCardSpotlight,
+  .serviceCardLink:hover {
     transform: none;
     box-shadow: none;
+  }
+  .serviceCardLink:active {
+    transform: none;
   }
 }
 

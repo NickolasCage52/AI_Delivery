@@ -72,7 +72,7 @@ function FinalCTAInner({ enabled = true }: { enabled?: boolean }) {
             Получить бесплатный MVP за 24 часа
           </Link>
           <Link
-            href="/demo#contact"
+            href="/#contact"
             aria-label="Разобрать задачу за 15 минут"
             className="inline-flex items-center justify-center min-h-[48px] rounded-xl border-2 border-[var(--accent)]/50 bg-transparent px-8 py-3 text-base font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/70 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
           >
@@ -82,6 +82,26 @@ function FinalCTAInner({ enabled = true }: { enabled?: boolean }) {
         <p className="text-[13px] text-[var(--text-muted)] opacity-60">
           1 сценарий · 24 часа · без предоплаты
         </p>
+        <nav className="mt-6 pt-6 border-t border-white/10 w-full max-w-md" aria-label="Дополнительные материалы">
+          <p className="text-xs uppercase tracking-wider text-[var(--text-muted)] mb-3">Также читайте</p>
+          <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+            <li>
+              <Link href="/cases" className="text-[var(--accent)] hover:underline">
+                Кейсы автоматизации бизнеса — результаты
+              </Link>
+            </li>
+            <li>
+              <Link href="/services#n8n" className="text-[var(--accent)] hover:underline">
+                n8n-автоматизация для лидов
+              </Link>
+            </li>
+            <li>
+              <Link href="/services#miniapps" className="text-[var(--accent)] hover:underline">
+                Telegram MiniApp: MVP для бизнеса
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   );

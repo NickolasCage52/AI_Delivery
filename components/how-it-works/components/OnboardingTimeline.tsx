@@ -65,7 +65,7 @@ function OnboardingTimelineInner({ enabled = true }: { enabled?: boolean }) {
   return (
     <div
       ref={ref}
-      className={`relative max-w-[560px] mx-auto px-5 md:px-0 ${s.timelineAmbient}`}
+      className={`relative w-full max-w-[520px] ml-auto px-0 md:px-0 ${s.timelineAmbient}`}
       style={{
         opacity: reduced ? 1 : resetting ? 0 : runAnimation ? 1 : 0,
         transitionDuration: `${FADE_MS}ms`,
@@ -160,7 +160,7 @@ function OnboardingTimelineInner({ enabled = true }: { enabled?: boolean }) {
           })
         }
         aria-label="Начать бесплатно"
-        className="mt-8 w-full sm:w-auto inline-flex items-center justify-center min-h-[52px] rounded-xl border-2 border-[var(--accent)] bg-transparent px-8 py-4 text-base font-semibold text-[var(--accent)] hover:bg-[var(--accent)]/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        className="flex mt-8 mx-auto w-full max-w-[320px] sm:w-auto sm:max-w-none min-h-[52px] items-center justify-center rounded-xl border-2 border-[var(--accent)] bg-transparent px-8 py-4 text-base font-semibold text-[var(--accent)] hover:bg-[var(--accent)]/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
         style={
           runAnimation
             ? { animationDelay: "3800ms" }

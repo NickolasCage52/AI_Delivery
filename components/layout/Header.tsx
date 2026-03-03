@@ -196,19 +196,25 @@ export function Header() {
       {isHome && (
         <div className={`hidden md:block border-t border-white/5 ${subHeaderBg}`}>
           <Container>
-            <div className="flex items-center gap-3 py-2 text-xs text-[var(--text-secondary)]">
+            <nav className="relative flex items-center gap-3 py-2 text-xs text-[var(--text-secondary)]" aria-label="Якорная навигация">
               {anchorLinks.map((item) => (
                 <Link
                   key={item.id}
                   href={item.href}
-                  className={`rounded-full px-3 py-1 transition-colors ${
-                    item.active ? "bg-white/10 text-[var(--text-primary)]" : "hover:text-[var(--text-primary)]"
-                  }`}
+                  onClick={() => setActiveAnchor(item.id)}
+                  className="relative z-10 rounded-full px-3 py-1 transition-colors duration-200 hover:text-[var(--text-primary)]"
                 >
-                  {item.label}
+                  {item.active && (
+                    <motion.span
+                      layoutId="anchor-indicator"
+                      className="absolute inset-0 rounded-full bg-white/10"
+                      transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                    />
+                  )}
+                  <span className={`relative z-10 ${item.active ? "text-[var(--text-primary)]" : ""}`}>{item.label}</span>
                 </Link>
               ))}
-            </div>
+            </nav>
           </Container>
         </div>
       )}

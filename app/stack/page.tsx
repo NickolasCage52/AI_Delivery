@@ -8,7 +8,7 @@ import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata = buildMetadata({
-  title: "Стек и интеграции AI Delivery",
+  title: "Стек технологий — инструменты автоматизации",
   description:
     "Работаем с n8n, Telegram/MiniApps, CRM, аналитикой и вебом. Подбираем стек под задачу, интегрируемся с вашими системами.",
   path: "/stack",
@@ -19,8 +19,8 @@ export default function StackPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Стек", url: `${siteConfig.domain}/stack` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Стек", url: `${siteConfig.siteUrl}/stack` },
         ])}
       />
       <Header />

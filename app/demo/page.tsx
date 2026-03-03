@@ -7,9 +7,9 @@ import { getBreadcrumbSchema } from "@/lib/seo/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata = buildMetadata({
-  title: "Получить бесплатный MVP за 24 часа",
+  title: "Бесплатный MVP за 24 часа — заявка онлайн",
   description:
-    "Бесплатный MVP за 24 часа — 1 сценарий. Заявка → уточнение → прототип через 24ч → созвон и план доработки или боевого запуска.",
+    "Бесплатный прототип автоматизации под вашу задачу за 24 часа. Без предоплаты, без риска. Заявка онлайн — ответ в тот же день.",
   path: "/demo",
 });
 
@@ -29,12 +29,12 @@ export default function DemoPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Получить MVP", url: `${siteConfig.domain}/demo` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Получить MVP", url: `${siteConfig.siteUrl}/demo` },
         ])}
       />
       <Header />
-      <main className="pb-24 md:pb-28">
+      <main id="main-content" className="pb-24 md:pb-28">
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <section className="pt-28 pb-12 md:pt-32 md:pb-16 bg-[var(--bg-primary)]">
           <Container>

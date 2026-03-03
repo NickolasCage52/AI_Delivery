@@ -29,15 +29,25 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.domain),
+  metadataBase: new URL(`${siteConfig.siteUrl}/`),
   title: {
     default: siteConfig.title,
-    template: `%s — ${siteConfig.name}`,
+    template: `%s | ${siteConfig.name}`,
+  },
+  icons: {
+    icon: siteConfig.favicon,
+    shortcut: siteConfig.favicon,
+    // TODO: создать public/apple-touch-icon.png 180×180 — сейчас может 404 на iOS
+    apple: siteConfig.basePath ? `${siteConfig.basePath}/apple-touch-icon.png` : "/apple-touch-icon.png",
   },
   description: siteConfig.description,
+  verification: {
+    google: "TODO_GOOGLE_VERIFICATION_TOKEN",
+    yandex: "TODO_YANDEX_VERIFICATION_TOKEN",
+  },
   openGraph: {
     type: "website",
-    url: siteConfig.domain,
+    url: `${siteConfig.siteUrl}/`,
     siteName: siteConfig.name,
     locale: siteConfig.locale,
     title: siteConfig.title,
@@ -71,6 +81,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] aurora-bg" suppressHydrationWarning>
+        <a
+          href="#main-content"
+          className="fixed left-[-9999px] top-4 z-[9999] rounded bg-[var(--accent)] px-4 py-2 text-sm text-white shadow-lg transition-[left] duration-200 focus:left-4 focus:outline-none focus:ring-2 focus:ring-white/50"
+        >
+          Перейти к основному контенту
+        </a>
         <JsonLd data={[getOrganizationSchema(), getWebSiteSchema()]} />
         <LeadModalProvider>
           <UnhandledRejectionHandler />

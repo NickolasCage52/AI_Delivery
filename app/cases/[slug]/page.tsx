@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const data = getCaseBySlug(slug);
   if (!data) {
     return buildMetadata({
-      title: "Кейс AI Delivery",
+      title: "Кейс",
       description: "Кейс внедрения: цель, решение, сроки и результат.",
       path: `/cases/${slug}`,
     });
@@ -59,9 +59,9 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
       <>
         <JsonLd
           data={getBreadcrumbSchema([
-            { name: "Главная", url: siteConfig.domain },
-            { name: "Кейсы", url: `${siteConfig.domain}/cases` },
-            { name: landingCase.title, url: `${siteConfig.domain}/cases/${landingCase.slug}` },
+            { name: "Главная", url: `${siteConfig.siteUrl}/` },
+            { name: "Кейсы", url: `${siteConfig.siteUrl}/cases` },
+            { name: landingCase.title, url: `${siteConfig.siteUrl}/cases/${landingCase.slug}` },
           ])}
         />
         <Header />
@@ -83,9 +83,9 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ slu
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Кейсы", url: `${siteConfig.domain}/cases` },
-          { name: data.title, url: `${siteConfig.domain}/cases/${data.slug}` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Кейсы", url: `${siteConfig.siteUrl}/cases` },
+          { name: data.title, url: `${siteConfig.siteUrl}/cases/${data.slug}` },
         ])}
       />
       <Header />

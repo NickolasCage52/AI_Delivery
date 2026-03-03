@@ -18,8 +18,8 @@ export default function PrivacyPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Политика конфиденциальности", url: `${siteConfig.domain}/privacy` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Политика конфиденциальности", url: `${siteConfig.siteUrl}/privacy` },
         ])}
       />
       <Header />

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useRef, useState, useCallback, useEffect } from "react";
+import Link from "next/link";
 import { useInViewport } from "@/hooks/useInViewport";
 import { useReducedMotion } from "@/lib/motion";
 import { useAnimationCycle } from "../hooks/useAnimationCycle";
@@ -8,24 +9,32 @@ import s from "../how-it-works.module.css";
 
 const SERVICES = [
   {
+    id: "bots",
     emoji: "🤖",
     title: "Боты и автоответчики",
     desc: "Квалификация и ответы 24/7",
+    href: "/services#bots",
   },
   {
+    id: "n8n",
     emoji: "⚙️",
     title: "Автоматизация процессов",
     desc: "Лид → CRM → задачи → отчёты",
+    href: "/services#n8n",
   },
   {
+    id: "sites",
     emoji: "🌐",
     title: "Лендинги и сайты",
     desc: "Страницы под гипотезу с аналитикой",
+    href: "/services#sites",
   },
   {
+    id: "miniapps",
     emoji: "📱",
     title: "Telegram Mini App",
     desc: "MVP в Telegram для проверки спроса",
+    href: "/services#miniapps",
   },
 ];
 
@@ -74,11 +83,13 @@ function ServicesCardsInner({ enabled = true }: { enabled?: boolean }) {
   return (
     <div ref={ref} className="grid grid-cols-2 gap-4 md:gap-6 max-w-3xl">
       {SERVICES.map((svc, i) => (
-        <div
-          key={svc.title}
-          className={`rounded-xl border border-white/[0.08] bg-[rgba(8,5,24,0.6)] p-5 md:p-6 transition-transform duration-200 active:scale-[1.02] md:active:scale-100 ${s.servicesCard} ${
+        <Link
+          key={svc.id}
+          href={svc.href}
+          aria-label={`${svc.title}: ${svc.desc}. Перейти к подробностям`}
+          className={`${s.serviceCardLink} rounded-xl border border-white/[0.08] bg-[rgba(8,5,24,0.6)] p-5 md:p-6 block ${s.servicesCard} ${
             show && !reduced ? s.servicesCardActive : ""
-          } ${reduced ? s.servicesCardReduced : ""} ${s.servicesCardHover} ${
+          } ${reduced ? s.servicesCardReduced : ""} ${
             runAnimation && spotlightIndex === i ? s.servicesCardSpotlight : ""
           }`}
           style={show && !reduced ? { animationDelay: `${i * 100}ms` } : undefined}
@@ -96,7 +107,7 @@ function ServicesCardsInner({ enabled = true }: { enabled?: boolean }) {
             {svc.title}
           </p>
           <p className="text-sm text-[var(--text-secondary)] mt-2">{svc.desc}</p>
-        </div>
+        </Link>
       ))}
     </div>
   );

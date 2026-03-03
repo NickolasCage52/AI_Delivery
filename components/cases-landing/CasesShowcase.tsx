@@ -8,8 +8,7 @@ import { FILTERS, getDisplayImages, type CaseItem } from "./cases-data";
 import { GalleryLightbox } from "./GalleryLightbox";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
 import { FormStatus } from "@/components/forms/FormStatus";
-
-const CONTACT_URL = "https://t.me/nikmorus";
+import { siteConfig } from "@/lib/seo/metadata";
 
 function casesWithPhotos(cases: CaseItem[]) {
   return cases.filter((c) => c.images && c.images.length > 0);
@@ -454,7 +453,7 @@ function CTAFormBlock() {
           <aside className={s.contacts}>
             <h3>Контакты</h3>
             <p>
-              <a href={CONTACT_URL} target="_blank" rel="noopener noreferrer">
+              <a href={siteConfig.telegram} target="_blank" rel="noopener noreferrer">
                 Telegram
               </a>
             </p>
@@ -585,7 +584,7 @@ function HeroSection() {
           <a href="#cases" className={`${s.btn} ${s.btnPrimary}`}>
             Смотреть кейсы
           </a>
-          <a href={CONTACT_URL} className={s.btn} target="_blank" rel="noopener noreferrer">
+          <a href={siteConfig.telegram} className={s.btn} target="_blank" rel="noopener noreferrer">
             Написать нам
           </a>
         </div>

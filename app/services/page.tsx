@@ -11,9 +11,9 @@ import { getAllCases } from "@/lib/content/cases";
 import { getAllInsights } from "@/lib/content/insights";
 
 export const metadata = buildMetadata({
-  title: "Услуги AI Delivery — боты, сайты, n8n и MiniApps",
+  title: "Услуги автоматизации бизнеса под ключ",
   description:
-    "4 направления под ключ: ИИ‑боты, лендинги под трафик, n8n‑автоматизации и Telegram MiniApps. Сроки 48–72 часа или 3–7 дней, интеграции включены.",
+    "Автоматизация продаж, лидогенерации, CRM-интеграций. Чат-боты, n8n, MiniApps. MVP за 24 часа. Москва и Санкт-Петербург.",
   path: "/services",
 });
 
@@ -126,7 +126,7 @@ export default function ServicesPage() {
     getServiceSchema({
       name: service.title,
       description: `${service.solves.join(", ")}. ${service.deliverables.join(", ")}.`,
-      url: `${siteConfig.domain}/services#${service.id}`,
+      url: `${siteConfig.siteUrl}/services#${service.id}`,
     }),
   );
 
@@ -135,15 +135,15 @@ export default function ServicesPage() {
       <JsonLd
         data={[
           getBreadcrumbSchema([
-            { name: "Главная", url: siteConfig.domain },
-            { name: "Услуги", url: `${siteConfig.domain}/services` },
+            { name: "Главная", url: `${siteConfig.siteUrl}/` },
+            { name: "Услуги", url: `${siteConfig.siteUrl}/services` },
           ]),
           getFaqSchema(faqItems),
           ...serviceSchemas,
         ]}
       />
       <Header />
-      <main className="pb-24 md:pb-28">
+      <main id="main-content" className="pb-24 md:pb-28">
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <section className="pt-28 pb-16 md:pt-32 md:pb-20 bg-[var(--bg-primary)]">
           <Container>

@@ -1,10 +1,9 @@
 "use client";
 
-import { memo, useRef, useState, useCallback } from "react";
+import { memo, useRef, useState, useEffect, Fragment } from "react";
+import { motion } from "framer-motion";
 import { useInViewport } from "@/hooks/useInViewport";
 import { useReducedMotion } from "@/lib/motion";
-import { useAnimationCycle } from "../hooks/useAnimationCycle";
-import s from "../how-it-works.module.css";
 
 const NODES = [
   { id: "lead", label: "Лид" },
@@ -15,110 +14,96 @@ const NODES = [
   { id: "repeat", label: "Повтор" },
 ];
 
-const CYCLE_MS = 4000;
-const PAUSE_MS = 2000;
+const FLOW_PULSE_INTERVAL_MS = 900;
+
+function FlowNode({
+  label,
+  isActive,
+  reducedMotion,
+}: {
+  label: string;
+  isActive: boolean;
+  reducedMotion: boolean;
+}) {
+  return (
+    <motion.div
+      className={`rounded-lg border px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] transition-colors duration-150 ${
+        isActive
+          ? "border-violet-400/80 bg-violet-500/25 shadow-[0_0_28px_rgba(139,92,246,0.4),0_0_0_1px_rgba(139,92,246,0.3)]"
+          : "border-violet-500/25 bg-violet-500/8"
+      } ${reducedMotion && isActive ? "ring-2 ring-violet-400/50" : ""}`}
+      animate={isActive && !reducedMotion ? { scale: [1, 1.03, 1] } : {}}
+      transition={{ duration: 0.2 }}
+    >
+      <span className={isActive ? "drop-shadow-[0_0_6px_rgba(139,92,246,0.6)]" : ""}>
+        {label}
+      </span>
+    </motion.div>
+  );
+}
+
+function FlowArrow({ isActive, reducedMotion }: { isActive: boolean; reducedMotion: boolean }) {
+  return (
+    <svg
+      width="24"
+      height="16"
+      viewBox="0 0 24 16"
+      fill="none"
+      aria-hidden
+      className={`flex-shrink-0 transition-all duration-150 ${isActive ? "text-violet-300 drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]" : "text-violet-400/60"}`}
+    >
+      <path
+        d="M0 8h18m0 0l-5-5m5 5l-5 5"
+        stroke="currentColor"
+        strokeWidth={isActive && !reducedMotion ? 2 : 1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function PipelineInner({ enabled = true }: { enabled?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInViewport(ref, { rootMargin: "120px", threshold: 0.5 });
   const active = enabled && inView;
   const reduced = useReducedMotion();
-  const [playing, setPlaying] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  useAnimationCycle({
-    enabled: active,
-    pauseMs: PAUSE_MS,
-    cycleDurationMs: CYCLE_MS,
-    onStart: useCallback(() => setPlaying(true), []),
-    onReset: useCallback(() => setPlaying(false), []),
-  });
-
-  const show = active || reduced;
-  const runAnimation = show && !reduced && playing;
+  useEffect(() => {
+    if (!active || reduced) return;
+    const t = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % NODES.length);
+    }, FLOW_PULSE_INTERVAL_MS);
+    return () => clearInterval(t);
+  }, [active, reduced]);
 
   return (
     <div
       ref={ref}
-      className="rounded-xl border border-white/[0.08] bg-[rgba(8,5,24,0.6)] p-5 md:p-6 overflow-hidden max-w-3xl"
+      className="rounded-xl border border-white/[0.06] bg-[rgba(11,6,32,0.5)] p-6 md:p-8 overflow-hidden max-w-3xl"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <span
-          className={`h-2 w-2 rounded-full bg-violet-500 ${runAnimation ? "animate-pulse" : ""}`}
-          aria-hidden
-        />
-        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-          Lead → CRM → Продажа
-        </span>
-      </div>
-      <div className="relative flex flex-col items-stretch gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-4 md:flex-nowrap">
-        {/* Mobile: vertical line left of nodes */}
-        <div
-          className={`absolute left-[11px] top-2 bottom-2 w-0.5 bg-[var(--accent)]/50 md:hidden ${s.timelineLine} ${
-            runAnimation ? s.timelineLineActive : ""
-          } ${reduced ? s.timelineLineReduced : ""}`}
-          style={{ transformOrigin: "top" }}
-          aria-hidden
-        />
+      <p className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">
+        Lead → CRM → Продажа
+      </p>
+      <div className="relative flex flex-wrap items-center justify-center gap-4 md:gap-6 min-h-[3rem]">
         {NODES.map((node, i) => (
-          <div
-            key={node.id}
-            className={`relative flex flex-col items-center gap-1 pl-6 md:pl-0 ${s.pipelineNode} ${
-              runAnimation ? s.pipelineNodeActive : ""
-            } ${reduced ? "opacity-100" : ""}`}
-            style={runAnimation ? { animationDelay: `${i * 150}ms` } : undefined}
-          >
-            <div className="rounded-lg border border-[var(--accent)]/40 bg-[rgba(139,92,246,0.12)] px-2 py-1.5 min-w-[60px] text-center">
-              <span className="text-xs font-medium text-[var(--text-secondary)]">
-                {node.label}
-              </span>
-            </div>
+          <Fragment key={node.id}>
+            <FlowNode
+              label={node.label}
+              isActive={activeIndex === i}
+              reducedMotion={reduced}
+            />
             {i < NODES.length - 1 && (
-              <span
-                className="hidden md:inline text-[var(--accent)]/50 text-xs"
-                aria-hidden
-              >
-                →
-              </span>
+              <FlowArrow
+                isActive={activeIndex === i}
+                reducedMotion={reduced}
+              />
             )}
-            {i < NODES.length - 1 && (
-              <span
-                className="md:hidden block text-[var(--accent)]/50 text-xs text-center"
-                aria-hidden
-              >
-                ↓
-              </span>
-            )}
-          </div>
+          </Fragment>
         ))}
       </div>
-      <svg
-        viewBox="0 0 360 60"
-        className="hidden md:block w-full h-16 md:h-20 mt-4"
-        aria-hidden
-      >
-        <defs>
-          <linearGradient id="hiw-pipeline-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="var(--accent)" />
-            <stop offset="100%" stopColor="var(--accent-pink)" />
-          </linearGradient>
-        </defs>
-        <line
-          x1="30"
-          y1="30"
-          x2="330"
-          y2="30"
-          stroke="url(#hiw-pipeline-grad)"
-          strokeWidth="1.5"
-          strokeOpacity="0.4"
-          strokeDasharray="300"
-          strokeDashoffset={reduced ? 0 : runAnimation ? 0 : 300}
-          style={{
-            transition: "stroke-dashoffset 1.2s ease-out",
-            transitionDelay: runAnimation ? "0.2s" : "0s",
-          }}
-        />
-      </svg>
-      <p className="mt-3 text-xs text-[var(--text-muted)]">
+      <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
         Один сквозной процесс вместо хаоса в мессенджерах
       </p>
     </div>

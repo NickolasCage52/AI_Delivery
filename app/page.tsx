@@ -9,6 +9,7 @@ import { FeaturedCases } from "@/components/sections/FeaturedCases";
 import { ProcessPanel } from "@/components/sections/ProcessPanel";
 import { Integrations } from "@/components/sections/Integrations";
 import { WhyUs } from "@/components/sections/WhyUs";
+import { LocalSEO } from "@/components/sections/LocalSEO";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTA } from "@/components/sections/CTA";
 import { Footer } from "@/components/sections/Footer";
@@ -16,14 +17,14 @@ import { getFeaturedCases } from "@/lib/cases/getCases";
 import { getAllInsights } from "@/lib/content/insights";
 import { Insights } from "@/components/sections/Insights";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildMetadata } from "@/lib/seo/metadata";
-import { getFaqSchema } from "@/lib/seo/schema";
+import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
+import { getFaqSchema, getServiceSchema } from "@/lib/seo/schema";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 
 export const metadata = buildMetadata({
-  title: "AI Delivery — ИИ‑боты, сайты и автоматизация под ключ",
+  title: "Автоматизация бизнеса под ключ — Москва и СПб",
   description:
-    "Бесплатный MVP за 24 часа (1 сценарий). Боевой запуск за 3–10 дней. Боты, лендинги, Telegram MiniApps и n8n‑автоматизации с измеримым результатом.",
+    "Внедряем автоматизацию продаж, лидогенерации и CRM-интеграций за 24 часа. Чат-боты, n8n, MiniApps. Бесплатный MVP. Работаем с бизнесом в Москве и Санкт-Петербурге.",
   path: "/",
 });
 
@@ -33,15 +34,23 @@ export default function Home() {
   return (
     <>
       <JsonLd
-        data={getFaqSchema(
-          FAQ_ITEMS.map((item) => ({
-            question: item.question,
-            answer: item.answer,
-          })),
-        )}
+        data={[
+          getFaqSchema(
+            FAQ_ITEMS.map((item) => ({
+              question: item.question,
+              answer: item.answer,
+            })),
+          ),
+          getServiceSchema({
+            name: "Автоматизация бизнеса под ключ",
+            description:
+              "Внедрение чат-ботов, n8n-автоматизаций, CRM-интеграций и Telegram MiniApps для малого и среднего бизнеса в Москве и Санкт-Петербурге",
+            url: `${siteConfig.siteUrl}/`,
+          }),
+        ]}
       />
       <Header />
-      <main className="pb-24 md:pb-28">
+      <main id="main-content" className="pb-24 md:pb-28">
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <HeroScene />
         <GrowthStory />
@@ -54,6 +63,7 @@ export default function Home() {
         <Integrations />
         <WhyUs />
         <Insights items={insights} />
+        <LocalSEO />
         <FAQ />
         <CTA />
         <Footer />

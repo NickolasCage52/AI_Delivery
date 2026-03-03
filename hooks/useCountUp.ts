@@ -39,6 +39,13 @@ export function useCountUp(target: number, { durationMs = 900, decimals = 0, sta
     return (n: number) => fmt.format(n);
   }, [decimals]);
 
+  // When inView becomes false — keep value at target, reset flag for re-animation on next enter
+  useEffect(() => {
+    if (!startOnView) return;
+    if (inView) return;
+    startedRef.current = false;
+  }, [startOnView, inView]);
+
   useEffect(() => {
     if (reduced) {
       setValue(target);

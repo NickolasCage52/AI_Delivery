@@ -77,11 +77,11 @@ export function StoryCard({
             {demo}
           </div>
         ) : useHookLayout ? (
-          <div className="hiw-card-inner flex flex-1 flex-col items-center justify-center text-center w-full max-w-[860px] mx-auto px-6 py-12 md:px-12 md:py-12 min-h-full">
-            <div className="space-y-3 flex flex-col items-center">
+          <>
+            <div className="flex flex-col justify-center order-1 md:order-1">
               <motion.h2
                 id={id + "-title"}
-                className="text-3xl font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl lg:text-5xl"
+                className="text-[min(26px,7vw)] font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl lg:text-5xl max-w-[520px]"
                 initial={reduced ? undefined : { opacity: 0, clipPath: "inset(0 0 100% 0)" }}
                 animate={isRevealed ? { opacity: 1, clipPath: "inset(0 0 0 0)" } : undefined}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -90,7 +90,7 @@ export function StoryCard({
               </motion.h2>
               {subtitle && (
                 <motion.p
-                  className="text-base text-[var(--text-muted)] md:text-lg max-w-xl"
+                  className="mt-3 text-base text-[var(--text-muted)] md:text-lg max-w-[480px] opacity-[0.7]"
                   initial={reduced ? undefined : { opacity: 0, y: 16 }}
                   animate={isRevealed ? { opacity: 1, y: 0 } : undefined}
                   transition={{ duration: 0.4, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
@@ -99,11 +99,11 @@ export function StoryCard({
                 </motion.p>
               )}
               {bullets && bullets.length > 0 && (
-                <ul className="mt-5 space-y-3 max-w-[480px] mx-auto text-left">
+                <ul className="mt-5 space-y-3 max-w-[440px]">
                   {bullets.map((b, i) => (
                     <motion.li
                       key={i}
-                      className="flex items-start gap-3 text-base text-[var(--text-secondary)] md:text-lg min-[768px]:text-lg"
+                      className="flex items-start gap-3 text-[min(15px,4vw)] text-[var(--text-secondary)] md:text-lg min-[768px]:text-lg"
                       initial={reduced ? undefined : { opacity: 0 }}
                       animate={isRevealed ? { opacity: 1 } : undefined}
                       transition={{ duration: 0.35, delay: 0.4 + i * 0.15 }}
@@ -114,18 +114,25 @@ export function StoryCard({
                   ))}
                 </ul>
               )}
+              <p className="mt-6 text-xs text-[var(--text-muted)]">
+                {index + 1}/{totalCards} · Скролл →
+              </p>
             </div>
-            <div className="w-full flex justify-center mt-8">{demo}</div>
-            <p className="text-xs text-[var(--text-muted)] mt-6">
-              {index + 1}/{totalCards} · Скролл →
-            </p>
-          </div>
+            <motion.div
+              className="relative order-2 flex items-end justify-end md:items-center md:justify-end"
+              initial={reduced ? undefined : { opacity: 0, y: 20 }}
+              animate={isRevealed ? { opacity: 1, y: 0 } : undefined}
+              transition={{ duration: 0.45, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="w-full max-w-[600px] ml-auto">{demo}</div>
+            </motion.div>
+          </>
         ) : useStackedLayout ? (
-          <div className="hiw-card-inner flex w-full flex-1 flex-col items-center justify-center gap-8 text-center max-w-[860px] mx-auto px-6 py-12 md:px-12 md:py-12 min-h-full">
-            <div className="space-y-3">
+          <>
+            <div className="flex flex-col justify-center order-1 md:order-1">
               <motion.h2
                 id={id + "-title"}
-                className="text-3xl font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl"
+                className="text-3xl font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl max-w-[520px]"
                 initial={reduced ? undefined : { opacity: 0, y: 16 }}
                 animate={isRevealed ? { opacity: 1, y: 0 } : undefined}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -134,7 +141,7 @@ export function StoryCard({
               </motion.h2>
               {subtitle && (
                 <motion.p
-                  className="text-base text-[var(--text-muted)] md:text-lg"
+                  className="mt-3 text-base text-[var(--text-muted)] md:text-lg"
                   initial={reduced ? undefined : { opacity: 0 }}
                   animate={isRevealed ? { opacity: 1 } : undefined}
                   transition={{ duration: 0.35, delay: 0.05 }}
@@ -142,12 +149,19 @@ export function StoryCard({
                   {subtitle}
                 </motion.p>
               )}
+              <p className="mt-6 text-xs text-[var(--text-muted)]">
+                {index + 1}/{totalCards} · Скролл →
+              </p>
             </div>
-            <div className="w-full max-w-3xl mx-auto flex justify-center">{demo}</div>
-            <p className="text-xs text-[var(--text-muted)] md:text-sm">
-              {index + 1}/{totalCards} · Скролл →
-            </p>
-          </div>
+            <motion.div
+              className="relative order-2 flex items-end justify-end md:items-center md:justify-end"
+              initial={reduced ? undefined : { opacity: 0, y: 20 }}
+              animate={isRevealed ? { opacity: 1, y: 0 } : undefined}
+              transition={{ duration: 0.45, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="w-full max-w-[600px] ml-auto">{demo}</div>
+            </motion.div>
+          </>
         ) : useCenteredLayout ? (
           <div className="flex w-full flex-1 flex-col items-center justify-center gap-8 text-center">
             <div className="space-y-3">

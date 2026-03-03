@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const data = getDirectionBySlug(slug);
   if (!data) {
     return buildMetadata({
-      title: "Направление AI Delivery",
+      title: "Направление",
       description: "Подробное направление: сроки, процесс, стек и примеры.",
       path: `/directions/${slug}`,
     });
@@ -40,9 +40,9 @@ export default async function DirectionDetailPage({ params }: { params: Promise<
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Направления", url: `${siteConfig.domain}/directions` },
-          { name: data.title, url: `${siteConfig.domain}/directions/${data.slug}` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Направления", url: `${siteConfig.siteUrl}/directions` },
+          { name: data.title, url: `${siteConfig.siteUrl}/directions/${data.slug}` },
         ])}
       />
       <Header />

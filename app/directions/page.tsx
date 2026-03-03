@@ -10,7 +10,7 @@ import { getBreadcrumbSchema } from "@/lib/seo/schema";
 import { getAllDirections } from "@/lib/content/directions";
 
 export const metadata = buildMetadata({
-  title: "Направления AI Delivery — боты, сайты, n8n и MiniApps",
+  title: "Направления — боты, сайты, n8n и MiniApps",
   description:
     "Подробные страницы по направлениям: кому подходит, сроки, что входит, примеры сценариев и стек интеграций.",
   path: "/directions",
@@ -22,8 +22,8 @@ export default function DirectionsPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Направления", url: `${siteConfig.domain}/directions` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Направления", url: `${siteConfig.siteUrl}/directions` },
         ])}
       />
       <Header />

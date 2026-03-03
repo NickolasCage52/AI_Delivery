@@ -7,9 +7,9 @@ import { CasesShowcase } from "@/components/cases-landing/CasesShowcase";
 import { getAllCases } from "@/lib/cases/getCases";
 
 export const metadata = buildMetadata({
-  title: "Кейсы AI Delivery — результаты, метрики и артефакты",
+  title: "Кейсы автоматизации бизнеса — реальные результаты",
   description:
-    "Портфолио AI-агентства: сайты, MiniApp, автоматизации и боты с измеримым бизнес-результатом. Смотрите кейсы, KPI и стек.",
+    "Реальные кейсы: рост заявок +212, конверсия 6.2%, экономия 18 ч/нед. Автоматизация продаж и лидогенерации для SMB в Москве и СПб.",
   path: "/cases",
 });
 
@@ -19,12 +19,12 @@ export default function CasesPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Кейсы", url: `${siteConfig.domain}/cases` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Кейсы", url: `${siteConfig.siteUrl}/cases` },
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <CasesShowcase cases={cases} />
       </main>
       <Footer />

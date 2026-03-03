@@ -15,7 +15,7 @@ export function FAQ() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          FAQ
+          Часто задаваемые вопросы об автоматизации бизнеса
         </motion.h2>
 
         <div className="mt-12 space-y-4">

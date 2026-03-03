@@ -17,8 +17,8 @@ export default function CookiesPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Политика cookies", url: `${siteConfig.domain}/cookies` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Политика cookies", url: `${siteConfig.siteUrl}/cookies` },
         ])}
       />
       <Header />

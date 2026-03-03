@@ -10,7 +10,7 @@ import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata = buildMetadata({
-  title: "Insights — база знаний AI Delivery",
+  title: "Insights — база знаний",
   description:
     "Гайды и чеклисты по внедрению ИИ, автоматизации лидов, n8n и Telegram MiniApps. Практика, сроки и советы без воды.",
   path: "/insights",
@@ -22,8 +22,8 @@ export default function InsightsPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Insights", url: `${siteConfig.domain}/insights` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Insights", url: `${siteConfig.siteUrl}/insights` },
         ])}
       />
       <Header />

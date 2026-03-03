@@ -53,7 +53,7 @@ function ProductsInner() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        Услуги и пакеты
+        Что мы автоматизируем для вашего бизнеса
       </motion.h2>
       <motion.p
         className="mt-4 text-[var(--text-secondary)] max-w-2xl"
@@ -62,7 +62,7 @@ function ProductsInner() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        4 направления под ключ — прозрачные сроки и состав работ.
+        Чат-боты, n8n, CRM-интеграции и MiniApps — прозрачные сроки и конкретный результат.
       </motion.p>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -110,10 +110,22 @@ function ProductsInner() {
 
       <div className="mt-10 flex flex-wrap items-center gap-3">
         <Link
+          href="/how-it-works"
+          className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+        >
+          Как мы внедряем автоматизацию
+        </Link>
+        <Link
+          href="/cases"
+          className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+        >
+          Кейсы автоматизации бизнеса
+        </Link>
+        <Link
           href="/services"
           className="btn-glow inline-flex rounded-lg border border-[var(--accent)]/40 px-5 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
         >
-          Все услуги и пакеты
+          Все услуги
         </Link>
         <Link
           href="/demo"

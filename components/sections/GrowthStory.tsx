@@ -134,8 +134,8 @@ function BuildScene({
           ))}
         </ul>
         <div className="mt-6">
-          <Link href="/cases" className="text-sm text-[var(--accent)] hover:underline">
-            {HOME_COPY.proof.casesLink ?? HOME_COPY.hero.ctaSecondary} →
+          <Link href="/how-it-works" className="text-sm text-[var(--accent)] hover:underline">
+            Как это работает →
           </Link>
         </div>
       </div>

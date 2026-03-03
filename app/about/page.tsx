@@ -8,7 +8,7 @@ import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata = buildMetadata({
-  title: "О нас — команда AI Delivery",
+  title: "О компании",
   description:
     "Сфокусированная команда, которая быстро внедряет ИИ‑решения под ключ: боты, автоматизация, MiniApps и лендинги. Прозрачный процесс и понятные сроки.",
   path: "/about",
@@ -48,8 +48,8 @@ export default function AboutPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "О нас", url: `${siteConfig.domain}/about` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "О нас", url: `${siteConfig.siteUrl}/about` },
         ])}
       />
       <Header />

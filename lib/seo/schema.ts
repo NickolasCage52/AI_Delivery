@@ -25,32 +25,42 @@ type ArticleSchemaInput = {
 };
 
 export function getOrganizationSchema() {
+  const base = siteConfig.siteUrl || siteConfig.domain;
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteConfig.name,
-    url: siteConfig.domain,
+    url: `${base}/`,
+    description:
+      "Автоматизация бизнеса под ключ: чат-боты, n8n, CRM-интеграции, Telegram MiniApps. Москва и Санкт-Петербург.",
+    logo: base.startsWith("http") ? `${base}${siteConfig.logo}` : `${siteConfig.domain}${siteConfig.logo}`,
     email: siteConfig.email,
-    logo: `${siteConfig.domain}${siteConfig.logo}`,
-    contactPoint: [
-      {
-        "@type": "ContactPoint",
-        contactType: "sales",
-        email: siteConfig.email,
-        areaServed: "RU",
-        availableLanguage: ["ru"],
-      },
+    areaServed: [
+      { "@type": "City", name: "Москва" },
+      { "@type": "City", name: "Санкт-Петербург" },
+      { "@type": "Country", name: "Россия" },
     ],
+    serviceType: "Автоматизация бизнеса",
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "sales",
+      email: siteConfig.email,
+      availableLanguage: "Russian",
+      areaServed: ["Москва", "Санкт-Петербург", "Россия"],
+    },
     sameAs: [siteConfig.telegram],
   };
 }
 
 export function getWebSiteSchema() {
+  const base = siteConfig.siteUrl || siteConfig.domain;
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
-    url: siteConfig.domain,
+    url: `${base}/`,
+    inLanguage: "ru-RU",
+    description: "Автоматизация бизнеса под ключ в Москве и Санкт-Петербурге",
   };
 }
 
@@ -83,17 +93,24 @@ export function getFaqSchema(items: FaqItem[]) {
 }
 
 export function getServiceSchema(service: ServiceSchemaInput) {
+  const base = siteConfig.siteUrl || siteConfig.domain;
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     name: service.name,
     description: service.description,
-    url: service.url,
-    areaServed: "RU",
+    url: service.url.startsWith("http") ? service.url : `${base}${service.url}`,
+    areaServed: ["Москва", "Санкт-Петербург", "Россия"],
     provider: {
       "@type": "Organization",
       name: siteConfig.name,
-      url: siteConfig.domain,
+      url: `${base}/`,
+    },
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "RUB",
+      description: "Бесплатный MVP за 24 часа — 1 сценарий",
     },
   };
 }
@@ -110,12 +127,12 @@ export function getArticleSchema(article: ArticleSchemaInput) {
     author: {
       "@type": "Organization",
       name: siteConfig.name,
-      url: siteConfig.domain,
+      url: `${siteConfig.siteUrl || siteConfig.domain}/`,
     },
     publisher: {
       "@type": "Organization",
       name: siteConfig.name,
-      url: siteConfig.domain,
+      url: `${siteConfig.siteUrl || siteConfig.domain}/`,
     },
   };
 }

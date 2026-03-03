@@ -4,7 +4,6 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { StoryCard } from "./StoryCard";
 import { SnapStory } from "./SnapStory";
 import { StoryRail } from "./StoryRail";
-import { CustomCursor } from "./CustomCursor";
 import { AmbientLight } from "./AmbientLight";
 import hiwStyles from "./how-it-works.module.css";
 import { LeadsFlowVisual } from "./components/LeadsFlowVisual";
@@ -124,7 +123,6 @@ export function HowItWorksStory() {
 
   return (
     <div className="relative min-h-[calc(100svh-4rem)]">
-      <CustomCursor />
       <StoryRail activeIndex={activeIndex} onDotClick={scrollToCard} />
       <div
         className="fixed left-0 right-0 top-16 z-[90] h-0.5 bg-transparent"

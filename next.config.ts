@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: isStaticExport,
   },
+  // Отключаем webpack cache — устраняет ENOENT pack.gz в OneDrive и при build && dev
+  webpack: (config) => {
+    config.cache = false;
+    return config;
+  },
 };
 
 export default nextConfig;

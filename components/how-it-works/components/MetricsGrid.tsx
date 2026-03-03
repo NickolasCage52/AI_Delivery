@@ -1,83 +1,87 @@
 "use client";
 
-import { memo, useRef, useState, useCallback } from "react";
+import { memo, useRef } from "react";
 import { useInViewport } from "@/hooks/useInViewport";
 import { useCountUp } from "@/hooks/useCountUp";
 import { useReducedMotion } from "@/lib/motion";
-import { useAnimationCycle } from "../hooks/useAnimationCycle";
 import Link from "next/link";
 import s from "../how-it-works.module.css";
 
 /* Real data from cases.json */
-const METRIC_LEADS = 212; // case-02
-const METRIC_CONVERSION = 6.2; // case-02
-const METRIC_HOURS = 18; // case-03
-const METRIC_CPL = 28; // case-02
-
 const TODO_QUOTE = "Быстро проверили спрос без долгой разработки.";
 const TODO_CLIENT = "Онлайн-школа, case-02";
 
 const METRICS = [
   {
-    value: METRIC_LEADS,
-    format: (n: number) => `+${Math.round(n)}`,
+    value: 212,
     suffix: "",
-    label: "Заявок за месяц",
-    icon: "↑",
-    tone: "growth" as const,
+    prefix: "+",
+    label: "новых заявок за месяц",
+    bar: 78,
+    icon: "📈",
+    format: (n: number) => `+${Math.round(n)}`,
+    decimals: 0,
   },
   {
-    value: METRIC_CONVERSION,
+    value: 6.2,
+    suffix: "%",
+    prefix: "",
+    label: "конверсия в заявку",
+    bar: 62,
+    icon: "🎯",
     format: (n: number) => n.toFixed(1),
-    suffix: "%",
-    label: "Конверсия",
-    icon: "↑",
-    tone: "growth" as const,
+    decimals: 1,
   },
   {
-    value: METRIC_HOURS,
-    format: (n: number) => `${Math.round(n)}`,
+    value: 18,
     suffix: " ч/нед",
-    label: "Экономия времени",
-    icon: "↑",
-    tone: "growth" as const,
+    prefix: "",
+    label: "экономия времени команды",
+    bar: 72,
+    icon: "⏱",
+    format: (n: number) => `${Math.round(n)}`,
+    decimals: 0,
   },
   {
-    value: METRIC_CPL,
-    format: (n: number) => `-${Math.round(n)}`,
+    value: 28,
     suffix: "%",
-    label: "Снижение CPL",
-    icon: "↑",
-    tone: "growth" as const,
+    prefix: "-",
+    label: "снижение стоимости лида",
+    bar: 56,
+    icon: "💰",
+    format: (n: number) => `-${Math.round(n)}`,
+    decimals: 0,
   },
 ];
 
-const CYCLE_MS = 4800;
-const FADE_MS = 600;
-const PAUSE_MS = FADE_MS + 200;
+const EASING = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
 
 function MetricCell({
   target,
   format,
   suffix,
   label,
+  bar,
+  icon,
+  decimals,
   inView,
   reduced,
   delayMs,
-  tone,
 }: {
   target: number;
   format: (n: number) => string;
   suffix: string;
   label: string;
+  bar: number;
+  icon: string;
+  decimals: number;
   inView: boolean;
   reduced: boolean;
   delayMs?: number;
-  tone: "growth" | "speed";
 }) {
   const { value } = useCountUp(target, {
     durationMs: 1800,
-    decimals: target === METRIC_CONVERSION ? 1 : 0,
+    decimals,
     startOnView: true,
     inView,
   });
@@ -94,13 +98,8 @@ function MetricCell({
       }}
     >
       <div className="flex items-center justify-between">
-        <span
-          className={`text-lg ${
-            tone === "growth" ? "text-emerald-400" : "text-[var(--accent)]"
-          }`}
-          aria-hidden
-        >
-          {tone === "growth" ? "↑" : "⚡"}
+        <span className="text-lg" aria-hidden>
+          {icon}
         </span>
         <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
           {label}
@@ -131,10 +130,10 @@ function MetricCell({
         <div
           className={`h-full rounded-[3px] ${s.metricsBar}`}
           style={{
-            width: inView || reduced ? "100%" : "0%",
+            width: inView || reduced ? `${bar}%` : "0%",
             background:
               "linear-gradient(90deg, var(--accent) 0%, var(--accent-pink) 100%)",
-            transition: "width 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            transition: `width 1800ms ${EASING}`,
             transitionDelay: inView || reduced ? "200ms" : "0ms",
           }}
         />
@@ -145,68 +144,45 @@ function MetricCell({
 
 function MetricsGridInner({ enabled = true }: { enabled?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInViewport(ref, { rootMargin: "0px", threshold: 0.5 });
-  const active = enabled && inView;
+  const inView = useInViewport(ref, { rootMargin: "150px", threshold: 0.2 });
+  const shouldAnimate = enabled && inView;
   const reduced = useReducedMotion();
-  const [playing, setPlaying] = useState(false);
-  const [resetting, setResetting] = useState(false);
-  const [cycleKey, setCycleKey] = useState(0);
-
-  useAnimationCycle({
-    enabled: active,
-    pauseMs: PAUSE_MS,
-    cycleDurationMs: CYCLE_MS,
-    onStart: useCallback(() => {
-      setResetting(false);
-      setPlaying(true);
-      setCycleKey((k) => k + 1);
-    }, []),
-    onReset: useCallback(() => {
-      setPlaying(false);
-      setResetting(true);
-    }, []),
-  });
-
-  const show = active || reduced;
-  const runAnimation = show && !reduced && playing;
-  const showContent = runAnimation && !resetting;
-  const countersCanAnimate = (showContent || enabled) && !resetting;
+  const showContent = enabled && (inView || reduced);
 
   return (
     <div
       ref={ref}
-      className={`relative space-y-6 max-w-2xl mx-auto ${s.metricsGridBg}`}
+      className={`relative space-y-6 max-w-2xl ml-0 mr-0 md:ml-auto ${s.metricsGridBg}`}
     >
       <div
         className="grid grid-cols-2 gap-3 md:gap-4 transition-opacity duration-500"
         style={{
-          opacity: reduced ? 1 : resetting ? 0 : showContent ? 1 : 0,
+          opacity: showContent ? 1 : 0,
         }}
       >
         {METRICS.map((m, i) => (
           <MetricCell
-            key={`${cycleKey}-${i}`}
+            key={`${m.label}-${i}`}
             target={m.value}
             format={m.format}
             suffix={m.suffix}
             label={m.label}
-            inView={countersCanAnimate}
+            bar={m.bar}
+            icon={m.icon}
+            decimals={m.decimals}
+            inView={shouldAnimate}
             reduced={reduced}
             delayMs={i * 120}
-            tone={m.tone}
           />
         ))}
       </div>
       <blockquote
         className="relative pl-6 border-l-2 border-[var(--accent)]/40 transition-opacity duration-500"
         style={{
-          opacity: reduced ? 1 : showContent ? 1 : 0,
+          opacity: showContent ? 1 : 0,
           transitionDelay: showContent ? "800ms" : "0ms",
         }}
       >
-        <span className="absolute -left-2 top-0 text-[48px] text-[var(--accent)] opacity-20 leading-none">
-          «
-        </span>
         <p className="text-base text-[var(--text-muted)] italic">
           {TODO_QUOTE}
         </p>
@@ -217,7 +193,7 @@ function MetricsGridInner({ enabled = true }: { enabled?: boolean }) {
       <p
         className="text-xs text-[var(--text-muted)] opacity-40 transition-opacity"
         style={{
-          opacity: reduced ? 0.4 : showContent ? 0.4 : 0,
+          opacity: showContent ? 0.4 : 0,
         }}
       >
         Результаты конкретных проектов. Ваши показатели зависят от специфики

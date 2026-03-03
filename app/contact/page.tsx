@@ -8,7 +8,7 @@ import { buildMetadata, siteConfig } from "@/lib/seo/metadata";
 import { getBreadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata = buildMetadata({
-  title: "Контакты — разобрать задачу за 15 минут",
+  title: "Контакты — связаться с командой",
   description:
     "Оставьте заявку: разберём задачу, пришлём MVP за 24 часа и предложим план внедрения. Минимум полей и быстрый ответ в течение рабочего дня.",
   path: "/contact",
@@ -19,12 +19,12 @@ export default function ContactPage() {
     <>
       <JsonLd
         data={getBreadcrumbSchema([
-          { name: "Главная", url: siteConfig.domain },
-          { name: "Контакты", url: `${siteConfig.domain}/contact` },
+          { name: "Главная", url: `${siteConfig.siteUrl}/` },
+          { name: "Контакты", url: `${siteConfig.siteUrl}/contact` },
         ])}
       />
       <Header />
-      <main className="pb-24 md:pb-28">
+      <main id="main-content" className="pb-24 md:pb-28">
         <div id="sticky-cta-trigger" className="h-1" aria-hidden />
         <section className="pt-28 pb-16 md:pt-32 md:pb-20 bg-[var(--bg-primary)]">
           <Container>

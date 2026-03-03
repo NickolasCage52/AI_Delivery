@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const insight = getInsightBySlug(slug);
   if (!insight) {
     return buildMetadata({
-      title: "Материал AI Delivery",
+      title: "Материал",
       description: "Практический материал по внедрению ИИ и автоматизации.",
       path: `/insights/${slug}`,
     });
@@ -73,14 +73,14 @@ export default async function InsightDetailPage({ params }: { params: Promise<{ 
 
   const schema = [
     getBreadcrumbSchema([
-      { name: "Главная", url: siteConfig.domain },
-      { name: "Insights", url: `${siteConfig.domain}/insights` },
-      { name: insight.title, url: `${siteConfig.domain}/insights/${insight.slug}` },
+      { name: "Главная", url: `${siteConfig.siteUrl}/` },
+      { name: "Insights", url: `${siteConfig.siteUrl}/insights` },
+      { name: insight.title, url: `${siteConfig.siteUrl}/insights/${insight.slug}` },
     ]),
     getArticleSchema({
       headline: insight.title,
       description: insight.description,
-      url: `${siteConfig.domain}/insights/${insight.slug}`,
+      url: `${siteConfig.siteUrl}/insights/${insight.slug}`,
       datePublished: insight.date,
     }),
     ...(insight.faqs.length > 0 ? [getFaqSchema(insight.faqs)] : []),
