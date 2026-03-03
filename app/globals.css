@@ -452,3 +452,55 @@ h3 {
   .footer-top { gap: 12px; padding-bottom: 12px; }
   .footer-bottom { flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px 0; }
 }
+
+/* PhoneInput — react-international-phone dark theme */
+.phone-input-wrap .react-international-phone-input-container {
+  --react-international-phone-height: 48px;
+  --react-international-phone-background-color: var(--bg-surface);
+  --react-international-phone-text-color: var(--text-primary);
+  --react-international-phone-border-color: rgba(255, 255, 255, 0.1);
+}
+.phone-input-wrap .react-international-phone-input-container {
+  min-height: 48px;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface);
+}
+.phone-input-wrap .react-international-phone-input-container:focus-within {
+  border-color: rgba(139, 92, 246, 0.5);
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.5);
+}
+.phone-input-wrap .react-international-phone-country-selector-button {
+  background: var(--bg-surface) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+}
+.phone-input-wrap .react-international-phone-input {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  font-size: 16px !important;
+}
+.phone-input-wrap .react-international-phone-country-selector-dropdown {
+  background: var(--bg-elevated) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+.phone-input-wrap .react-international-phone-country-selector-dropdown__list-item {
+  color: var(--text-primary);
+}
+.phone-input-wrap .phone-input-error .react-international-phone-input-container {
+  border-color: rgba(240, 140, 122, 0.5) !important;
+}
+
+/* Form disclaimer */
+.form-disclaimer {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+.form-disclaimer a {
+  text-decoration: underline;
+  opacity: 0.8;
+}

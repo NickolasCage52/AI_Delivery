@@ -1,64 +1,38 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { trackCtaEvent } from "@/lib/analytics/cta";
-import { submitLead, collectUtm } from "@/lib/lead/submitLead";
+import { useLeadForm } from "@/hooks/useLeadForm";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { HOME_COPY } from "@/content/site-copy";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
 import { FormStatus } from "@/components/forms/FormStatus";
 
-type Status = "idle" | "loading" | "success" | "error";
-
 export function CTA() {
-  const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const submittedRef = useRef(false);
-  const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    contact: "",
-    niche: "",
-    need: "",
-    deadline: "",
-    _hp: "",
-  });
-  const pathname = usePathname();
-  const sourcePage = "home";
-  const service = "general";
+  const [niche, setNiche] = useState("");
+  const [need, setNeed] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [hp, setHp] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submittedRef.current) return;
-    submittedRef.current = true;
-    setStatus("loading");
-    setErrorMessage("");
-    trackCtaEvent({ action: "submit", label: "Home CTA", location: "home-final" });
-    const result = await submitLead({
-      name: form.name,
-      contact: form.contact,
-      niche: form.niche,
-      need: form.need,
-      timeline: form.deadline,
-      sourcePage: pathname ?? "/",
-      formId: "home_cta",
-      utm: collectUtm(),
-      _hp: form._hp,
-    });
-    if (result.ok) {
-      setStatus("success");
-      setForm({ name: "", contact: "", niche: "", need: "", deadline: "", _hp: "" });
-      setTimeout(() => router.push("/thank-you"), 400);
-    } else {
-      submittedRef.current = false;
-      setStatus("error");
-      setErrorMessage(result.message);
-    }
-  };
+  const {
+    name,
+    setName,
+    phone,
+    setPhone,
+    status,
+    errorMessage,
+    isValid,
+    handleSubmit,
+    reset,
+  } = useLeadForm({
+    source: "home_cta",
+  });
+
+  const pathname = usePathname();
 
   return (
     <section id="contact" className="relative py-24 md:py-32">
@@ -90,97 +64,114 @@ export function CTA() {
               transition={{ duration: 0.4 }}
             >
               <p className="text-[var(--accent-pink-strong)] font-medium">
-                Спасибо! Мы свяжемся с вами в ближайшее время.
+                ✅ Заявка отправлена!
               </p>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Что дальше: в течение рабочего дня напишем или позвоним. Пришлём рабочий прототип (1 сценарий) в течение 24 часов и план внедрения под вашу задачу.
-                </p>
+              <p className="text-sm text-[var(--text-secondary)]">
+                Мы напишем вам в ближайшее время.
+              </p>
+              <p className="text-sm text-[var(--text-secondary)]">
+                Что дальше: в течение рабочего дня напишем или позвоним. Пришлём рабочий прототип (1 сценарий) в течение 24 часов и план внедрения под вашу задачу.
+              </p>
+              <button
+                type="button"
+                onClick={reset}
+                className="btn-glow mt-4 rounded-lg border border-[var(--accent)]/40 py-2.5 px-4 text-sm font-medium text-[var(--accent)]"
+              >
+                Отправить ещё одну заявку
+              </button>
             </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <form
+              onSubmit={(e) => {
+                trackCtaEvent({ action: "submit", label: "Home CTA", location: "home-final" });
+                handleSubmit(e, {
+                  niche,
+                  need,
+                  timeline: deadline,
+                  sourcePage: pathname ?? "/",
+                  _hp: hp,
+                });
+              }}
+              className="mt-8 space-y-4"
+            >
               <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
               <div className="sr-only" aria-hidden>
                 <label htmlFor="cta-hp">Не заполняйте</label>
-                <input id="cta-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />
+                <input id="cta-hp" type="text" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
               </div>
-              <input type="hidden" name="sourcePage" value={sourcePage} />
-              <input type="hidden" name="service" value={service} />
+              <input type="hidden" name="sourcePage" value={pathname ?? "/"} />
+              <input type="hidden" name="service" value="general" />
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-[var(--text-secondary)]">
-                  Имя
+                <label htmlFor="cta-name" className="block text-sm font-medium text-[var(--text-secondary)]">
+                  Ваше имя
                 </label>
                 <input
-                  id="name"
+                  id="cta-name"
                   type="text"
                   required
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                  placeholder="Как к вам обращаться"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  inputMode="text"
+                  autoComplete="name"
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
+                  placeholder="Иван"
                 />
               </div>
+              <PhoneInput value={phone} onChange={setPhone} label="Телефон" id="cta-phone" />
               <div>
-                <label htmlFor="contact" className="block text-sm font-medium text-[var(--text-secondary)]">
-                  Контакт (Telegram / почта / телефон)
-                </label>
-                <input
-                  id="contact"
-                  type="text"
-                  required
-                  value={form.contact}
-                  onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                  placeholder="@username или +7..."
-                />
-              </div>
-              <div>
-                <label htmlFor="niche" className="block text-sm font-medium text-[var(--text-secondary)]">
+                <label htmlFor="cta-niche" className="block text-sm font-medium text-[var(--text-secondary)]">
                   Ниша / чем занимаетесь
                 </label>
                 <input
-                  id="niche"
+                  id="cta-niche"
                   type="text"
-                  value={form.niche}
-                  onChange={(e) => setForm((f) => ({ ...f, niche: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+                  value={niche}
+                  onChange={(e) => setNiche(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
                   placeholder="Кратко"
                 />
               </div>
               <div>
-                <label htmlFor="need" className="block text-sm font-medium text-[var(--text-secondary)]">
+                <label htmlFor="cta-need" className="block text-sm font-medium text-[var(--text-secondary)]">
                   Что нужно
                 </label>
                 <textarea
-                  id="need"
+                  id="cta-need"
                   rows={3}
-                  value={form.need}
-                  onChange={(e) => setForm((f) => ({ ...f, need: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+                  value={need}
+                  onChange={(e) => setNeed(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
                   placeholder="Лендинг, бот, автоматизация..."
                 />
               </div>
               <div>
-                <label htmlFor="deadline" className="block text-sm font-medium text-[var(--text-secondary)]">
+                <label htmlFor="cta-deadline" className="block text-sm font-medium text-[var(--text-secondary)]">
                   Желаемые сроки
                 </label>
                 <input
-                  id="deadline"
+                  id="cta-deadline"
                   type="text"
-                  value={form.deadline}
-                  onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
                   placeholder="Например: до конца месяца"
                 />
               </div>
+              <p className="form-disclaimer">
+                Нажимая кнопку, вы соглашаетесь с{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  политикой конфиденциальности
+                </a>
+              </p>
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button
                   type="submit"
                   variant="primary"
                   size="large"
-                  disabled={status === "loading"}
-                  className="flex-1 sm:flex-initial"
+                  disabled={status === "loading" || !isValid}
+                  className="flex-1 sm:flex-initial min-h-[52px]"
                 >
-                  {status === "loading" ? "Отправка…" : "Получить бесплатное демо"}
+                  {status === "loading" ? "Отправляю..." : "Получить бесплатное демо"}
                 </Button>
                 <TelegramLeadButton location="home-cta" className="sm:w-auto" />
               </div>

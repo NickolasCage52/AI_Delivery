@@ -8,6 +8,8 @@ import { FILTERS, getDisplayImages, type CaseItem } from "./cases-data";
 import { GalleryLightbox } from "./GalleryLightbox";
 import { TelegramLeadButton } from "@/components/cta/TelegramLeadButton";
 import { FormStatus } from "@/components/forms/FormStatus";
+import { PhoneInput } from "@/components/ui/PhoneInput";
+import { useLeadForm } from "@/hooks/useLeadForm";
 import { siteConfig } from "@/lib/seo/metadata";
 
 function casesWithPhotos(cases: CaseItem[]) {
@@ -358,60 +360,40 @@ export function CaseDetailView({
 
 /* ── CTA form ── */
 function CTAFormBlock() {
-  const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [statusMsg, setStatusMsg] = useState("");
-  const submittedRef = useRef(false);
+  const [message, setMessage] = useState("");
+  const [hp, setHp] = useState("");
+  const {
+    name,
+    setName,
+    phone,
+    setPhone,
+    status,
+    errorMessage,
+    isValid,
+    handleSubmit,
+  } = useLeadForm({ source: "cases_form" });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (submittedRef.current) return;
-    const fd = new FormData(e.currentTarget);
-    const name = (fd.get("name") as string)?.trim() || "";
-    const contact = (fd.get("contact") as string)?.trim() || "";
-    const message = (fd.get("message") as string)?.trim() || "";
-    const company = (fd.get("company") as string)?.trim() || "";
+  const canSubmit = isValid && message.trim().length >= 10;
 
-    if (company) return;
-    if (name.length < 2 || name.length > 60) {
-      setFormState("error");
-      setStatusMsg("Имя: от 2 до 60 символов.");
-      return;
-    }
-    if (contact.length < 3 || contact.length > 80) {
-      setFormState("error");
-      setStatusMsg("Контакт: от 3 до 80 символов.");
-      return;
-    }
-    if (message.length < 10 || message.length > 2000) {
-      setFormState("error");
-      setStatusMsg("Сообщение: от 10 до 2000 символов.");
-      return;
-    }
-
-    submittedRef.current = true;
-    setFormState("loading");
-    setStatusMsg("");
-
-    const { submitLead, collectUtm } = await import("@/lib/lead/submitLead");
-    const result = await submitLead({
-      name,
-      contact,
-      message,
-      sourcePage: "/cases",
-      formId: "cases_form",
-      utm: collectUtm(),
-    });
-    if (result.ok) {
-      setFormState("success");
-      setStatusMsg("Заявка отправлена. Мы свяжемся в течение 24 часов.");
-      submittedRef.current = false;
-      (e.target as HTMLFormElement).reset();
-    } else {
-      submittedRef.current = false;
-      setFormState("error");
-      setStatusMsg(result.message);
-    }
-  };
+  if (status === "success") {
+    return (
+      <section className={`${s.section} ${s.cta}`} id="cta">
+        <div className={s.ctaWrap}>
+          <div className={s.ctaGrid}>
+            <div>
+              <h2 className={s.sectionTitle}>Обсудим ваш кейс</h2>
+              <p className="text-[var(--accent-pink-strong)] font-medium mt-2">
+                ✅ Заявка отправлена!
+              </p>
+              <p className="text-sm text-[var(--text-secondary)] mt-1">
+                Мы напишем вам в ближайшее время.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={`${s.section} ${s.cta}`} id="cta">
@@ -420,34 +402,68 @@ function CTAFormBlock() {
           <div>
             <h2 className={s.sectionTitle}>Обсудим ваш кейс</h2>
             <p className={s.sectionSub}>Напишите задачу и контакт. Вернёмся с планом внедрения и сроками.</p>
-            <form className={s.form} onSubmit={handleSubmit} noValidate>
+            <form
+              className={s.form}
+              onSubmit={(e) => handleSubmit(e, { task: message, sourcePage: "/cases", company: hp })}
+              noValidate
+            >
               <div className={s.field}>
-                <label htmlFor="cl-name">Имя</label>
-                <input id="cl-name" name="name" type="text" placeholder="Как к вам обращаться" required minLength={2} maxLength={60} autoComplete="name" />
+                <label htmlFor="cl-name">Ваше имя</label>
+                <input
+                  id="cl-name"
+                  name="name"
+                  type="text"
+                  placeholder="Иван"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  minLength={2}
+                  maxLength={60}
+                  autoComplete="name"
+                  inputMode="text"
+                  className="text-base min-h-[48px]"
+                />
               </div>
               <div className={s.field}>
-                <label htmlFor="cl-contact">Контакт</label>
-                <input id="cl-contact" name="contact" type="text" placeholder="@telegram / телефон / email" required minLength={3} maxLength={80} autoComplete="tel" />
+                <PhoneInput value={phone} onChange={setPhone} label="Телефон" id="cl-phone" />
               </div>
               <div className={s.field}>
                 <label htmlFor="cl-message">Сообщение</label>
-                <textarea id="cl-message" name="message" rows={4} placeholder="Коротко о задаче" minLength={10} maxLength={2000} required />
+                <textarea
+                  id="cl-message"
+                  name="message"
+                  rows={4}
+                  placeholder="Коротко о задаче"
+                  minLength={10}
+                  maxLength={2000}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="text-base min-h-[48px]"
+                />
               </div>
               <div className={s.fieldHp} aria-hidden="true">
                 <label htmlFor="cl-company">Компания</label>
-                <input id="cl-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+                <input id="cl-company" name="company" type="text" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
               </div>
               <FormStatus
-                variant={formState === "success" ? "success" : formState === "error" ? "error" : "idle"}
-                message={statusMsg}
+                variant={status === "error" ? "error" : "idle"}
+                message={errorMessage}
               />
               <div className="flex flex-col sm:flex-row gap-3">
-                <button type="submit" className={`${s.btn} ${s.btnPrimary} ${s.pulse} flex-1`} disabled={formState === "loading"}>
-                  {formState === "loading" ? "Отправка…" : "Отправить заявку"}
+                <button
+                  type="submit"
+                  className={`${s.btn} ${s.btnPrimary} ${s.pulse} flex-1 min-h-[52px]`}
+                  disabled={status === "loading" || !canSubmit}
+                >
+                  {status === "loading" ? "Отправляю..." : "Отправить заявку"}
                 </button>
                 <TelegramLeadButton location="cases-form" />
               </div>
-              <p className={s.disclaimer}>Нажимая кнопку, вы соглашаетесь на обработку данных для обратной связи.</p>
+              <p className="form-disclaimer">
+                Нажимая кнопку, вы соглашаетесь с{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  политикой конфиденциальности
+                </a>
+              </p>
             </form>
           </div>
           <aside className={s.contacts}>

@@ -3,10 +3,10 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { trackCtaEvent } from "@/lib/analytics/cta";
-import { submitLead, collectUtm } from "@/lib/lead/submitLead";
+import { useLeadForm } from "@/hooks/useLeadForm";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/ui/scrollLock";
 import { TelegramLeadButton } from "./TelegramLeadButton";
 import { FormStatus } from "@/components/forms/FormStatus";
@@ -19,32 +19,48 @@ export function useLeadModal() {
   return useContext(LeadModalContext);
 }
 
-type Status = "idle" | "loading" | "success" | "error";
-
 export function LeadModalProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const submittedRef = useRef(false);
-  const [form, setForm] = useState({ name: "", contact: "", need: "", sphere: "", timeline: "", _hp: "" });
   const [context, setContext] = useState({ sourcePage: "", service: "" });
   const [showMore, setShowMore] = useState(false);
-  const router = useRouter();
+  const [need, setNeed] = useState("");
+  const [sphere, setSphere] = useState("");
+  const [timeline, setTimeline] = useState("");
+  const [hp, setHp] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
+
+  const pathname = usePathname();
+  const sourcePage = context.sourcePage || pathname || "/";
+
+  const {
+    name,
+    setName,
+    phone,
+    setPhone,
+    status,
+    errorMessage,
+    isValid,
+    handleSubmit,
+    reset,
+  } = useLeadForm({
+    source: "lead_modal",
+    onSuccess: () => {},
+  });
 
   useEffect(() => setMounted(true), []);
 
   const openModal = useCallback((payload?: { sourcePage?: string; service?: string }) => {
-    const sourcePage =
+    const sp =
       payload?.sourcePage ?? (typeof window !== "undefined" ? window.location.pathname : "");
-    setContext({ sourcePage, service: payload?.service ?? "" });
+    setContext({ sourcePage: sp, service: payload?.service ?? "" });
     setClosing(false);
     setOpen(true);
     trackCtaEvent({ action: "open-modal", label: "LeadModal", location: "global" });
   }, []);
+
   const closeModal = useCallback(() => {
     setClosing(true);
   }, []);
@@ -52,39 +68,14 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
   const handleExitComplete = useCallback(() => {
     setOpen(false);
     setClosing(false);
-    setTimeout(() => setStatus("idle"), 0);
-    setShowMore(false);
-  }, []);
-
-  const pathname = usePathname();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submittedRef.current) return;
-    submittedRef.current = true;
-    setStatus("loading");
-    setErrorMessage("");
-    trackCtaEvent({ action: "submit", label: "LeadModal", location: "modal" });
-    const result = await submitLead({
-      name: form.name,
-      contact: form.contact,
-      need: form.need,
-      sphere: form.sphere,
-      timeline: form.timeline,
-      sourcePage: context.sourcePage || pathname || "/",
-      formId: "lead_modal",
-      utm: collectUtm(),
-      _hp: form._hp,
-    });
-    if (result.ok) {
-      setStatus("success");
-      setForm({ name: "", contact: "", need: "", sphere: "", timeline: "", _hp: "" });
-    } else {
-      submittedRef.current = false;
-      setStatus("error");
-      setErrorMessage(result.message);
-    }
-  };
+    setTimeout(() => {
+      reset();
+      setNeed("");
+      setSphere("");
+      setTimeline("");
+      setShowMore(false);
+    }, 0);
+  }, [reset]);
 
   const visible = open || closing;
   useEffect(() => {
@@ -172,152 +163,168 @@ export function LeadModalProvider({ children }: { children: ReactNode }) {
           transition={{ duration: 0.2 }}
           onClick={(e) => e.stopPropagation()}
         >
-              <div className="flex items-center justify-between">
-                <h3 id="lead-modal-title" className="text-xl font-semibold text-[var(--text-primary)]">
-                  Получить план внедрения
-                </h3>
+          <div className="flex items-center justify-between">
+            <h3 id="lead-modal-title" className="text-xl font-semibold text-[var(--text-primary)]">
+              Получить план внедрения
+            </h3>
+            <button
+              type="button"
+              onClick={closeModal}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            Оставьте контакт — разберём задачу и предложим реалистичный план со сроками, стеком и ожидаемыми метриками.
+          </p>
+
+          {status === "success" ? (
+            <motion.div
+              className="mt-6 space-y-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <p className="text-[var(--accent-pink-strong)] font-medium">
+                ✅ Заявка отправлена!
+              </p>
+              <p className="text-sm text-[var(--text-secondary)]">
+                Мы напишем вам в ближайшее время. В течение рабочего дня напишем или позвоним. Пришлём MVP (рабочий прототип) за 24 часа и план внедрения.
+              </p>
+              <div className="flex gap-3 mt-4">
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="flex-1 rounded-lg border border-[var(--accent)]/40 py-2.5 text-sm font-medium text-[var(--accent)]"
+                >
+                  Отправить ещё
+                </button>
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                  aria-label="Закрыть"
+                  className="rounded-lg border border-white/20 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-white/5"
                 >
-                  ×
+                  Закрыть
                 </button>
               </div>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Оставьте контакт — разберём задачу и предложим реалистичный план со сроками, стеком и ожидаемыми метриками.
-              </p>
-
-              {status === "success" ? (
-                <motion.div
-                  className="mt-6 space-y-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <p className="text-[var(--accent-pink-strong)] font-medium">
-                    Спасибо! Мы свяжемся с вами в ближайшее время.
-                  </p>
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    В течение рабочего дня напишем или позвоним. Пришлём MVP (рабочий прототип) за 24 часа и план внедрения.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => router.push("/thank-you")}
-                    className="btn-glow mt-4 w-full rounded-lg border border-[var(--accent)]/40 py-2.5 text-sm font-medium text-[var(--accent)]"
-                  >
-                    Перейти на страницу «Спасибо»
-                  </button>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                  <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
-                  <div className="sr-only" aria-hidden>
-                    <label htmlFor="modal-hp">Не заполняйте</label>
-                    <input id="modal-hp" type="text" tabIndex={-1} autoComplete="off" value={form._hp} onChange={(e) => setForm((f) => ({ ...f, _hp: e.target.value }))} />
-                  </div>
-                  <input type="hidden" name="sourcePage" value={context.sourcePage} />
-                  <input type="hidden" name="service" value={context.service} />
-                  <div>
-                    <label htmlFor="modal-name" className="block text-sm font-medium text-[var(--text-secondary)]">
-                      Имя
-                    </label>
-                    <input
-                      id="modal-name"
-                      type="text"
-                      required
-                      value={form.name}
-                      onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                      placeholder="Как к вам обращаться"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="modal-contact" className="block text-sm font-medium text-[var(--text-secondary)]">
-                      Контакт (Telegram / почта / телефон)
-                    </label>
-                    <input
-                      id="modal-contact"
-                      type="text"
-                      required
-                      value={form.contact}
-                      onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-                      className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                      placeholder="@username или +7..."
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="modal-need" className="block text-sm font-medium text-[var(--text-secondary)]">
-                      Что нужно
-                    </label>
-                    <input
-                      id="modal-need"
-                      type="text"
-                      value={form.need}
-                      onChange={(e) => setForm((f) => ({ ...f, need: e.target.value }))}
-                      className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                      placeholder="Лендинг, бот, автоматизация..."
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowMore((v) => !v)}
-                    className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                  >
-                    {showMore ? "Скрыть доп. поля" : "Добавить детали (опционально)"}
-                  </button>
-                  {showMore && (
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="modal-sphere" className="block text-sm font-medium text-[var(--text-secondary)]">
-                          Сфера / ниша
-                        </label>
-                        <input
-                          id="modal-sphere"
-                          type="text"
-                          value={form.sphere}
-                          onChange={(e) => setForm((f) => ({ ...f, sphere: e.target.value }))}
-                          className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                          placeholder="E‑commerce, услуги, образование..."
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="modal-timeline" className="block text-sm font-medium text-[var(--text-secondary)]">
-                          Желаемые сроки
-                        </label>
-                        <input
-                          id="modal-timeline"
-                          type="text"
-                          value={form.timeline}
-                          onChange={(e) => setForm((f) => ({ ...f, timeline: e.target.value }))}
-                          className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
-                          placeholder="48–72 часа / 3–5 дней / 7–10 дней"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex flex-col gap-3 pt-2">
-                    <div className="flex gap-3">
-                      <button
-                        type="submit"
-                        disabled={status === "loading"}
-                        className="flex-1 rounded-lg bg-[var(--accent)] py-3 font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)] disabled:opacity-70"
-                      >
-                        {status === "loading" ? "Отправка…" : "Отправить"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="rounded-lg border border-white/20 px-4 py-3 text-[var(--text-secondary)] hover:bg-white/5"
-                      >
-                        Отмена
-                      </button>
-                    </div>
-                    <TelegramLeadButton location="lead-modal" variant="outline" />
-                  </div>
-                </form>
-              )}
             </motion.div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                trackCtaEvent({ action: "submit", label: "LeadModal", location: "modal" });
+                handleSubmit(e, {
+                  need,
+                  sphere: sphere || undefined,
+                  timeline: timeline || undefined,
+                  sourcePage,
+                  _hp: hp,
+                });
+              }}
+              className="mt-6 space-y-4"
+            >
+              <FormStatus variant={status === "error" ? "error" : "idle"} message={errorMessage} />
+              <div className="sr-only" aria-hidden>
+                <label htmlFor="modal-hp">Не заполняйте</label>
+                <input id="modal-hp" type="text" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+              </div>
+              <input type="hidden" name="sourcePage" value={context.sourcePage} />
+              <input type="hidden" name="service" value={context.service} />
+              <div>
+                <label htmlFor="modal-name" className="block text-sm font-medium text-[var(--text-secondary)]">
+                  Ваше имя
+                </label>
+                <input
+                  id="modal-name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  inputMode="text"
+                  autoComplete="name"
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
+                  placeholder="Иван"
+                />
+              </div>
+              <PhoneInput value={phone} onChange={setPhone} label="Телефон" id="modal-phone" />
+              <div>
+                <label htmlFor="modal-need" className="block text-sm font-medium text-[var(--text-secondary)]">
+                  Что нужно
+                </label>
+                <input
+                  id="modal-need"
+                  type="text"
+                  value={need}
+                  onChange={(e) => setNeed(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50 min-h-[48px]"
+                  placeholder="Лендинг, бот, автоматизация..."
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMore((v) => !v)}
+                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              >
+                {showMore ? "Скрыть доп. поля" : "Добавить детали (опционально)"}
+              </button>
+              {showMore && (
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="modal-sphere" className="block text-sm font-medium text-[var(--text-secondary)]">
+                      Сфера / ниша
+                    </label>
+                    <input
+                      id="modal-sphere"
+                      type="text"
+                      value={sphere}
+                      onChange={(e) => setSphere(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+                      placeholder="E‑commerce, услуги, образование..."
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="modal-timeline" className="block text-sm font-medium text-[var(--text-secondary)]">
+                      Желаемые сроки
+                    </label>
+                    <input
+                      id="modal-timeline"
+                      type="text"
+                      value={timeline}
+                      onChange={(e) => setTimeline(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-white/10 bg-[var(--bg-surface)] px-4 py-3 text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/50"
+                      placeholder="48–72 часа / 3–5 дней / 7–10 дней"
+                    />
+                  </div>
+                </div>
+              )}
+              <p className="form-disclaimer">
+                Нажимая кнопку, вы соглашаетесь с{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  политикой конфиденциальности
+                </a>
+              </p>
+              <div className="flex flex-col gap-3 pt-2">
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={status === "loading" || !isValid}
+                    className="flex-1 min-h-[52px] rounded-lg bg-[var(--accent)] py-3 font-semibold text-[#09040F] transition-colors hover:shadow-[0_0_20px_rgba(139,92,246,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {status === "loading" ? "Отправляю..." : "Отправить"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="rounded-lg border border-white/20 px-4 py-3 text-[var(--text-secondary)] hover:bg-white/5"
+                  >
+                    Отмена
+                  </button>
+                </div>
+                <TelegramLeadButton location="lead-modal" variant="outline" />
+              </div>
+            </form>
+          )}
+        </motion.div>
       </motion.div>
     ) : null;
 
