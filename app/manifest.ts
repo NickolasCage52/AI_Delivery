@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 
+/** Required for static export (output: export) — e.g. GitHub Pages */
+export const dynamic = "force-static";
+
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() ?? "";
 const startUrl = basePath ? `${basePath}/` : "/";
 
